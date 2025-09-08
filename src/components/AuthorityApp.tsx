@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '@/contexts/AppContext';
 import LoginScreen from '@/components/authority/LoginScreen';
-import DashboardScreen from '@/components/authority/DashboardScreen';
+import MapDashboard from '@/components/authority/MapDashboard';
 import VerificationScreen from '@/components/authority/VerificationScreen';
 import AlertsScreen from '@/components/authority/AlertsScreen';
 import EFirScreen from '@/components/authority/EFirScreen';
@@ -16,7 +16,7 @@ const AuthorityApp: React.FC = () => {
       case 'login':
         return <LoginScreen />;
       case 'dashboard':
-        return <DashboardScreen />;
+        return <MapDashboard />;
       case 'verification':
         return <VerificationScreen />;
       case 'alerts':
@@ -33,7 +33,7 @@ const AuthorityApp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-accent">
+    <div className="min-h-screen bg-background">
       {renderPage()}
     </div>
   );
