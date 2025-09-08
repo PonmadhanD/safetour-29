@@ -2,31 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tourist Safety App Design System - Northeast India
-Professional blue, teal, green, and white color scheme
+/* SafeTravel NE - Government-Grade Design System
+Deep Blue authority theme with warm yellow accents
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 210 15% 20%;
+    --background: 0 0% 96%;
+    --foreground: 210 100% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 15% 20%;
+    --card-foreground: 210 100% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 15% 20%;
+    --popover-foreground: 210 100% 10%;
 
-    /* Primary Blue - Professional and trustworthy */
-    --primary: 210 100% 45%;
+    /* Primary Deep Blue - Government authority and trust */
+    --primary: 210 100% 20%;
     --primary-foreground: 0 0% 100%;
     --primary-light: 210 100% 85%;
-    --primary-dark: 210 100% 35%;
+    --primary-dark: 210 100% 15%;
 
-    /* Secondary Teal - Calming and nature-inspired */
-    --secondary: 180 100% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-light: 180 100% 85%;
+    /* Secondary Warm Yellow - Tourism vibrancy */
+    --secondary: 51 100% 50%;
+    --secondary-foreground: 210 100% 15%;
+    --secondary-light: 51 100% 90%;
 
     /* Success Green - Safety and security */
     --success: 145 85% 45%;
@@ -38,13 +38,13 @@ Professional blue, teal, green, and white color scheme
     --emergency-foreground: 0 0% 100%;
     --emergency-light: 0 85% 95%;
 
-    /* Warning Amber - Caution */
-    --warning: 45 95% 55%;
+    /* Warning Orange - Caution */
+    --warning: 25 95% 55%;
     --warning-foreground: 0 0% 100%;
-    --warning-light: 45 95% 90%;
+    --warning-light: 25 95% 90%;
 
-    /* Neutral grays */
-    --muted: 210 15% 95%;
+    /* Neutral grays - Clean government aesthetic */
+    --muted: 210 15% 94%;
     --muted-foreground: 210 15% 45%;
     --accent: 210 15% 97%;
     --accent-foreground: 210 15% 25%;
@@ -52,28 +52,21 @@ Professional blue, teal, green, and white color scheme
     --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 15% 90%;
-    --input: 210 15% 96%;
-    --ring: 210 100% 45%;
+    --border: 210 15% 85%;
+    --input: 0 0% 100%;
+    --ring: 210 100% 20%;
 
-    --radius: 0.75rem;
-
-    /* Gradients for visual appeal */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--primary)));
-    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--secondary)));
-    --gradient-emergency: linear-gradient(135deg, hsl(var(--emergency)), hsl(var(--warning)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--success)) 100%);
+    --radius: 0.5rem;
     
-    /* Shadows for depth */
-    --shadow-sm: 0 2px 4px -1px hsl(var(--primary) / 0.1);
-    --shadow-md: 0 4px 12px -2px hsl(var(--primary) / 0.15);
-    --shadow-lg: 0 8px 24px -4px hsl(var(--primary) / 0.2);
+    /* Professional shadows - subtle and clean */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --shadow-emergency: 0 0 20px hsl(var(--emergency) / 0.3);
     
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Clean transitions */
+    --transition-smooth: all 0.2s ease-in-out;
+    --transition-bounce: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 

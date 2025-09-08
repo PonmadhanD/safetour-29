@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Eye, EyeOff, Lock, User } from 'lucide-react';
+import { Shield, Eye, EyeOff, Lock, User, Phone } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 const LoginScreen: React.FC = () => {
@@ -31,31 +31,31 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
+    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
-        <div className="text-center text-white space-y-4">
-          <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-            <Shield className="w-8 h-8" />
+        <div className="text-center text-primary-foreground space-y-4">
+          <div className="mx-auto w-16 h-16 bg-secondary rounded-full flex items-center justify-center shadow-lg">
+            <Shield className="w-8 h-8 text-secondary-foreground" />
           </div>
           <div>
             <h1 className="text-3xl font-bold">Authority Portal</h1>
-            <p className="text-white/90">Northeast India Tourism Safety</p>
+            <p className="text-primary-foreground/90">Government of India • Tourism Safety</p>
           </div>
         </div>
 
         {/* Login Card */}
-        <Card className="bg-white/95 backdrop-blur shadow-2xl">
+        <Card className="bg-card shadow-lg border-0">
           <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
+            <CardTitle className="flex items-center justify-center gap-2 text-xl">
               <Lock className="w-5 h-5 text-primary" />
-              Secure Login
+              Secure Access
             </CardTitle>
-            <div className="flex justify-center gap-2 mt-2">
-              <Badge variant="outline" className="bg-primary-light text-primary">
-                Police
+            <div className="flex justify-center gap-2 mt-3">
+              <Badge variant="outline" className="border-primary text-primary">
+                Police Department
               </Badge>
-              <Badge variant="outline" className="bg-secondary-light text-secondary">
+              <Badge variant="outline" className="border-secondary text-secondary-foreground bg-secondary/10">
                 Emergency Services
               </Badge>
             </div>
@@ -101,13 +101,12 @@ const LoginScreen: React.FC = () => {
 
             <div className="space-y-4 pt-2">
               <Button
-                variant="hero"
+                className="w-full bg-primary hover:bg-primary-dark text-primary-foreground"
                 size="lg"
-                className="w-full"
                 onClick={handleLogin}
               >
                 <Shield className="w-4 h-4 mr-2" />
-                Login to Dashboard
+                Access Dashboard
               </Button>
               
               <div className="text-center">
@@ -120,24 +119,26 @@ const LoginScreen: React.FC = () => {
         </Card>
 
         {/* Quick Access */}
-        <Card className="bg-white/10 backdrop-blur border-white/20 text-white">
+        <Card className="bg-card/50 border-primary/20">
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-3">Quick Access</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="glass" size="sm" className="justify-start">
-                Emergency Hotline
+            <h3 className="font-semibold mb-3 text-foreground">Emergency Access</h3>
+            <div className="grid grid-cols-1 gap-2">
+              <Button variant="outline" size="sm" className="justify-start text-primary border-primary">
+                <Phone className="w-4 h-4 mr-2" />
+                Emergency Hotline: 100
               </Button>
-              <Button variant="glass" size="sm" className="justify-start">
-                Command Center
+              <Button variant="outline" size="sm" className="justify-start text-primary border-primary">
+                <Shield className="w-4 h-4 mr-2" />
+                Tourist Helpline: 1363
               </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Footer */}
-        <div className="text-center text-white/60 text-sm">
-          <p>Government of India • Ministry of Tourism</p>
-          <p>Secure Access Portal v2.1</p>
+        <div className="text-center text-primary-foreground/70 text-sm">
+          <p className="font-medium">Government of India • Ministry of Tourism</p>
+          <p>Secure Access Portal v3.0 • Northeast Region</p>
         </div>
       </div>
     </div>

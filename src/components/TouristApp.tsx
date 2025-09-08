@@ -3,12 +3,13 @@ import { useApp } from '@/contexts/AppContext';
 import SplashScreen from '@/components/tourist/SplashScreen';
 import OnboardingScreen from '@/components/tourist/OnboardingScreen';
 import DigitalIdScreen from '@/components/tourist/DigitalIdScreen';
-import HomeScreen from '@/components/tourist/HomeScreen';
+import MapScreen from '@/components/tourist/MapScreen';
 import ZonesScreen from '@/components/tourist/ZonesScreen';
 import RoutesScreen from '@/components/tourist/RoutesScreen';
 import PanicScreen from '@/components/tourist/PanicScreen';
 import HistoryScreen from '@/components/tourist/HistoryScreen';
 import SettingsScreen from '@/components/tourist/SettingsScreen';
+import BottomNavigation from '@/components/tourist/BottomNavigation';
 
 const TouristApp: React.FC = () => {
   const { touristPage } = useApp();
@@ -22,7 +23,7 @@ const TouristApp: React.FC = () => {
       case 'digitalId':
         return <DigitalIdScreen />;
       case 'home':
-        return <HomeScreen />;
+        return <MapScreen />;
       case 'zones':
         return <ZonesScreen />;
       case 'routes':
@@ -38,10 +39,15 @@ const TouristApp: React.FC = () => {
     }
   };
 
+  const showBottomNav = ['digitalId', 'history', 'home', 'settings'].includes(touristPage);
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-md bg-white shadow-lg min-h-screen">
-        {renderPage()}
+      <div className="mx-auto max-w-md bg-card shadow-lg min-h-screen relative">
+        <div className={showBottomNav ? 'pb-16' : ''}>
+          {renderPage()}
+        </div>
+        {showBottomNav && <BottomNavigation />}
       </div>
     </div>
   );
