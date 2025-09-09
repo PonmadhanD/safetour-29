@@ -1,11 +1,54 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.heat';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Phone, Shield, MapPin, AlertTriangle, Locate, RefreshCw } from 'lucide-react';
 import { Tourist, Zone, SafeRoute, Alert as AppAlert } from '@/types';
-import 'mapbox-gl/dist/mapbox-gl.css';
+
+// Import mock data
+import safeZonesData from '@/mockData/safeZones.json';
+import safeRoutesData from '@/mockData/safeRoutes.json';
+import touristsData from '@/mockData/tourists.json';
+
+// Fix Leaflet default marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom marker icons
+const createCustomIcon = (color: string, size: [number, number] = [25, 41]) => {
+  return L.divIcon({
+    className: 'custom-div-icon',
+    html: `<div style="
+      background-color: ${color};
+      width: ${size[0]}px;
+      height: ${size[1]}px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    "></div>`,
+    iconSize: size,
+    iconAnchor: [size[0] / 2, size[1]],
+    popupAnchor: [0, -size[1]]
+  });
+};
+
+const safeZoneIcon = createCustomIcon('#10b981'); // green
+const cautionZoneIcon = createCustomIcon('#f59e0b'); // orange
+const dangerZoneIcon = createCustomIcon('#ef4444'); // red
+const touristSafeIcon = createCustomIcon('#3b82f6', [20, 32]); // blue
+const touristAlertIcon = createCustomIcon('#f59e0b', [20, 32]); // orange
+const touristEmergencyIcon = createCustomIcon('#ef4444', [20, 32]); // red
+const waypointIcon = createCustomIcon('#6366f1', [15, 24]); // indigo
 
 interface MapViewProps {
   mode: 'tourist' | 'authority';
@@ -19,184 +62,93 @@ interface MapViewProps {
   className?: string;
 }
 
-interface ViewState {
-  longitude: number;
-  latitude: number;
-  zoom: number;
-  bearing?: number;
-  pitch?: number;
-}
+// HeatMap component for tourist density
+const HeatmapLayer: React.FC<{ tourists: Tourist[] }> = ({ tourists }) => {
+  const mapRef = useRef<any>(null);
 
-// Mock data for demonstration
-const mockZones: Zone[] = [
-  {
-    id: '1',
-    name: 'Shillong Safe Zone',
-    description: 'Main tourist area with high security',
-    category: 'tourist',
-    safetyLevel: 'high',
-    location: { lat: 25.5788, lng: 91.8933, address: 'Police Bazar, Shillong' },
-    features: ['24/7 Security', 'Tourist Police', 'Emergency Services'],
-    bestTime: 'All day',
-    guidelines: ['Stay in groups', 'Keep ID ready'],
-    emergencyContacts: ['+91-364-2222222']
-  }
-];
+  useEffect(() => {
+    if (mapRef.current && tourists.length > 0) {
+      const map = mapRef.current;
+      
+      // Create heat map data points
+      const heatData = tourists
+        .filter(tourist => tourist.currentLocation)
+        .map(tourist => [
+          tourist.currentLocation!.lat,
+          tourist.currentLocation!.lng,
+          tourist.status === 'emergency' ? 1.0 : tourist.status === 'alert' ? 0.7 : 0.5
+        ]);
 
-const mockRoutes: SafeRoute[] = [
-  {
-    id: '1',
-    name: 'Shillong to Cherrapunji Safe Route',
-    from: 'Shillong',
-    to: 'Cherrapunji',
-    distance: '54 km',
-    duration: '1.5 hours',
-    safetyRating: 4.5,
-    waypoints: [
-      { lat: 25.5788, lng: 91.8933, name: 'Shillong Start', type: 'checkpoint' },
-      { lat: 25.2993, lng: 91.7362, name: 'Cherrapunji', type: 'checkpoint' }
-    ],
-    warnings: ['Check weather conditions'],
-    lastUpdated: '2024-01-08'
-  }
-];
+      if (heatData.length > 0 && (window as any).L && (window as any).L.heatLayer) {
+        const heat = (window as any).L.heatLayer(heatData, {
+          radius: 20,
+          blur: 15,
+          maxZoom: 17,
+          gradient: {
+            0.0: '#10b981', // green
+            0.5: '#f59e0b', // orange
+            1.0: '#ef4444'  // red
+          }
+        }).addTo(map);
+
+        return () => {
+          if (map.hasLayer(heat)) {
+            map.removeLayer(heat);
+          }
+        };
+      }
+    }
+  }, [tourists]);
+
+  return null;
+};
 
 const MapView: React.FC<MapViewProps> = ({
   mode,
-  tourists = [],
-  zones = mockZones,
-  routes = mockRoutes,
+  tourists = touristsData as Tourist[],
+  zones = safeZonesData as Zone[],
+  routes = safeRoutesData as SafeRoute[],
   alerts = [],
   onPanicAlert,
   onTouristSelect,
   showPanicButton = true,
   className = ''
 }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<any>(null);
-  const [viewState, setViewState] = useState<ViewState>({
-    longitude: 91.8933,
-    latitude: 25.5788,
-    zoom: 12,
-    bearing: 0,
-    pitch: 0
-  });
-  const [mapboxToken, setMapboxToken] = useState('');
+  const mapRef = useRef<any>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isTracking, setIsTracking] = useState(false);
 
+  // Load heatmap script
   useEffect(() => {
-    // For demo purposes - in production this would come from environment variables
-    const token = prompt('Enter your Mapbox public token (get from https://mapbox.com/):');
-    if (token) {
-      setMapboxToken(token);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!mapRef.current || !mapboxToken) return;
-
-    // Initialize Mapbox map
     const script = document.createElement('script');
-    script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
-    script.onload = () => {
-      const link = document.createElement('link');
-      link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
-      link.rel = 'stylesheet';
-      document.head.appendChild(link);
-
-      // @ts-ignore
-      mapboxgl.accessToken = mapboxToken;
-      
-      // @ts-ignore
-      mapInstance.current = new mapboxgl.Map({
-        container: mapRef.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [viewState.longitude, viewState.latitude],
-        zoom: viewState.zoom
-      });
-
-      // @ts-ignore
-      mapInstance.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-      // Add zone markers
-      zones.forEach(zone => {
-        const el = document.createElement('div');
-        el.className = `w-6 h-6 rounded-full border-2 border-white shadow-lg cursor-pointer ${
-          zone.safetyLevel === 'high' ? 'bg-success' :
-          zone.safetyLevel === 'medium' ? 'bg-warning' : 'bg-emergency'
-        }`;
-        
-        // @ts-ignore
-        new mapboxgl.Marker(el)
-          .setLngLat([zone.location.lng, zone.location.lat])
-          // @ts-ignore
-          .setPopup(new mapboxgl.Popup().setHTML(`
-            <div class="p-2">
-              <h3 class="font-semibold">${zone.name}</h3>
-              <p class="text-sm text-gray-600">${zone.description}</p>
-            </div>
-          `))
-          .addTo(mapInstance.current);
-      });
-
-      // Add route waypoints
-      routes.forEach(route => {
-        route.waypoints.forEach((waypoint, index) => {
-          const el = document.createElement('div');
-          el.className = `w-5 h-5 rounded-full border-2 border-white shadow-lg cursor-pointer ${
-            waypoint.type === 'emergency' ? 'bg-emergency' :
-            waypoint.type === 'checkpoint' ? 'bg-success' : 'bg-primary'
-          }`;
-          
-          // @ts-ignore
-          new mapboxgl.Marker(el)
-            .setLngLat([waypoint.lng, waypoint.lat])
-            // @ts-ignore
-            .setPopup(new mapboxgl.Popup().setHTML(`
-              <div class="p-2">
-                <h3 class="font-semibold">${waypoint.name}</h3>
-                <p class="text-sm text-gray-600 capitalize">${waypoint.type}</p>
-              </div>
-            `))
-            .addTo(mapInstance.current);
-        });
-      });
-
-      // Add tourist markers for authority mode
-      if (mode === 'authority') {
-        tourists.forEach(tourist => {
-          if (tourist.currentLocation) {
-            const el = document.createElement('div');
-            el.className = `w-6 h-6 rounded-full border-2 border-white shadow-lg cursor-pointer ${
-              tourist.status === 'safe' ? 'bg-success' :
-              tourist.status === 'alert' ? 'bg-warning' : 'bg-emergency'
-            }`;
-            el.onclick = () => onTouristSelect?.(tourist);
-            
-            // @ts-ignore
-            new mapboxgl.Marker(el)
-              .setLngLat([tourist.currentLocation.lng, tourist.currentLocation.lat])
-              // @ts-ignore
-              .setPopup(new mapboxgl.Popup().setHTML(`
-                <div class="p-2">
-                  <h3 class="font-semibold">${tourist.name}</h3>
-                  <p class="text-sm text-gray-600">Status: ${tourist.status}</p>
-                  <p class="text-sm text-gray-600">ID: ${tourist.digitalId}</p>
-                </div>
-              `))
-              .addTo(mapInstance.current);
-          }
-        });
-      }
-    };
+    script.src = 'https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js';
     document.head.appendChild(script);
 
     return () => {
-      mapInstance.current?.remove();
+      document.head.removeChild(script);
     };
-  }, [mapboxToken, mode, tourists, zones, routes, onTouristSelect]);
+  }, []);
+
+  // Get zone color based on safety level
+  const getZoneColor = (safetyLevel: string) => {
+    switch (safetyLevel) {
+      case 'high': return '#10b981'; // green
+      case 'medium': return '#f59e0b'; // orange
+      case 'low': return '#ef4444'; // red
+      default: return '#6b7280'; // gray
+    }
+  };
+
+  // Get tourist marker icon based on status
+  const getTouristIcon = (status: string) => {
+    switch (status) {
+      case 'safe': return touristSafeIcon;
+      case 'alert': return touristAlertIcon;
+      case 'emergency': return touristEmergencyIcon;
+      default: return touristSafeIcon;
+    }
+  };
 
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -210,20 +162,8 @@ const MapView: React.FC<MapViewProps> = ({
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
         
-        if (mapInstance.current) {
-          mapInstance.current.flyTo({
-            center: [longitude, latitude],
-            zoom: 15
-          });
-
-          // Add user location marker
-          const el = document.createElement('div');
-          el.className = 'w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg animate-pulse';
-          
-          // @ts-ignore
-          new mapboxgl.Marker(el)
-            .setLngLat([longitude, latitude])
-            .addTo(mapInstance.current);
+        if (mapRef.current) {
+          mapRef.current.setView([latitude, longitude], 15);
         }
         
         setLocationError(null);
@@ -237,46 +177,133 @@ const MapView: React.FC<MapViewProps> = ({
     );
   }, []);
 
-  if (!mapboxToken) {
-    return (
-      <div className={`flex items-center justify-center bg-muted rounded-lg h-96 ${className}`}>
-        <div className="text-center p-6">
-          <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Mapbox Token Required</h3>
-          <p className="text-muted-foreground mb-4">
-            Please refresh and enter your Mapbox public token to view the map.
-          </p>
-          <Button onClick={() => window.location.reload()}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Reload Page
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={`relative ${className}`}>
       {/* Location Error Alert */}
       {locationError && (
-        <Alert className="absolute top-4 left-4 right-4 z-20 bg-card">
+        <Alert className="absolute top-4 left-4 right-4 z-[1000] bg-card">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{locationError}</AlertDescription>
         </Alert>
       )}
 
       {/* Map Container */}
-      <div 
-        ref={mapRef} 
-        className="w-full h-full rounded-lg"
-        style={{ minHeight: '400px' }}
-      />
+      <MapContainer
+        center={[25.5788, 91.8933]}
+        zoom={12}
+        ref={mapRef}
+        className={`w-full h-full rounded-lg ${className}`}
+        style={{ minHeight: '400px', zIndex: 1 }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {/* Safe Zones as Polygons */}
+        {zones.map((zone: any) => (
+          <Polygon
+            key={zone.id}
+            positions={zone.coordinates}
+            color={getZoneColor(zone.safetyLevel)}
+            fillColor={getZoneColor(zone.safetyLevel)}
+            fillOpacity={0.3}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold">{zone.name}</h3>
+                <p className="text-sm text-gray-600">{zone.description}</p>
+                <p className="text-xs text-gray-500 mt-1">Safety: {zone.safetyLevel}</p>
+              </div>
+            </Popup>
+          </Polygon>
+        ))}
+
+        {/* Safe Routes as Polylines */}
+        {routes.map((route: any) => (
+          <Polyline
+            key={route.id}
+            positions={route.coordinates}
+            color="#003366"
+            weight={4}
+            opacity={0.8}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold">{route.name}</h3>
+                <p className="text-sm text-gray-600">{route.from} → {route.to}</p>
+                <p className="text-xs text-gray-500">Distance: {route.distance}</p>
+                <p className="text-xs text-gray-500">Duration: {route.duration}</p>
+              </div>
+            </Popup>
+          </Polyline>
+        ))}
+
+        {/* Route Waypoints */}
+        {routes.map((route: any) =>
+          route.waypoints.map((waypoint: any, index: number) => (
+            <Marker
+              key={`${route.id}-waypoint-${index}`}
+              position={[waypoint.lat, waypoint.lng]}
+              icon={waypointIcon}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-semibold">{waypoint.name}</h3>
+                  <p className="text-sm text-gray-600 capitalize">{waypoint.type}</p>
+                </div>
+              </Popup>
+            </Marker>
+          ))
+        )}
+
+        {/* Tourists (Authority Mode) */}
+        {mode === 'authority' && tourists.map((tourist) => 
+          tourist.currentLocation ? (
+            <Marker
+              key={tourist.id}
+              position={[tourist.currentLocation.lat, tourist.currentLocation.lng]}
+              icon={getTouristIcon(tourist.status)}
+              eventHandlers={{
+                click: () => onTouristSelect?.(tourist)
+              }}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-semibold">{tourist.name}</h3>
+                  <p className="text-sm text-gray-600">Status: {tourist.status}</p>
+                  <p className="text-sm text-gray-600">ID: {tourist.digitalId}</p>
+                  <p className="text-xs text-gray-500">{tourist.currentLocation.address}</p>
+                </div>
+              </Popup>
+            </Marker>
+          ) : null
+        )}
+
+        {/* User Location Marker */}
+        {userLocation && (
+          <Marker
+            position={[userLocation.lat, userLocation.lng]}
+            icon={createCustomIcon('#3b82f6', [15, 24])}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold">Your Location</h3>
+                <p className="text-sm text-gray-600">Current position</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Heatmap Layer for Tourist Density */}
+        {mode === 'authority' && <HeatmapLayer tourists={tourists} />}
+      </MapContainer>
 
       {/* Panic Button (Tourist Mode) */}
       {mode === 'tourist' && showPanicButton && (
         <Button
           onClick={onPanicAlert}
-          className="absolute bottom-6 right-6 w-16 h-16 rounded-full bg-emergency hover:bg-emergency/90 text-emergency-foreground shadow-emergency animate-pulse-emergency"
+          className="absolute bottom-6 right-6 w-16 h-16 rounded-full bg-emergency hover:bg-emergency/90 text-emergency-foreground shadow-lg z-[1000] animate-pulse"
           size="icon"
         >
           <Phone className="w-8 h-8" />
@@ -287,7 +314,7 @@ const MapView: React.FC<MapViewProps> = ({
       <Button
         onClick={getCurrentLocation}
         disabled={isTracking}
-        className="absolute bottom-6 left-6 w-12 h-12 rounded-full bg-card border shadow-md"
+        className="absolute bottom-6 left-6 w-12 h-12 rounded-full bg-card border shadow-md z-[1000]"
         variant="outline"
         size="icon"
       >
@@ -299,20 +326,20 @@ const MapView: React.FC<MapViewProps> = ({
       </Button>
 
       {/* Map Legend (Bottom Center) */}
-      <Card className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur">
+      <Card className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur z-[1000]">
         <CardContent className="p-3">
           <div className="flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-success rounded" />
+              <div className="w-3 h-3" style={{ backgroundColor: '#10b981' }} />
               <span>Safe Zone</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-1 bg-primary rounded" />
+              <div className="w-3 h-1" style={{ backgroundColor: '#003366' }} />
               <span>Safe Route</span>
             </div>
             {mode === 'authority' && (
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-primary rounded-full" />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3b82f6' }} />
                 <span>Tourist</span>
               </div>
             )}

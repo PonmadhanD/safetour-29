@@ -4,30 +4,111 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Eye, EyeOff, Lock, User, Phone } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Shield, Eye, EyeOff, Lock, User, Phone, AlertTriangle } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const LoginScreen: React.FC = () => {
   const { setAuthorityPage, setCurrentAuthority } = useApp();
   const [formData, setFormData] = useState({
-    badgeId: '',
+    email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = () => {
-    const authority = {
-      id: 'auth_' + Date.now(),
-      name: 'Officer Rajesh Kumar',
-      email: 'rajesh.kumar@nepd.gov.in',
-      role: 'officer' as const,
-      department: 'Northeast Police Department',
-      badge: formData.badgeId || 'NE-2024-001',
-      permissions: ['view_tourists', 'create_efir', 'send_alerts', 'verify_ids']
-    };
-    
-    setCurrentAuthority(authority);
-    setAuthorityPage('dashboard');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please try again.');
+        } else if (authError.message.includes('Email not confirmed')) {
+          setError('Please check your email and confirm your account before signing in.');
+        } else {
+          setError(authError.message);
+        }
+        return;
+      }
+
+      if (data.user) {
+        // Create authority profile from user data
+        const authority = {
+          id: data.user.id,
+          name: data.user.user_metadata?.full_name || 'Authority User',
+          email: data.user.email || '',
+          role: 'officer' as const,
+          department: 'Northeast Police Department',
+          badge: data.user.user_metadata?.badge_id || 'NE-2024-001',
+          permissions: ['view_tourists', 'create_efir', 'send_alerts', 'verify_ids']
+        };
+        
+        setCurrentAuthority(authority);
+        setAuthorityPage('dashboard');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: 'Authority User',
+            badge_id: 'NE-2024-001'
+          }
+        }
+      });
+
+      if (signUpError) {
+        if (signUpError.message.includes('already registered')) {
+          setError('An account with this email already exists. Please sign in instead.');
+        } else {
+          setError(signUpError.message);
+        }
+        return;
+      }
+
+      if (data.user) {
+        setError('Account created successfully! Please check your email to confirm your account, then sign in.');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred during sign up. Please try again.');
+      console.error('Sign up error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -61,60 +142,81 @@ const LoginScreen: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="badge-id">Badge ID / Employee ID</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="badge-id"
-                  value={formData.badgeId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, badgeId: e.target.value }))}
-                  placeholder="Enter your badge ID"
-                  className="pl-10"
-                />
-              </div>
-            </div>
+            {error && (
+              <Alert className="border-destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  placeholder="Enter your password"
-                  className="pl-10 pr-10"
-                />
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Official Email</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter your official email"
+                    className="pl-10"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="Enter your password"
+                    className="pl-10 pr-10"
+                    disabled={isLoading}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <Button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                  size="lg"
+                  disabled={isLoading}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  {isLoading ? 'Signing In...' : 'Access Dashboard'}
+                </Button>
+                
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1 h-8 w-8"
-                  onClick={() => setShowPassword(!showPassword)}
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                  onClick={handleSignUp}
+                  disabled={isLoading}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {isLoading ? 'Creating Account...' : 'Create Authority Account'}
                 </Button>
               </div>
-            </div>
-
-            <div className="space-y-4 pt-2">
-              <Button
-                className="w-full bg-primary hover:bg-primary-dark text-primary-foreground"
-                size="lg"
-                onClick={handleLogin}
-              >
-                <Shield className="w-4 h-4 mr-2" />
-                Access Dashboard
-              </Button>
-              
-              <div className="text-center">
-                <Button variant="link" className="text-muted-foreground">
-                  Forgot Password?
-                </Button>
-              </div>
-            </div>
+            </form>
           </CardContent>
         </Card>
 

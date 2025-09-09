@@ -1,0 +1,78 @@
+[
+  {
+    "id": "route_1",
+    "name": "Shillong to Cherrapunji Safe Route",
+    "from": "Shillong",
+    "to": "Cherrapunji",
+    "distance": "54 km",
+    "duration": "1.5 hours",
+    "safetyRating": 4.5,
+    "coordinates": [
+      [91.8933, 25.5788],
+      [91.8700, 25.5500],
+      [91.8400, 25.5200],
+      [91.8000, 25.4800],
+      [91.7600, 25.4200],
+      [91.7362, 25.2993]
+    ],
+    "waypoints": [
+      { "lat": 25.5788, "lng": 91.8933, "name": "Shillong Start", "type": "checkpoint" },
+      { "lat": 25.5500, "lng": 91.8700, "name": "Mawkdok Checkpoint", "type": "checkpoint" },
+      { "lat": 25.4200, "lng": 91.7600, "name": "Mawsynram Junction", "type": "landmark" },
+      { "lat": 25.2993, "lng": 91.7362, "name": "Cherrapunji", "type": "checkpoint" }
+    ],
+    "warnings": ["Check weather conditions", "Monsoon restrictions apply"],
+    "lastUpdated": "2024-01-08"
+  },
+  {
+    "id": "route_2",
+    "name": "Guwahati to Shillong Highway",
+    "from": "Guwahati",
+    "to": "Shillong",
+    "distance": "104 km",
+    "duration": "2.5 hours",
+    "safetyRating": 4.8,
+    "coordinates": [
+      [91.7458, 26.1844],
+      [91.7800, 26.1200],
+      [91.8200, 26.0400],
+      [91.8500, 25.9600],
+      [91.8700, 25.8800],
+      [91.8800, 25.7800],
+      [91.8900, 25.6800],
+      [91.8933, 25.5788]
+    ],
+    "waypoints": [
+      { "lat": 26.1844, "lng": 91.7458, "name": "Guwahati Start", "type": "checkpoint" },
+      { "lat": 26.0400, "lng": 91.8200, "name": "Jorabat Checkpoint", "type": "checkpoint" },
+      { "lat": 25.9600, "lng": 91.8500, "name": "Ri Bhoi Border", "type": "checkpoint" },
+      { "lat": 25.7800, "lng": 91.8800, "name": "Nongpoh", "type": "landmark" },
+      { "lat": 25.5788, "lng": 91.8933, "name": "Shillong", "type": "checkpoint" }
+    ],
+    "warnings": ["Heavy traffic during peak hours", "Fog in winter mornings"],
+    "lastUpdated": "2024-01-08"
+  },
+  {
+    "id": "route_3",
+    "name": "Shillong City Circuit",
+    "from": "Police Bazar",
+    "to": "Ward's Lake",
+    "distance": "5 km",
+    "duration": "20 minutes",
+    "safetyRating": 4.9,
+    "coordinates": [
+      [91.8933, 25.5788],
+      [91.8950, 25.5750],
+      [91.8980, 25.5720],
+      [91.9000, 25.5700],
+      [91.9020, 25.5680]
+    ],
+    "waypoints": [
+      { "lat": 25.5788, "lng": 91.8933, "name": "Police Bazar", "type": "checkpoint" },
+      { "lat": 25.5750, "lng": 91.8950, "name": "Laitumkhrah", "type": "landmark" },
+      { "lat": 25.5680, "lng": 91.9020, "name": "Ward's Lake", "type": "checkpoint" }
+    ],
+    "warnings": ["Parking limited near Ward's Lake"],
+    "lastUpdated": "2024-01-08"
+  }
+]

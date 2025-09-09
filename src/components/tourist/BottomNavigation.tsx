@@ -5,23 +5,22 @@ import { useApp } from '@/contexts/AppContext';
 import { TouristPage } from '@/types';
 
 const BottomNavigation: React.FC = () => {
-  const { touristPage, setTouristPage } = useApp();
+  const { touristPage, setTouristPage, currentTourist } = useApp();
 
-  const navItems: Array<{
-    id: TouristPage;
-    label: string;
-    icon: React.ComponentType<{ className?: string }>;
-  }> = [
-    { id: 'digitalId', label: 'ID', icon: Badge },
-    { id: 'history', label: 'History', icon: Clock },
-    { id: 'home', label: 'Map', icon: MapPin },
-    { id: 'settings', label: 'Settings', icon: Settings }
-  ];
+  // Show ID tab only if user is not logged in or not verified
+  const showIdTab = !currentTourist || !currentTourist.isVerified;
+
+  const navItems = [
+    { id: 'digitalId' as TouristPage, label: 'ID', icon: CreditCard, show: showIdTab },
+    { id: 'history' as TouristPage, label: 'History', icon: Clock, show: true },
+    { id: 'home' as TouristPage, label: 'Map', icon: MapPin, show: true },
+    { id: 'settings' as TouristPage, label: 'Settings', icon: Settings, show: true }
+  ].filter(item => item.show);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
       <div className="max-w-md mx-auto">
-        <div className="grid grid-cols-4 gap-0">
+        <div className={`grid gap-0 ${navItems.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = touristPage === item.id;

@@ -1,0 +1,94 @@
+[
+  {
+    "id": "zone_1",
+    "name": "Shillong Safe Zone",
+    "description": "Main tourist area with high security",
+    "category": "tourist",
+    "safetyLevel": "high",
+    "location": {
+      "lat": 25.5788,
+      "lng": 91.8933,
+      "address": "Police Bazar, Shillong"
+    },
+    "coordinates": [
+      [91.8900, 25.5800],
+      [91.8950, 25.5800],
+      [91.8950, 25.5750],
+      [91.8900, 25.5750],
+      [91.8900, 25.5800]
+    ],
+    "features": ["24/7 Security", "Tourist Police", "Emergency Services"],
+    "bestTime": "All day",
+    "guidelines": ["Stay in groups", "Keep ID ready"],
+    "emergencyContacts": ["+91-364-2222222"]
+  },
+  {
+    "id": "zone_2",
+    "name": "Cherrapunji Tourist Area",
+    "description": "Popular waterfall destination with moderate safety",
+    "category": "nature",
+    "safetyLevel": "medium",
+    "location": {
+      "lat": 25.2993,
+      "lng": 91.7362,
+      "address": "Sohra, Cherrapunji"
+    },
+    "coordinates": [
+      [91.7300, 25.3050],
+      [91.7400, 25.3050],
+      [91.7400, 25.2950],
+      [91.7300, 25.2950],
+      [91.7300, 25.3050]
+    ],
+    "features": ["Tourist Guide Available", "Emergency Contact Points"],
+    "bestTime": "9 AM - 5 PM",
+    "guidelines": ["Weather dependent", "Monsoon restrictions"],
+    "emergencyContacts": ["+91-364-2333333"]
+  },
+  {
+    "id": "zone_3",
+    "name": "Guwahati Railway Station",
+    "description": "Major transport hub with enhanced security",
+    "category": "cultural",
+    "safetyLevel": "high",
+    "location": {
+      "lat": 26.1844,
+      "lng": 91.7458,
+      "address": "Guwahati Railway Station"
+    },
+    "coordinates": [
+      [91.7400, 26.1880],
+      [91.7500, 26.1880],
+      [91.7500, 26.1800],
+      [91.7400, 26.1800],
+      [91.7400, 26.1880]
+    ],
+    "features": ["Railway Police", "Medical Facility", "Tourist Information"],
+    "bestTime": "All day",
+    "guidelines": ["Keep tickets safe", "Report suspicious activity"],
+    "emergencyContacts": ["+91-361-2444444"]
+  },
+  {
+    "id": "zone_4",
+    "name": "Remote Hill Area",
+    "description": "Beautiful but isolated area requiring caution",
+    "category": "adventure",
+    "safetyLevel": "low",
+    "location": {
+      "lat": 25.4500,
+      "lng": 91.9500,
+      "address": "Remote Hills, East Khasi"
+    },
+    "coordinates": [
+      [91.9450, 25.4550],
+      [91.9550, 25.4550],
+      [91.9550, 25.4450],
+      [91.9450, 25.4450],
+      [91.9450, 25.4550]
+    ],
+    "features": ["Local Guide Required", "Limited Connectivity"],
+    "bestTime": "10 AM - 4 PM",
+    "guidelines": ["Travel in groups", "Inform local authorities", "Carry emergency supplies"],
+    "emergencyContacts": ["+91-364-2555555"]
+  }
+]

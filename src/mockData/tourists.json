@@ -1,0 +1,152 @@
+[
+  {
+    "id": "tourist_1",
+    "name": "Priya Sharma",
+    "email": "priya.sharma@gmail.com",
+    "phone": "+91-9876543210",
+    "digitalId": "NE-DID-2024-001",
+    "isVerified": true,
+    "currentLocation": {
+      "lat": 25.5788,
+      "lng": 91.8933,
+      "address": "Police Bazar, Shillong"
+    },
+    "emergencyContacts": [
+      {
+        "id": "ec_1",
+        "name": "Rajesh Sharma",
+        "relationship": "Father",
+        "phone": "+91-9876543211",
+        "isPrimary": true
+      }
+    ],
+    "travelHistory": [],
+    "status": "safe",
+    "lastActive": "2024-01-08T10:30:00Z"
+  },
+  {
+    "id": "tourist_2",
+    "name": "John Miller",
+    "email": "john.miller@email.com",
+    "phone": "+91-8765432109",
+    "digitalId": "NE-DID-2024-002",
+    "isVerified": true,
+    "currentLocation": {
+      "lat": 25.2993,
+      "lng": 91.7362,
+      "address": "Cherrapunji, Meghalaya"
+    },
+    "emergencyContacts": [
+      {
+        "id": "ec_2",
+        "name": "Sarah Miller",
+        "relationship": "Wife",
+        "phone": "+91-8765432110",
+        "isPrimary": true
+      }
+    ],
+    "travelHistory": [],
+    "status": "safe",
+    "lastActive": "2024-01-08T11:15:00Z"
+  },
+  {
+    "id": "tourist_3",
+    "name": "Ankit Kumar",
+    "email": "ankit.kumar@yahoo.com",
+    "phone": "+91-7654321098",
+    "digitalId": "NE-DID-2024-003",
+    "isVerified": false,
+    "currentLocation": {
+      "lat": 26.1844,
+      "lng": 91.7458,
+      "address": "Guwahati Railway Station"
+    },
+    "emergencyContacts": [
+      {
+        "id": "ec_3",
+        "name": "Sunita Kumar",
+        "relationship": "Mother",
+        "phone": "+91-7654321099",
+        "isPrimary": true
+      }
+    ],
+    "travelHistory": [],
+    "status": "alert",
+    "lastActive": "2024-01-08T09:45:00Z"
+  },
+  {
+    "id": "tourist_4",
+    "name": "Lisa Chen",
+    "email": "lisa.chen@outlook.com",
+    "phone": "+91-6543210987",
+    "digitalId": "NE-DID-2024-004",
+    "isVerified": true,
+    "currentLocation": {
+      "lat": 25.4500,
+      "lng": 91.9500,
+      "address": "Remote Hills, East Khasi"
+    },
+    "emergencyContacts": [
+      {
+        "id": "ec_4",
+        "name": "David Chen",
+        "relationship": "Brother",
+        "phone": "+91-6543210988",
+        "isPrimary": true
+      }
+    ],
+    "travelHistory": [],
+    "status": "emergency",
+    "lastActive": "2024-01-08T08:20:00Z"
+  },
+  {
+    "id": "tourist_5",
+    "name": "Rahul Singh",
+    "email": "rahul.singh@gmail.com",
+    "phone": "+91-5432109876",
+    "digitalId": "NE-DID-2024-005",
+    "isVerified": true,
+    "currentLocation": {
+      "lat": 25.5750,
+      "lng": 91.8950,
+      "address": "Laitumkhrah, Shillong"
+    },
+    "emergencyContacts": [
+      {
+        "id": "ec_5",
+        "name": "Meera Singh",
+        "relationship": "Sister",
+        "phone": "+91-5432109877",
+        "isPrimary": true
+      }
+    ],
+    "travelHistory": [],
+    "status": "safe",
+    "lastActive": "2024-01-08T12:00:00Z"
+  },
+  {
+    "id": "tourist_6",
+    "name": "Emily Johnson",
+    "email": "emily.johnson@email.com",
+    "phone": "+91-4321098765",
+    "digitalId": "NE-DID-2024-006",
+    "isVerified": true,
+    "currentLocation": {
+      "lat": 25.5680,
+      "lng": 91.9020,
+      "address": "Ward's Lake, Shillong"
+    },
+    "emergencyContacts": [
+      {
+        "id": "ec_6",
+        "name": "Robert Johnson",
+        "relationship": "Father",
+        "phone": "+91-4321098766",
+        "isPrimary": true
+      }
+    ],
+    "travelHistory": [],
+    "status": "safe",
+    "lastActive": "2024-01-08T11:45:00Z"
+  }
+]
