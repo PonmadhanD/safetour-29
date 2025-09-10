@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
@@ -62,25 +62,27 @@ interface MapViewProps {
   className?: string;
 }
 
-// HeatMap component for tourist density
+// HeatMap component for tourist density using react-leaflet hooks
 const HeatmapLayer: React.FC<{ tourists: Tourist[] }> = ({ tourists }) => {
-  const mapRef = useRef<any>(null);
+  const map = useMap(); // Get map instance properly
 
   useEffect(() => {
-    if (mapRef.current && tourists.length > 0) {
-      const map = mapRef.current;
+    if (!map || tourists.length === 0) return;
       
-      // Create heat map data points
-      const heatData = tourists
-        .filter(tourist => tourist.currentLocation)
-        .map(tourist => [
-          tourist.currentLocation!.lat,
-          tourist.currentLocation!.lng,
-          tourist.status === 'emergency' ? 1.0 : tourist.status === 'alert' ? 0.7 : 0.5
-        ]);
+    // Create heat map data points
+    const heatData = tourists
+      .filter(tourist => tourist.currentLocation)
+      .map(tourist => [
+        tourist.currentLocation!.lat,
+        tourist.currentLocation!.lng,
+        tourist.status === 'emergency' ? 1.0 : tourist.status === 'alert' ? 0.7 : 0.5
+      ]);
 
+    let heatLayer: any = null;
+
+    const initializeHeatmap = () => {
       if (heatData.length > 0 && (window as any).L && (window as any).L.heatLayer) {
-        const heat = (window as any).L.heatLayer(heatData, {
+        heatLayer = (window as any).L.heatLayer(heatData, {
           radius: 20,
           blur: 15,
           maxZoom: 17,
@@ -89,16 +91,39 @@ const HeatmapLayer: React.FC<{ tourists: Tourist[] }> = ({ tourists }) => {
             0.5: '#f59e0b', // orange
             1.0: '#ef4444'  // red
           }
-        }).addTo(map);
-
-        return () => {
-          if (map.hasLayer(heat)) {
-            map.removeLayer(heat);
-          }
-        };
+        });
+        
+        if (map && heatLayer) {
+          heatLayer.addTo(map);
+        }
       }
+    };
+
+    // Check if heatmap library is loaded, if not wait for it
+    if ((window as any).L && (window as any).L.heatLayer) {
+      initializeHeatmap();
+    } else {
+      const checkHeatmapLoaded = setInterval(() => {
+        if ((window as any).L && (window as any).L.heatLayer) {
+          clearInterval(checkHeatmapLoaded);
+          initializeHeatmap();
+        }
+      }, 100);
+
+      return () => {
+        clearInterval(checkHeatmapLoaded);
+        if (heatLayer && map && map.hasLayer(heatLayer)) {
+          map.removeLayer(heatLayer);
+        }
+      };
     }
-  }, [tourists]);
+
+    return () => {
+      if (heatLayer && map && map.hasLayer(heatLayer)) {
+        map.removeLayer(heatLayer);
+      }
+    };
+  }, [tourists, map]);
 
   return null;
 };
@@ -241,7 +266,7 @@ const MapView: React.FC<MapViewProps> = ({
 
         {/* Route Waypoints */}
         {routes.map((route: any) =>
-          route.waypoints.map((waypoint: any, index: number) => (
+          route.waypoints?.map((waypoint: any, index: number) => (
             <Marker
               key={`${route.id}-waypoint-${index}`}
               position={[waypoint.lat, waypoint.lng]}
@@ -254,31 +279,29 @@ const MapView: React.FC<MapViewProps> = ({
                 </div>
               </Popup>
             </Marker>
-          ))
+          )) || []
         )}
 
         {/* Tourists (Authority Mode) */}
-        {mode === 'authority' && tourists.map((tourist) => 
-          tourist.currentLocation ? (
-            <Marker
-              key={tourist.id}
-              position={[tourist.currentLocation.lat, tourist.currentLocation.lng]}
-              icon={getTouristIcon(tourist.status)}
-              eventHandlers={{
-                click: () => onTouristSelect?.(tourist)
-              }}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-semibold">{tourist.name}</h3>
-                  <p className="text-sm text-gray-600">Status: {tourist.status}</p>
-                  <p className="text-sm text-gray-600">ID: {tourist.digitalId}</p>
-                  <p className="text-xs text-gray-500">{tourist.currentLocation.address}</p>
-                </div>
-              </Popup>
-            </Marker>
-          ) : null
-        )}
+        {mode === 'authority' && tourists.filter(tourist => tourist.currentLocation).map((tourist) => (
+          <Marker
+            key={tourist.id}
+            position={[tourist.currentLocation!.lat, tourist.currentLocation!.lng]}
+            icon={getTouristIcon(tourist.status)}
+            eventHandlers={{
+              click: () => onTouristSelect?.(tourist)
+            }}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold">{tourist.name}</h3>
+                <p className="text-sm text-gray-600">Status: {tourist.status}</p>
+                <p className="text-sm text-gray-600">ID: {tourist.digitalId}</p>
+                <p className="text-xs text-gray-500">{tourist.currentLocation?.address}</p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
 
         {/* User Location Marker */}
         {userLocation && (
