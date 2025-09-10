@@ -62,12 +62,18 @@ interface MapViewProps {
   className?: string;
 }
 
-// HeatMap component for tourist density using react-leaflet hooks
+// Simplified HeatMap component without dynamic script loading
 const HeatmapLayer: React.FC<{ tourists: Tourist[] }> = ({ tourists }) => {
-  const map = useMap(); // Get map instance properly
+  const map = useMap();
 
   useEffect(() => {
     if (!map || tourists.length === 0) return;
+      
+    // Only proceed if leaflet heat is already available
+    if (!(window as any).L?.heatLayer) {
+      console.warn('Leaflet heatLayer not available. Skipping heatmap rendering.');
+      return;
+    }
       
     // Create heat map data points
     const heatData = tourists
@@ -78,48 +84,23 @@ const HeatmapLayer: React.FC<{ tourists: Tourist[] }> = ({ tourists }) => {
         tourist.status === 'emergency' ? 1.0 : tourist.status === 'alert' ? 0.7 : 0.5
       ]);
 
-    let heatLayer: any = null;
+    if (heatData.length === 0) return;
 
-    const initializeHeatmap = () => {
-      if (heatData.length > 0 && (window as any).L && (window as any).L.heatLayer) {
-        heatLayer = (window as any).L.heatLayer(heatData, {
-          radius: 20,
-          blur: 15,
-          maxZoom: 17,
-          gradient: {
-            0.0: '#10b981', // green
-            0.5: '#f59e0b', // orange
-            1.0: '#ef4444'  // red
-          }
-        });
-        
-        if (map && heatLayer) {
-          heatLayer.addTo(map);
-        }
+    const heatLayer = (window as any).L.heatLayer(heatData, {
+      radius: 20,
+      blur: 15,
+      maxZoom: 17,
+      gradient: {
+        0.0: '#10b981', // green
+        0.5: '#f59e0b', // orange
+        1.0: '#ef4444'  // red
       }
-    };
-
-    // Check if heatmap library is loaded, if not wait for it
-    if ((window as any).L && (window as any).L.heatLayer) {
-      initializeHeatmap();
-    } else {
-      const checkHeatmapLoaded = setInterval(() => {
-        if ((window as any).L && (window as any).L.heatLayer) {
-          clearInterval(checkHeatmapLoaded);
-          initializeHeatmap();
-        }
-      }, 100);
-
-      return () => {
-        clearInterval(checkHeatmapLoaded);
-        if (heatLayer && map && map.hasLayer(heatLayer)) {
-          map.removeLayer(heatLayer);
-        }
-      };
-    }
+    });
+    
+    heatLayer.addTo(map);
 
     return () => {
-      if (heatLayer && map && map.hasLayer(heatLayer)) {
+      if (map.hasLayer(heatLayer)) {
         map.removeLayer(heatLayer);
       }
     };
@@ -143,17 +124,6 @@ const MapView: React.FC<MapViewProps> = ({
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isTracking, setIsTracking] = useState(false);
-
-  // Load heatmap script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js';
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
 
   // Get zone color based on safety level
   const getZoneColor = (safetyLevel: string) => {
@@ -319,7 +289,9 @@ const MapView: React.FC<MapViewProps> = ({
         )}
 
         {/* Heatmap Layer for Tourist Density */}
-        {mode === 'authority' && <HeatmapLayer tourists={tourists} />}
+        {mode === 'authority' && typeof (window as any).L?.heatLayer === 'function' && (
+          <HeatmapLayer tourists={tourists} />
+        )}
       </MapContainer>
 
       {/* Panic Button (Tourist Mode) */}
