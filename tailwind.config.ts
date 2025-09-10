@@ -91,7 +91,8 @@ export default {
 				'gradient-secondary': 'var(--gradient-secondary)',
 				'gradient-success': 'var(--gradient-success)',
 				'gradient-emergency': 'var(--gradient-emergency)',
-				'gradient-hero': 'var(--gradient-hero)'
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-tourism': 'var(--gradient-tourism)'
 			},
 			boxShadow: {
 				'sm': 'var(--shadow-sm)',

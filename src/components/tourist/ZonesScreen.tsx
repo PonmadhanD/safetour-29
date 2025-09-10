@@ -10,6 +10,8 @@ import {
 import { useApp } from '@/contexts/AppContext';
 import { Zone } from '@/types';
 
+import FloatingPanicButton from './FloatingPanicButton';
+
 const ZonesScreen: React.FC = () => {
   const { setTouristPage } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
@@ -234,6 +236,9 @@ const ZonesScreen: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Floating Panic Button */}
+      <FloatingPanicButton />
     </div>
   );
 };

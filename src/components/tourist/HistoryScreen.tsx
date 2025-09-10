@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, MapPin, Clock, Calendar, Route } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
+import FloatingPanicButton from './FloatingPanicButton';
+
 const HistoryScreen: React.FC = () => {
   const { setTouristPage } = useApp();
 
@@ -188,6 +190,9 @@ const HistoryScreen: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Floating Panic Button */}
+      <FloatingPanicButton />
     </div>
   );
 };

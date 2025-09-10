@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Shield, MapPin, Phone, Settings, History, AlertTriangle, 
-  CheckCircle, Clock, Navigation, Bell 
+  Shield, MapPin, Settings, Bell, Users, Map,
+  AlertTriangle, CheckCircle, Clock, Phone
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import FloatingPanicButton from './FloatingPanicButton';
 
 const HomeScreen: React.FC = () => {
   const { setTouristPage, currentTourist, setEmergencyActive } = useApp();
@@ -27,24 +28,29 @@ const HomeScreen: React.FC = () => {
     }
   ]);
 
-  const handlePanicButton = () => {
-    setEmergencyActive(true);
-    setTouristPage('panic');
+  // Calculate safety score (mock logic)
+  const getSafetyScore = () => {
+    const score = 85; // Mock score
+    if (score >= 80) return { score, level: 'safe', color: 'success' };
+    if (score >= 60) return { score, level: 'moderate', color: 'warning' };
+    return { score, level: 'risky', color: 'emergency' };
   };
 
+  const safetyData = getSafetyScore();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light/30 to-secondary-light/30">
+    <div className="min-h-screen bg-gradient-tourism">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-card/95 backdrop-blur-sm shadow-sm border-b sticky top-0 z-40">
         <div className="p-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-foreground">Welcome back!</h1>
-            <p className="text-sm text-muted-foreground">{currentTourist?.name}</p>
+            <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
+            <p className="text-sm text-muted-foreground">{currentTourist?.name || 'Traveler'}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-success-light text-success">
+            <Badge variant="outline" className={`bg-${safetyData.color}-light text-${safetyData.color}`}>
               <CheckCircle className="w-3 h-3 mr-1" />
-              Safe
+              {safetyData.level}
             </Badge>
             <Button 
               variant="ghost" 
@@ -57,64 +63,105 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Emergency Button */}
-        <Card className="bg-gradient-emergency shadow-lg">
-          <CardContent className="p-6 text-center">
-            <Button
-              variant="panic"
-              size="lg"
-              className="w-full mb-4"
-              onClick={handlePanicButton}
-            >
-              <Phone className="w-6 h-6 mr-2" />
-              EMERGENCY
-            </Button>
-            <p className="text-white text-sm">
-              Tap for immediate assistance from local authorities
-            </p>
+      <div className="p-4 space-y-6 pb-24">
+        {/* Tourist Safety Score Card */}
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            <div className={`bg-${safetyData.color} text-${safetyData.color}-foreground p-6`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold">Safety Score</h2>
+                  <p className="text-sm opacity-90">Your current safety rating</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold">{safetyData.score}</div>
+                  <div className="text-sm opacity-90">{safetyData.level.toUpperCase()}</div>
+                </div>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="w-4 h-4" />
+                <span>Shillong, Meghalaya • Safe Zone</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
-          <Button 
-            variant="outline" 
-            className="h-20 flex-col gap-2"
-            onClick={() => setTouristPage('zones')}
-          >
-            <MapPin className="w-6 h-6" />
-            <span className="text-sm">Safe Zones</span>
-          </Button>
+        {/* Quick Actions - 3 Main Buttons */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
           
-          <Button 
-            variant="outline" 
-            className="h-20 flex-col gap-2"
-            onClick={() => setTouristPage('history')}
+          {/* Emergency Button */}
+          <Button
+            size="lg"
+            className="w-full h-16 bg-emergency hover:bg-emergency/90 text-emergency-foreground shadow-lg rounded-2xl"
+            onClick={() => {
+              setEmergencyActive(true);
+              setTouristPage('panic');
+            }}
           >
-            <History className="w-6 h-6" />
-            <span className="text-sm">Travel History</span>
+            <Phone className="w-6 h-6 mr-3" />
+            <div className="text-left">
+              <div className="font-bold">🚨 Panic Button</div>
+              <div className="text-sm opacity-90">Emergency assistance</div>
+            </div>
+          </Button>
+
+          {/* Map & Safe Zones */}
+          <Button
+            variant="outline"
+            size="lg" 
+            className="w-full h-16 bg-card hover:bg-primary/10 rounded-2xl"
+            onClick={() => setTouristPage('map')}
+          >
+            <Map className="w-6 h-6 mr-3 text-primary" />
+            <div className="text-left">
+              <div className="font-bold">🗺️ View Map & Safe Zones</div>
+              <div className="text-sm text-muted-foreground">Navigate safely</div>
+            </div>
+          </Button>
+
+          {/* Family Tracking */}
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full h-16 bg-card hover:bg-secondary/10 rounded-2xl"
+            onClick={() => setTouristPage('familyTracking')}
+          >
+            <Users className="w-6 h-6 mr-3 text-secondary" />
+            <div className="text-left">
+              <div className="font-bold">👨‍👩‍👧 Family Tracking</div>
+              <div className="text-sm text-muted-foreground">Stay connected</div>
+            </div>
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Button 
-            variant="outline" 
-            className="h-20 flex-col gap-2"
-            onClick={() => setTouristPage('routes')}
-          >
-            <Navigation className="w-6 h-6" />
-            <span className="text-sm">Safe Routes</span>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="h-20 flex-col gap-2"
-          >
-            <Shield className="w-6 h-6" />
-            <span className="text-sm">Check-in</span>
-          </Button>
-        </div>
+        {/* Recent Alerts / Notifications */}
+        {activeAlerts.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="w-5 h-5 text-warning" />
+                Recent Alerts ({activeAlerts.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {activeAlerts.map((alert) => (
+                <div key={alert.id} className="flex items-start gap-3 p-3 bg-warning-light/50 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-warning mt-1" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{alert.title}</p>
+                    <p className="text-xs text-muted-foreground">{alert.message}</p>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {alert.severity}
+                  </Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Current Status */}
         <Card>
@@ -135,32 +182,6 @@ const HomeScreen: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Active Alerts */}
-        {activeAlerts.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-warning" />
-                Active Alerts ({activeAlerts.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {activeAlerts.map((alert) => (
-                <div key={alert.id} className="flex items-start gap-3 p-3 bg-warning-light rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-warning mt-1" />
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">{alert.title}</p>
-                    <p className="text-xs text-muted-foreground">{alert.message}</p>
-                  </div>
-                  <Badge variant="outline" className="text-xs">
-                    {alert.severity}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
 
         {/* Recent Activity */}
         <Card>
@@ -189,6 +210,9 @@ const HomeScreen: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Panic Button */}
+      <FloatingPanicButton />
     </div>
   );
 };

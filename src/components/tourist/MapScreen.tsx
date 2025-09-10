@@ -1,61 +1,67 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Phone, Shield, MapPin, Navigation, Clock } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import MapView from '@/components/MapView';
+import MapView from '../MapView';
+import FloatingPanicButton from './FloatingPanicButton';
 
 const MapScreen: React.FC = () => {
-  const { setEmergencyActive, setTouristPage } = useApp();
+  const { setTouristPage } = useApp();
 
   const handlePanicAlert = () => {
-    setEmergencyActive(true);
     setTouristPage('panic');
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background relative">
       {/* Header */}
-      <div className="bg-card shadow-sm border-b">
-        <div className="p-4">
-          <h1 className="text-xl font-bold text-foreground">SafeTravel Map</h1>
-          <p className="text-sm text-muted-foreground">Real-time safety navigation</p>
+      <div className="bg-card/95 backdrop-blur-sm shadow-sm border-b z-40 flex-shrink-0">
+        <div className="p-4 flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => setTouristPage('home')}
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-foreground">Map & Navigation</h1>
+            <p className="text-sm text-muted-foreground">Safe zones and routes</p>
+          </div>
         </div>
       </div>
 
-      {/* Map Container */}
-      <div className="relative h-[calc(100vh-140px)]">
-        <MapView
+      {/* Full-screen Map */}
+      <div className="flex-1 relative">
+        <MapView 
           mode="tourist"
           onPanicAlert={handlePanicAlert}
-          showPanicButton={true}
+          showPanicButton={false}
           className="w-full h-full"
         />
       </div>
 
-      {/* Quick Actions Bar */}
-      <div className="absolute bottom-20 left-4 right-4">
-        <Card className="bg-card/95 backdrop-blur">
-          <CardContent className="p-3">
-            <div className="flex justify-between items-center">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setTouristPage('routes')}
-                className="flex-1 mr-2"
-              >
-                <Navigation className="w-4 h-4 mr-1" />
-                Routes
-              </Button>
+      {/* Bottom Navigation Actions */}
+      <div className="absolute bottom-16 left-0 right-0 z-40 px-4">
+        <Card className="bg-card/95 backdrop-blur-sm border">
+          <CardContent className="p-4">
+            <div className="flex gap-2 justify-between">
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => setTouristPage('zones')}
-                className="flex-1 mr-2"
+                className="flex-1"
               >
-                <Shield className="w-4 h-4 mr-1" />
                 Safe Zones
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setTouristPage('routes')}
+                className="flex-1"
+              >
+                Routes
               </Button>
               <Button 
                 variant="outline" 
@@ -63,7 +69,6 @@ const MapScreen: React.FC = () => {
                 onClick={() => setTouristPage('history')}
                 className="flex-1"
               >
-                <Clock className="w-4 h-4 mr-1" />
                 History
               </Button>
             </div>
@@ -71,22 +76,8 @@ const MapScreen: React.FC = () => {
         </Card>
       </div>
 
-      {/* Status Bar */}
-      <div className="absolute top-20 left-4 right-4">
-        <Card className="bg-card/95 backdrop-blur">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
-                <span className="text-sm font-medium">Connected & Safe</span>
-              </div>
-              <Badge variant="outline" className="text-xs">
-                GPS Active
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Floating Panic Button */}
+      <FloatingPanicButton />
     </div>
   );
 };
