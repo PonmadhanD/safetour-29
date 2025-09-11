@@ -1,3 +1,19 @@
+import * as L from "leaflet";
+
+declare module "leaflet" {
+  function heatLayer(
+    latlngs: L.LatLngExpression[] | [number, number, number][],
+    options?: {
+      minOpacity?: number;
+      maxZoom?: number;
+      radius?: number;
+      blur?: number;
+      max?: number;
+      gradient?: { [key: number]: string };
+    }
+  ): L.Layer;
+}
+
 export interface Tourist {
   id: string;
   name: string;
@@ -75,12 +91,8 @@ export interface SafeRoute {
   distance: string;
   duration: string;
   safetyRating: number;
-  waypoints: {
-    lat: number;
-    lng: number;
-    name: string;
-    type: 'checkpoint' | 'landmark' | 'emergency';
-  }[];
+  coordinates: [number, number][];
+  waypoints: { lat: number; lng: number; name?: string; type?: string }[];
   warnings: string[];
   lastUpdated: string;
 }
