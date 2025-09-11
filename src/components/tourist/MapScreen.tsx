@@ -32,8 +32,8 @@ const MapScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Full-screen Map */}
-      <div className="flex-1 relative">
+      {/* Map Container with proper spacing */}
+      <div className="flex-1 relative pb-24">
         <MapView 
           mode="tourist"
           onPanicAlert={handlePanicAlert}
@@ -42,9 +42,9 @@ const MapScreen: React.FC = () => {
         />
       </div>
 
-      {/* Bottom Navigation Actions */}
-      <div className="absolute bottom-16 left-0 right-0 z-40 px-4">
-        <Card className="bg-card/95 backdrop-blur-sm border">
+      {/* Bottom Navigation Actions - Fixed positioning */}
+      <div className="absolute bottom-4 left-4 right-4 z-50">
+        <Card className="bg-card/95 backdrop-blur-sm border shadow-lg">
           <CardContent className="p-4">
             <div className="flex gap-2 justify-between">
               <Button 
@@ -76,8 +76,10 @@ const MapScreen: React.FC = () => {
         </Card>
       </div>
 
-      {/* Floating Panic Button */}
-      <FloatingPanicButton />
+      {/* Floating Panic Button - Positioned above the bottom nav */}
+      <div className="fixed bottom-24 right-4 z-50">
+        <FloatingPanicButton />
+      </div>
     </div>
   );
 };
