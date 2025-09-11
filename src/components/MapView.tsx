@@ -1,113 +1,55 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, useMap } from 'react-leaflet';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.heat';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Phone, Shield, MapPin, AlertTriangle, Locate, RefreshCw } from 'lucide-react';
-import { Tourist, Zone, SafeRoute, Alert as AppAlert } from '@/types';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Locate, Navigation, AlertTriangle, Shield, 
+  Users, MapPin, Route, Phone 
+} from 'lucide-react';
+import { useApp } from '@/contexts/AppContext';
+import { Tourist, Zone, SafeRoute, Alert as AlertType } from '@/types';
 
 // Import mock data
 import safeZonesData from '@/mockData/safeZones.json';
 import safeRoutesData from '@/mockData/safeRoutes.json';
 import touristsData from '@/mockData/tourists.json';
 
-// Fix Leaflet default marker icons
+// Fix Leaflet default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Custom marker icons
-const createCustomIcon = (color: string, size: [number, number] = [25, 41]) => {
+// Custom icon creators
+const createCustomIcon = (color: string, icon: string) => {
   return L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div style="
-      background-color: ${color};
-      width: ${size[0]}px;
-      height: ${size[1]}px;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      border: 2px solid white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    "></div>`,
-    iconSize: size,
-    iconAnchor: [size[0] / 2, size[1]],
-    popupAnchor: [0, -size[1]]
+    html: `<div class="w-6 h-6 rounded-full ${color} border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-bold">${icon}</div>`,
+    className: 'custom-marker',
+    iconSize: [24, 24]
   });
 };
 
-const safeZoneIcon = createCustomIcon('#10b981'); // green
-const cautionZoneIcon = createCustomIcon('#f59e0b'); // orange
-const dangerZoneIcon = createCustomIcon('#ef4444'); // red
-const touristSafeIcon = createCustomIcon('#3b82f6', [20, 32]); // blue
-const touristAlertIcon = createCustomIcon('#f59e0b', [20, 32]); // orange
-const touristEmergencyIcon = createCustomIcon('#ef4444', [20, 32]); // red
-const waypointIcon = createCustomIcon('#6366f1', [15, 24]); // indigo
+// Icon definitions
+export const safeZoneIcon = createCustomIcon('bg-green-500', 'S');
+export const touristIcon = createCustomIcon('bg-blue-500', 'T');
+export const alertIcon = createCustomIcon('bg-red-500', '!');
+export const waypointIcon = createCustomIcon('bg-primary', 'W');
 
 interface MapViewProps {
   mode: 'tourist' | 'authority';
   tourists?: Tourist[];
   zones?: Zone[];
   routes?: SafeRoute[];
-  alerts?: AppAlert[];
-  onPanicAlert?: () => void;
+  alerts?: AlertType[];
   onTouristSelect?: (tourist: Tourist) => void;
+  onPanicAlert?: () => void;
   showPanicButton?: boolean;
   className?: string;
 }
-
-// Simplified HeatMap component without dynamic script loading
-const HeatmapLayer: React.FC<{ tourists: Tourist[] }> = ({ tourists }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!map || tourists.length === 0) return;
-      
-    // Only proceed if leaflet heat is already available
-    if (!(window as any).L?.heatLayer) {
-      console.warn('Leaflet heatLayer not available. Skipping heatmap rendering.');
-      return;
-    }
-      
-    // Create heat map data points
-    const heatData = tourists
-      .filter(tourist => tourist.currentLocation)
-      .map(tourist => [
-        tourist.currentLocation!.lat,
-        tourist.currentLocation!.lng,
-        tourist.status === 'emergency' ? 1.0 : tourist.status === 'alert' ? 0.7 : 0.5
-      ]);
-
-    if (heatData.length === 0) return;
-
-    const heatLayer = (window as any).L.heatLayer(heatData, {
-      radius: 20,
-      blur: 15,
-      maxZoom: 17,
-      gradient: {
-        0.0: '#10b981', // green
-        0.5: '#f59e0b', // orange
-        1.0: '#ef4444'  // red
-      }
-    });
-    
-    heatLayer.addTo(map);
-
-    return () => {
-      if (map.hasLayer(heatLayer)) {
-        map.removeLayer(heatLayer);
-      }
-    };
-  }, [tourists, map]);
-
-  return null;
-};
 
 const MapView: React.FC<MapViewProps> = ({
   mode,
@@ -115,232 +57,489 @@ const MapView: React.FC<MapViewProps> = ({
   zones = safeZonesData as Zone[],
   routes = safeRoutesData as SafeRoute[],
   alerts = [],
-  onPanicAlert,
   onTouristSelect,
+  onPanicAlert,
   showPanicButton = true,
   className = ''
 }) => {
-  const mapRef = useRef<any>(null);
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const heatmapLayer = useRef<any>(null);
+  const routingControl = useRef<any>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [isTracking, setIsTracking] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState<SafeRoute | null>(null);
+  const { setEmergencyActive, setTouristPage } = useApp();
 
-  // Get zone color based on safety level
-  const getZoneColor = (safetyLevel: string) => {
-    switch (safetyLevel) {
-      case 'high': return '#10b981'; // green
-      case 'medium': return '#f59e0b'; // orange
-      case 'low': return '#ef4444'; // red
-      default: return '#6b7280'; // gray
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainer.current || map.current) return;
+
+    map.current = L.map(mapContainer.current).setView([25.5788, 91.8933], 12);
+
+    // Add OpenStreetMap tiles with tourism-friendly styling
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map.current);
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, []);
+
+  // Update markers and layers when data changes
+  useEffect(() => {
+    if (!map.current) return;
+
+    // Clear existing markers and layers
+    map.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker || layer instanceof L.Polygon || layer instanceof L.Polyline) {
+        map.current!.removeLayer(layer);
+      }
+    });
+
+    // Remove heatmap
+    if (heatmapLayer.current) {
+      map.current.removeLayer(heatmapLayer.current);
+      heatmapLayer.current = null;
+    }
+
+    // Remove routing control
+    if (routingControl.current) {
+      map.current.removeControl(routingControl.current);
+      routingControl.current = null;
+    }
+
+    // Add safe zones
+    zones.forEach((zone: any) => {
+      if (!map.current) return;
+
+      const zoneColor = getZoneColor(zone.safetyLevel);
+      
+      // Add zone polygon
+      const polygon = L.polygon(zone.coordinates, {
+        color: zoneColor,
+        fillColor: zoneColor,
+        fillOpacity: 0.2,
+        weight: 2
+      }).addTo(map.current);
+
+      // Add zone marker
+      const marker = L.marker([zone.location.lat, zone.location.lng], {
+        icon: createCustomIcon(getZoneColorClass(zone.safetyLevel), 'S')
+      }).addTo(map.current);
+
+      marker.bindPopup(`
+        <div class="p-3 min-w-48">
+          <h3 class="font-semibold text-lg mb-2">${zone.name}</h3>
+          <p class="text-sm text-gray-600 mb-2">${zone.description}</p>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs px-2 py-1 rounded ${getZoneColorClass(zone.safetyLevel)} text-white">
+              Safety: ${zone.safetyLevel}/5
+            </span>
+          </div>
+          <p class="text-xs text-gray-500">${zone.location.address}</p>
+        </div>
+      `);
+    });
+
+    // Add routes
+    routes.forEach((route: any) => {
+      if (!map.current || !route.coordinates?.length) return;
+
+      const routeLine = L.polyline(route.coordinates.map(coord => [coord[1], coord[0]]), {
+        color: '#3b82f6',
+        weight: 4,
+        opacity: 0.8
+      }).addTo(map.current);
+
+      routeLine.bindPopup(`
+        <div class="p-3">
+          <h3 class="font-semibold">${route.name}</h3>
+          <p class="text-sm text-gray-600">${route.from} → ${route.to}</p>
+          <div class="flex gap-2 mt-2">
+            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${route.distance}</span>
+            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">${route.duration}</span>
+          </div>
+        </div>
+      `);
+
+      // Add waypoints
+      route.waypoints?.forEach((waypoint: any, index: number) => {
+        if (!map.current) return;
+        
+        L.marker([waypoint.lat, waypoint.lng], {
+          icon: createCustomIcon('bg-primary', (index + 1).toString())
+        }).addTo(map.current).bindPopup(`
+          <div class="p-2">
+            <h4 class="font-medium">${waypoint.name}</h4>
+            <p class="text-sm text-gray-600 capitalize">${waypoint.type}</p>
+          </div>
+        `);
+      });
+    });
+
+    // Add tourists (authority mode)
+    if (mode === 'authority') {
+      tourists.forEach((tourist) => {
+        if (!map.current || !tourist.currentLocation) return;
+
+        const marker = L.marker([tourist.currentLocation.lat, tourist.currentLocation.lng], {
+          icon: getTouristIcon(tourist.status)
+        }).addTo(map.current);
+
+        marker.bindPopup(`
+          <div class="p-3">
+            <h3 class="font-semibold">${tourist.name}</h3>
+            <p class="text-sm text-gray-600">${tourist.email}</p>
+            <p class="text-sm text-gray-600">${tourist.currentLocation.address}</p>
+            <div class="mt-2">
+              <span class="text-xs px-2 py-1 rounded ${getStatusColor(tourist.status)} text-white">
+                ${tourist.status.toUpperCase()}
+              </span>
+            </div>
+          </div>
+        `);
+
+        marker.on('click', () => {
+          if (onTouristSelect) {
+            onTouristSelect(tourist);
+          }
+        });
+      });
+
+      // Add heatmap for tourist density
+      if (tourists.length > 0 && window.L && (window.L as any).heatLayer) {
+        const heatData = tourists
+          .filter(t => t.currentLocation)
+          .map(t => [t.currentLocation!.lat, t.currentLocation!.lng, 1]);
+        
+        if (heatData.length > 0) {
+          heatmapLayer.current = (window.L as any).heatLayer(heatData, {
+            radius: 50,
+            blur: 35,
+            maxZoom: 17,
+            gradient: {
+              0.2: 'blue',
+              0.4: 'cyan',
+              0.6: 'lime',
+              0.8: 'yellow',
+              1.0: 'red'
+            }
+          }).addTo(map.current);
+        }
+      }
+    }
+
+    // Add alerts
+    alerts.forEach((alert) => {
+      if (!map.current) return;
+
+      L.marker([alert.location.lat, alert.location.lng], {
+        icon: alertIcon
+      }).addTo(map.current).bindPopup(`
+        <div class="p-3">
+          <h3 class="font-semibold text-red-600">${alert.type.toUpperCase()}</h3>
+          <p class="text-sm text-gray-600">${alert.message}</p>
+          <p class="text-xs text-gray-500 mt-2">${new Date().toLocaleString()}</p>
+        </div>
+      `);
+    });
+
+  }, [zones, routes, tourists, alerts, mode, onTouristSelect]);
+
+  const getZoneColor = (safetyLevel: string | number) => {
+    const level = typeof safetyLevel === 'string' ? 
+      (safetyLevel === 'high' ? 5 : safetyLevel === 'medium' ? 3 : 1) : 
+      safetyLevel;
+    
+    if (level >= 4) return '#10b981';
+    if (level >= 3) return '#f59e0b';
+    return '#ef4444';
+  };
+
+  const getZoneColorClass = (safetyLevel: string | number) => {
+    const level = typeof safetyLevel === 'string' ? 
+      (safetyLevel === 'high' ? 5 : safetyLevel === 'medium' ? 3 : 1) : 
+      safetyLevel;
+    
+    if (level >= 4) return 'bg-green-500';
+    if (level >= 3) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getTouristIcon = (status: string) => {
+    switch (status) {
+      case 'emergency':
+        return createCustomIcon('bg-red-500', '!');
+      case 'alert':
+        return createCustomIcon('bg-yellow-500', '⚠');
+      default:
+        return createCustomIcon('bg-green-500', '✓');
     }
   };
 
-  // Get tourist marker icon based on status
-  const getTouristIcon = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'safe': return touristSafeIcon;
-      case 'alert': return touristAlertIcon;
-      case 'emergency': return touristEmergencyIcon;
-      default: return touristSafeIcon;
+      case 'emergency':
+        return 'bg-red-500';
+      case 'alert':
+        return 'bg-yellow-500';
+      default:
+        return 'bg-green-500';
     }
   };
 
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported');
+      setLocationError('Geolocation is not supported by this browser.');
       return;
     }
 
-    setIsTracking(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
-        
-        if (mapRef.current) {
-          mapRef.current.setView([latitude, longitude], 15);
-        }
-        
         setLocationError(null);
-        setIsTracking(false);
+
+        if (map.current) {
+          map.current.setView([latitude, longitude], 15);
+          
+          // Add user location marker
+          L.marker([latitude, longitude], {
+            icon: L.divIcon({
+              html: '<div class="user-location-marker"></div>',
+              className: 'user-location-wrapper',
+              iconSize: [20, 20]
+            })
+          }).addTo(map.current).bindPopup('Your current location');
+        }
       },
       (error) => {
         setLocationError(`Location error: ${error.message}`);
-        setIsTracking(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   }, []);
 
+  const startNavigation = useCallback((route: SafeRoute) => {
+    if (!map.current || !userLocation) return;
+
+    setSelectedRoute(route);
+    
+    // Remove existing routing control
+    if (routingControl.current) {
+      map.current.removeControl(routingControl.current);
+    }
+
+    // Create waypoints for routing
+    const waypoints = [
+      L.latLng(userLocation.lat, userLocation.lng),
+      ...route.waypoints.map(wp => L.latLng(wp.lat, wp.lng))
+    ];
+
+    // Add routing control using Leaflet Routing Machine
+    if (window.L && (window.L as any).Routing) {
+      routingControl.current = (window.L as any).Routing.control({
+        waypoints: waypoints,
+        routeWhileDragging: false,
+        addWaypoints: false,
+        createMarker: () => null,
+        lineOptions: {
+          styles: [{ color: '#3b82f6', weight: 4, opacity: 0.8 }]
+        }
+      }).addTo(map.current);
+    }
+  }, [userLocation]);
+
+  const handlePanic = () => {
+    setEmergencyActive(true);
+    setTouristPage('panic');
+    if (onPanicAlert) {
+      onPanicAlert();
+    }
+  };
+
+  const findNearestSafeZone = useCallback(() => {
+    if (!userLocation || zones.length === 0) return;
+
+    let nearestZone = zones[0];
+    let minDistance = calculateDistance(
+      userLocation.lat, 
+      userLocation.lng, 
+      nearestZone.location.lat, 
+      nearestZone.location.lng
+    );
+
+    zones.forEach(zone => {
+      const distance = calculateDistance(
+        userLocation.lat, 
+        userLocation.lng, 
+        zone.location.lat, 
+        zone.location.lng
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestZone = zone;
+      }
+    });
+
+    if (map.current) {
+      map.current.setView([nearestZone.location.lat, nearestZone.location.lng], 14);
+    }
+  }, [userLocation, zones]);
+
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   return (
     <div className={`relative ${className}`}>
-      {/* Location Error Alert */}
-      {locationError && (
-        <Alert className="absolute top-4 left-4 right-4 z-[1000] bg-card">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{locationError}</AlertDescription>
-        </Alert>
-      )}
-
       {/* Map Container */}
-      <MapContainer
-        center={[25.5788, 91.8933]}
-        zoom={12}
-        ref={mapRef}
-        className={`w-full h-full rounded-lg ${className}`}
-        style={{ minHeight: '400px', zIndex: 1 }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      <div ref={mapContainer} className="w-full h-full rounded-lg" />
 
-        {/* Safe Zones as Polygons */}
-        {zones.map((zone: any) => (
-          <Polygon
-            key={zone.id}
-            positions={zone.coordinates}
-            color={getZoneColor(zone.safetyLevel)}
-            fillColor={getZoneColor(zone.safetyLevel)}
-            fillOpacity={0.3}
+      {/* Tourist Mode Controls */}
+      {mode === 'tourist' && (
+        <>
+          {/* Location Button */}
+          <Button
+            onClick={getCurrentLocation}
+            className="absolute top-4 right-4 z-40 w-12 h-12 rounded-full shadow-lg bg-card hover:bg-card/90"
+            size="icon"
+            variant="outline"
           >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold">{zone.name}</h3>
-                <p className="text-sm text-gray-600">{zone.description}</p>
-                <p className="text-xs text-gray-500 mt-1">Safety: {zone.safetyLevel}</p>
-              </div>
-            </Popup>
-          </Polygon>
-        ))}
+            <Locate className="w-5 h-5" />
+          </Button>
 
-        {/* Safe Routes as Polylines */}
-        {routes.map((route: any) => (
-          <Polyline
-            key={route.id}
-            positions={route.coordinates}
-            color="#003366"
-            weight={4}
-            opacity={0.8}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold">{route.name}</h3>
-                <p className="text-sm text-gray-600">{route.from} → {route.to}</p>
-                <p className="text-xs text-gray-500">Distance: {route.distance}</p>
-                <p className="text-xs text-gray-500">Duration: {route.duration}</p>
-              </div>
-            </Popup>
-          </Polyline>
-        ))}
-
-        {/* Route Waypoints */}
-        {routes.map((route: any) =>
-          route.waypoints?.map((waypoint: any, index: number) => (
-            <Marker
-              key={`${route.id}-waypoint-${index}`}
-              position={[waypoint.lat, waypoint.lng]}
-              icon={waypointIcon}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-semibold">{waypoint.name}</h3>
-                  <p className="text-sm text-gray-600 capitalize">{waypoint.type}</p>
+          {/* Quick Actions */}
+          {userLocation && (
+            <Card className="absolute bottom-4 left-4 right-4 z-40 bg-card/95 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTouristPage('zones')}
+                    className="flex flex-col gap-1 h-auto py-3 rounded-xl"
+                  >
+                    <Shield className="w-4 h-4 text-primary" />
+                    <span className="text-xs">Safe Zones</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTouristPage('routes')}
+                    className="flex flex-col gap-1 h-auto py-3 rounded-xl"
+                  >
+                    <Route className="w-4 h-4 text-primary" />
+                    <span className="text-xs">Routes</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={findNearestSafeZone}
+                    className="flex flex-col gap-1 h-auto py-3 rounded-xl"
+                  >
+                    <Navigation className="w-4 h-4 text-primary" />
+                    <span className="text-xs">Navigate</span>
+                  </Button>
                 </div>
-              </Popup>
-            </Marker>
-          )) || []
-        )}
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Tourists (Authority Mode) */}
-        {mode === 'authority' && tourists.filter(tourist => tourist.currentLocation).map((tourist) => (
-          <Marker
-            key={tourist.id}
-            position={[tourist.currentLocation!.lat, tourist.currentLocation!.lng]}
-            icon={getTouristIcon(tourist.status)}
-            eventHandlers={{
-              click: () => onTouristSelect?.(tourist)
-            }}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold">{tourist.name}</h3>
-                <p className="text-sm text-gray-600">Status: {tourist.status}</p>
-                <p className="text-sm text-gray-600">ID: {tourist.digitalId}</p>
-                <p className="text-xs text-gray-500">{tourist.currentLocation?.address}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-
-        {/* User Location Marker */}
-        {userLocation && (
-          <Marker
-            position={[userLocation.lat, userLocation.lng]}
-            icon={createCustomIcon('#3b82f6', [15, 24])}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-semibold">Your Location</h3>
-                <p className="text-sm text-gray-600">Current position</p>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-
-        {/* Heatmap Layer for Tourist Density */}
-        {mode === 'authority' && typeof (window as any).L?.heatLayer === 'function' && (
-          <HeatmapLayer tourists={tourists} />
-        )}
-      </MapContainer>
-
-      {/* Panic Button (Tourist Mode) */}
-      {mode === 'tourist' && showPanicButton && (
-        <Button
-          onClick={onPanicAlert}
-          className="absolute bottom-6 right-6 w-16 h-16 rounded-full bg-emergency hover:bg-emergency/90 text-emergency-foreground shadow-lg z-[1000] animate-pulse"
-          size="icon"
-        >
-          <Phone className="w-8 h-8" />
-        </Button>
+          {/* Panic Button */}
+          {showPanicButton && (
+            <Button
+              onClick={handlePanic}
+              className="fixed bottom-20 right-4 z-50 w-16 h-16 rounded-full bg-emergency hover:bg-emergency/90 text-emergency-foreground shadow-emergency animate-pulse-emergency"
+              size="icon"
+            >
+              <Phone className="w-6 h-6" />
+            </Button>
+          )}
+        </>
       )}
 
-      {/* Location Button */}
-      <Button
-        onClick={getCurrentLocation}
-        disabled={isTracking}
-        className="absolute bottom-6 left-6 w-12 h-12 rounded-full bg-card border shadow-md z-[1000]"
-        variant="outline"
-        size="icon"
-      >
-        {isTracking ? (
-          <RefreshCw className="w-5 h-5 animate-spin" />
-        ) : (
-          <Locate className="w-5 h-5" />
-        )}
-      </Button>
-
-      {/* Map Legend (Bottom Center) */}
-      <Card className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-card/95 backdrop-blur z-[1000]">
+      {/* Legend */}
+      <Card className="absolute top-4 left-4 z-40 bg-card/95 backdrop-blur-sm">
         <CardContent className="p-3">
-          <div className="flex items-center gap-3 text-xs">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3" style={{ backgroundColor: '#10b981' }} />
+          <h4 className="text-sm font-medium mb-2">Legend</h4>
+          <div className="space-y-1 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span>Safe Zone</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-1" style={{ backgroundColor: '#003366' }} />
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <span>Safe Route</span>
             </div>
             {mode === 'authority' && (
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3b82f6' }} />
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
                 <span>Tourist</span>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Location Error */}
+      {locationError && (
+        <Card className="absolute top-16 left-4 right-4 z-40 bg-destructive/10 border-destructive">
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-4 h-4" />
+              <span className="text-sm">{locationError}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* User Location Marker Styles */}
+      <style>{`
+        .user-location-marker {
+          width: 20px;
+          height: 20px;
+          background-color: #3b82f6;
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+          }
+        }
+
+        .custom-marker {
+          background: none !important;
+          border: none !important;
+        }
+
+        .user-location-wrapper {
+          background: none !important;
+          border: none !important;
+        }
+      `}</style>
     </div>
   );
 };
