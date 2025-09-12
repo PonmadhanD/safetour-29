@@ -24,6 +24,14 @@ const RoutesScreen: React.FC = () => {
       distance: '54 km',
       duration: '1.5 hours',
       safetyRating: 4.8,
+      coordinates: [
+        [91.8933, 25.5788],
+        [91.8700, 25.5500],
+        [91.8400, 25.5200],
+        [91.8000, 25.4800],
+        [91.7600, 25.4200],
+        [91.7326, 25.3011]
+      ],
       waypoints: [
         { lat: 25.5788, lng: 91.8933, name: 'Shillong Police Bazaar', type: 'checkpoint' },
         { lat: 25.4526, lng: 91.7318, name: 'Mawkdok Police Station', type: 'emergency' },
@@ -40,6 +48,13 @@ const RoutesScreen: React.FC = () => {
       distance: '96 km',
       duration: '2.5 hours',
       safetyRating: 4.5,
+      coordinates: [
+        [91.8967, 25.5738],
+        [91.8200, 25.4000],
+        [91.7800, 25.3000],
+        [91.7639, 25.2677],
+        [91.7667, 25.1167]
+      ],
       waypoints: [
         { lat: 25.5738, lng: 91.8967, name: 'Shillong Bus Stand', type: 'checkpoint' },
         { lat: 25.2677, lng: 91.7639, name: 'Pynursla Police Station', type: 'emergency' },
@@ -56,6 +71,15 @@ const RoutesScreen: React.FC = () => {
       distance: '100 km',
       duration: '3 hours',
       safetyRating: 4.6,
+      coordinates: [
+        [91.7362, 26.1445],
+        [91.7800, 26.1200],
+        [91.8200, 26.0400],
+        [91.8014, 25.9441],
+        [91.8600, 25.8000],
+        [91.8800, 25.7000],
+        [91.8933, 25.5788]
+      ],
       waypoints: [
         { lat: 26.1445, lng: 91.7362, name: 'Guwahati Railway Station', type: 'checkpoint' },
         { lat: 25.9441, lng: 91.8014, name: 'Jorabat Police Station', type: 'emergency' },
@@ -72,6 +96,13 @@ const RoutesScreen: React.FC = () => {
       distance: '90 km',
       duration: '2.5 hours',
       safetyRating: 4.3,
+      coordinates: [
+        [91.8933, 25.5788],
+        [91.8500, 25.4000],
+        [91.8000, 25.3000],
+        [91.7639, 25.2677],
+        [91.8833, 25.2167]
+      ],
       waypoints: [
         { lat: 25.5788, lng: 91.8933, name: 'Shillong Police Bazaar', type: 'checkpoint' },
         { lat: 25.2677, lng: 91.7639, name: 'Pynursla Police Station', type: 'emergency' },
