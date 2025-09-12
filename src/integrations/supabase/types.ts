@@ -187,6 +187,135 @@ export type Database = {
           },
         ]
       }
+      family_members: {
+        Row: {
+          can_track: boolean
+          created_at: string
+          family_member_id: string
+          id: string
+          relationship: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_track?: boolean
+          created_at?: string
+          family_member_id: string
+          id?: string
+          relationship?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_track?: boolean
+          created_at?: string
+          family_member_id?: string
+          id?: string
+          relationship?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      geofence_violations: {
+        Row: {
+          id: string
+          latitude: number
+          longitude: number
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          timestamp: string
+          tourist_id: string
+          violation_type: string
+          zone_id: string | null
+        }
+        Insert: {
+          id?: string
+          latitude: number
+          longitude: number
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          timestamp?: string
+          tourist_id: string
+          violation_type: string
+          zone_id?: string | null
+        }
+        Update: {
+          id?: string
+          latitude?: number
+          longitude?: number
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          timestamp?: string
+          tourist_id?: string
+          violation_type?: string
+          zone_id?: string | null
+        }
+        Relationships: []
+      }
+      nearby_services: {
+        Row: {
+          address: string | null
+          address_hi: string | null
+          address_ta: string | null
+          contact_number: string | null
+          created_at: string
+          id: string
+          is_24x7: boolean | null
+          is_active: boolean
+          latitude: number
+          longitude: number
+          name: string
+          name_hi: string | null
+          name_ta: string | null
+          rating: number | null
+          service_type: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          address_hi?: string | null
+          address_ta?: string | null
+          contact_number?: string | null
+          created_at?: string
+          id?: string
+          is_24x7?: boolean | null
+          is_active?: boolean
+          latitude: number
+          longitude: number
+          name: string
+          name_hi?: string | null
+          name_ta?: string | null
+          rating?: number | null
+          service_type: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          address_hi?: string | null
+          address_ta?: string | null
+          contact_number?: string | null
+          created_at?: string
+          id?: string
+          is_24x7?: boolean | null
+          is_active?: boolean
+          latitude?: number
+          longitude?: number
+          name?: string
+          name_hi?: string | null
+          name_ta?: string | null
+          rating?: number | null
+          service_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       panic_requests: {
         Row: {
           latitude: number
@@ -313,6 +442,66 @@ export type Database = {
             referencedColumns: ["authority_id"]
           },
         ]
+      }
+      tourist_attractions: {
+        Row: {
+          category: string
+          contact_number: string | null
+          created_at: string
+          description: string | null
+          description_hi: string | null
+          description_ta: string | null
+          entry_fee: string | null
+          id: string
+          is_active: boolean
+          latitude: number
+          longitude: number
+          name: string
+          name_hi: string | null
+          name_ta: string | null
+          opening_hours: Json | null
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          contact_number?: string | null
+          created_at?: string
+          description?: string | null
+          description_hi?: string | null
+          description_ta?: string | null
+          entry_fee?: string | null
+          id?: string
+          is_active?: boolean
+          latitude: number
+          longitude: number
+          name: string
+          name_hi?: string | null
+          name_ta?: string | null
+          opening_hours?: Json | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          contact_number?: string | null
+          created_at?: string
+          description?: string | null
+          description_hi?: string | null
+          description_ta?: string | null
+          entry_fee?: string | null
+          id?: string
+          is_active?: boolean
+          latitude?: number
+          longitude?: number
+          name?: string
+          name_hi?: string | null
+          name_ta?: string | null
+          opening_hours?: Json | null
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       tourist_locations: {
         Row: {
@@ -450,6 +639,36 @@ export type Database = {
             referencedColumns: ["zone_id"]
           },
         ]
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          location_sharing: boolean
+          notifications_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language?: string
+          location_sharing?: boolean
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          location_sharing?: boolean
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {

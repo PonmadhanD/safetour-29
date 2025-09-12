@@ -4,13 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Shield, MapPin, Settings, Bell, Users, Map,
-  AlertTriangle, CheckCircle, Clock, Phone
+  AlertTriangle, CheckCircle, Clock, Phone, LogOut, Camera
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import FloatingPanicButton from './FloatingPanicButton';
 
 const HomeScreen: React.FC = () => {
   const { setTouristPage, currentTourist, setEmergencyActive } = useApp();
+  const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const [activeAlerts] = useState([
     {
       id: '1',
@@ -44,7 +48,9 @@ const HomeScreen: React.FC = () => {
       <div className="bg-card/95 backdrop-blur-sm shadow-sm border-b sticky top-0 z-40">
         <div className="p-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              {t('welcomeBack')} {user?.user_metadata?.full_name || user?.email?.split('@')[0]}!
+            </h1>
             <p className="text-sm text-muted-foreground">{currentTourist?.name || 'Traveler'}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -59,6 +65,14 @@ const HomeScreen: React.FC = () => {
             >
               <Settings className="w-5 h-5" />
             </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={signOut}
+              title={t('signOut')}
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -70,7 +84,7 @@ const HomeScreen: React.FC = () => {
             <div className={`bg-${safetyData.color} text-${safetyData.color}-foreground p-6`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold">Safety Score</h2>
+                  <h2 className="text-xl font-bold">{t('safetyScore')}</h2>
                   <p className="text-sm opacity-90">Your current safety rating</p>
                 </div>
                 <div className="text-right">
@@ -90,7 +104,7 @@ const HomeScreen: React.FC = () => {
 
         {/* Quick Actions - 3 Main Buttons */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-card-foreground">Quick Actions</h3>
+          <h3 className="text-lg font-semibold text-card-foreground">{t('quickActions')}</h3>
           
           {/* Emergency Button */}
           <Button
@@ -103,7 +117,7 @@ const HomeScreen: React.FC = () => {
           >
             <Phone className="w-6 h-6 mr-3" />
             <div className="text-left">
-              <div className="font-bold">🚨 Panic Button</div>
+              <div className="font-bold">🚨 {t('panicButton')}</div>
               <div className="text-sm opacity-90">Emergency assistance</div>
             </div>
           </Button>
@@ -117,7 +131,7 @@ const HomeScreen: React.FC = () => {
           >
             <Map className="w-6 h-6 mr-3 text-primary" />
             <div className="text-left">
-              <div className="font-bold">🗺️ View Map & Safe Zones</div>
+              <div className="font-bold">🗺️ {t('viewMap')}</div>
               <div className="text-sm text-muted-foreground">Navigate safely</div>
             </div>
           </Button>
@@ -131,8 +145,22 @@ const HomeScreen: React.FC = () => {
           >
             <Users className="w-6 h-6 mr-3 text-secondary" />
             <div className="text-left">
-              <div className="font-bold">👨‍👩‍👧 Family Tracking</div>
+              <div className="font-bold">👨‍👩‍👧 {t('familyTracking')}</div>
               <div className="text-sm text-muted-foreground">Stay connected</div>
+            </div>
+          </Button>
+          
+          {/* Tourist Attractions */}
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full h-16 bg-card hover:bg-accent/10 rounded-2xl"
+            onClick={() => setTouristPage('attractions')}
+          >
+            <Camera className="w-6 h-6 mr-3 text-accent" />
+            <div className="text-left">
+              <div className="font-bold">🏛️ {t('touristAttractions')}</div>
+              <div className="text-sm text-muted-foreground">Discover places</div>
             </div>
           </Button>
         </div>
@@ -143,7 +171,7 @@ const HomeScreen: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="w-5 h-5 text-warning" />
-                Recent Alerts ({activeAlerts.length})
+                {t('recentAlerts')} ({activeAlerts.length})
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">

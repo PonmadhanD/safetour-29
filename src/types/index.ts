@@ -125,5 +125,5 @@ export interface EFir {
 }
 
 export type AppView = 'tourist' | 'authority';
-export type TouristPage = 'splash' | 'onboarding' | 'digitalId' | 'home' | 'zones' | 'routes' | 'panic' | 'history' | 'settings' | 'map' | 'familyTracking';
+export type TouristPage = 'splash' | 'onboarding' | 'digitalId' | 'home' | 'zones' | 'routes' | 'panic' | 'history' | 'settings' | 'map' | 'familyTracking' | 'attractions';
 export type AuthorityPage = 'login' | 'dashboard' | 'verification' | 'alerts' | 'efir' | 'analytics' | 'settings';
