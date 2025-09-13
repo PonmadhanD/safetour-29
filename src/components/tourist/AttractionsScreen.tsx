@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  ArrowLeft, MapPin, Clock, Phone, Search, Star,
-  Camera, Mountain, Church, TreePine, Compass, Utensils
+  ArrowLeft, MapPin, Clock, Phone, Search, Star, Navigation,
+  Camera, Mountain, Church, TreePine, Compass, Utensils, Route
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -53,10 +53,33 @@ const AttractionsScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     loadData();
+    getCurrentLocation();
   }, []);
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          // Fallback to Shillong coordinates
+          setUserLocation({ lat: 25.5788, lng: 91.8933 });
+        }
+      );
+    } else {
+      // Fallback to Shillong coordinates
+      setUserLocation({ lat: 25.5788, lng: 91.8933 });
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -128,6 +151,38 @@ const AttractionsScreen: React.FC = () => {
     }
   };
 
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  const getDistanceToAttraction = (attraction: Attraction) => {
+    if (!userLocation) return '';
+    const distance = calculateDistance(
+      userLocation.lat, userLocation.lng,
+      attraction.latitude, attraction.longitude
+    );
+    return distance < 1 
+      ? `${Math.round(distance * 1000)}m`
+      : `${distance.toFixed(1)}km`;
+  };
+
+  const handleNavigateToAttraction = (attraction: Attraction) => {
+    // Store the selected attraction for navigation
+    localStorage.setItem('navigationTarget', JSON.stringify({
+      name: getLocalizedName(attraction),
+      lat: attraction.latitude,
+      lng: attraction.longitude
+    }));
+    setTouristPage('routes');
+  };
+
   const filteredAttractions = attractions.filter(attraction => {
     const matchesSearch = getLocalizedName(attraction).toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (getLocalizedDescription(attraction) || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -164,7 +219,7 @@ const AttractionsScreen: React.FC = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">{t('touristAttractions')}</h1>
-            <p className="text-sm text-muted-foreground">Discover amazing places</p>
+            <p className="text-sm text-muted-foreground">{t('discoverAmazingPlaces')}</p>
           </div>
         </div>
       </div>
@@ -175,7 +230,7 @@ const AttractionsScreen: React.FC = () => {
           <div className="relative">
             <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search attractions and services..."
+              placeholder={t('searchAttractionsAndServices')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -197,7 +252,7 @@ const AttractionsScreen: React.FC = () => {
                 size="sm"
                 onClick={() => setSelectedCategory('all')}
               >
-                All
+                {t('all')}
               </Button>
               {['natural', 'historical', 'religious', 'cultural', 'adventure'].map((category) => (
                 <Button
@@ -207,7 +262,7 @@ const AttractionsScreen: React.FC = () => {
                   onClick={() => setSelectedCategory(category)}
                   className="capitalize whitespace-nowrap"
                 >
-                  {category}
+                  {t(category)}
                 </Button>
               ))}
             </div>
@@ -246,7 +301,7 @@ const AttractionsScreen: React.FC = () => {
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-4 h-4 text-muted-foreground" />
-                          <span>View Location</span>
+                          <span>{getDistanceToAttraction(attraction) || t('viewLocation')}</span>
                         </div>
                         
                         {attraction.contact_number && (
@@ -268,10 +323,35 @@ const AttractionsScreen: React.FC = () => {
 
                       {attraction.entry_fee && (
                         <div className="text-sm">
-                          <span className="font-medium">Entry Fee: </span>
+                          <span className="font-medium">{t('entryFee')}: </span>
                           <span className="text-primary">{attraction.entry_fee}</span>
                         </div>
                       )}
+
+                      <div className="flex gap-2 pt-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => handleNavigateToAttraction(attraction)}
+                        >
+                          <Navigation className="w-4 h-4 mr-1" />
+                          {t('getDirections')}
+                        </Button>
+                        <Button 
+                          variant="default" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => {
+                            // Store attraction details for map view
+                            localStorage.setItem('selectedAttraction', JSON.stringify(attraction));
+                            setTouristPage('map');
+                          }}
+                        >
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {t('viewOnMap')}
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 );

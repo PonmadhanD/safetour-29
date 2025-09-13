@@ -3,16 +3,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   ArrowLeft, User, Shield, Bell, MapPin, Phone, 
   QrCode, Lock, Globe, HelpCircle, LogOut 
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 
 const SettingsScreen: React.FC = () => {
   const { setTouristPage, currentTourist } = useApp();
   const { signOut } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
+
+  const languages: { value: Language; label: string }[] = [
+    { value: 'en', label: t('english') },
+    { value: 'hi', label: t('hindi') },
+    { value: 'ta', label: t('tamil') },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light/30 to-secondary-light/30">
@@ -27,8 +36,8 @@ const SettingsScreen: React.FC = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold">Settings</h1>
-            <p className="text-sm text-muted-foreground">Manage your preferences</p>
+            <h1 className="text-xl font-bold">{t('settings')}</h1>
+            <p className="text-sm text-muted-foreground">{t('managePreferences')}</p>
           </div>
         </div>
       </div>
@@ -39,7 +48,7 @@ const SettingsScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
-              Profile
+{t('profile')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -50,14 +59,14 @@ const SettingsScreen: React.FC = () => {
               </div>
               <Badge className="bg-success-light text-success">
                 <Shield className="w-3 h-3 mr-1" />
-                Verified
+                {t('verified')}
               </Badge>
             </div>
             
             <div className="flex items-center gap-3 p-3 bg-accent rounded-lg">
               <QrCode className="w-8 h-8 text-primary" />
               <div className="flex-1">
-                <p className="font-medium">Digital ID</p>
+                <p className="font-medium">{t('digitalId')}</p>
                 <p className="text-sm text-muted-foreground">{currentTourist?.digitalId}</p>
               </div>
             </div>
@@ -69,7 +78,7 @@ const SettingsScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="w-5 h-5 text-primary" />
-              Security & Privacy
+              {t('securityAndPrivacy')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -104,7 +113,7 @@ const SettingsScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-secondary" />
-              Location Services
+              {t('locationServices')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -139,7 +148,7 @@ const SettingsScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="w-5 h-5 text-warning" />
-              Notifications
+              {t('notifications')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -174,7 +183,7 @@ const SettingsScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Phone className="w-5 h-5 text-emergency" />
-              Emergency Contacts
+{t('emergencyContacts')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -190,7 +199,7 @@ const SettingsScreen: React.FC = () => {
               </div>
             ))}
             <Button variant="outline" className="w-full">
-              Add Contact
+              {t('addContact')}
             </Button>
           </CardContent>
         </Card>
@@ -200,24 +209,35 @@ const SettingsScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-primary" />
-              App Settings
+{t('appSettings')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Language</p>
-                <p className="text-sm text-muted-foreground">English (India)</p>
+                <p className="font-medium">{t('language')}</p>
+                <p className="text-sm text-muted-foreground">{languages.find(l => l.value === language)?.label}</p>
               </div>
-              <Button variant="ghost" size="sm">Change</Button>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">App Version</p>
+                <p className="font-medium">{t('appVersion')}</p>
                 <p className="text-sm text-muted-foreground">v2.1.0</p>
               </div>
-              <Badge variant="outline">Latest</Badge>
+              <Badge variant="outline">{t('latest')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -227,7 +247,7 @@ const SettingsScreen: React.FC = () => {
           <CardContent className="p-4 space-y-3">
             <Button variant="outline" className="w-full justify-start">
               <HelpCircle className="w-4 h-4 mr-2" />
-              Help & Support
+              {t('helpAndSupport')}
             </Button>
             
             <Button 
@@ -243,7 +263,7 @@ const SettingsScreen: React.FC = () => {
               }}
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+{t('logout')}
             </Button>
           </CardContent>
         </Card>
