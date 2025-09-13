@@ -196,7 +196,7 @@ const HomeScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary" />
-              Current Location
+              {t('currentLocation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -216,7 +216,7 @@ const HomeScreen: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5 text-secondary" />
-              Recent Activity
+              {t('recentActivity')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">

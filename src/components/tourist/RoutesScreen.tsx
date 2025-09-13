@@ -1,98 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   ArrowLeft, Navigation, MapPin, Clock, Shield, Star,
-  Route, AlertTriangle, Phone, Info, Search
+  Route, AlertTriangle, Phone, Info
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/integrations/supabase/client';
 import { SafeRoute } from '@/types';
 import NavigationScreen from './NavigationScreen';
 
 const RoutesScreen: React.FC = () => {
   const { setTouristPage } = useApp();
-  const { t } = useLanguage();
   const [selectedRoute, setSelectedRoute] = useState<SafeRoute | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [safeRoutes, setSafeRoutes] = useState<SafeRoute[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [navigationTarget, setNavigationTarget] = useState<any>(null);
 
-  useEffect(() => {
-    loadSafeRoutes();
-    getCurrentLocation();
-    checkNavigationTarget();
-  }, []);
-
-  const loadSafeRoutes = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('safe_routes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Transform database data to match SafeRoute interface
-      const routes = data.map(route => {
-        const pathCoords = route.path_coordinates as any;
-        return {
-          id: route.route_id,
-          name: route.name,
-          from: 'Start Location',
-          to: 'End Location',
-          distance: '0 km',
-          duration: '0 min',
-          safetyRating: route.safety_level === 'safe' ? 4.8 : route.safety_level === 'caution' ? 4.0 : 3.5,
-          coordinates: pathCoords?.coordinates || [],
-          waypoints: pathCoords?.waypoints || [],
-          warnings: pathCoords?.warnings || [],
-          lastUpdated: route.updated_at
-        };
-      });
-
-      setSafeRoutes(routes);
-    } catch (error) {
-      console.error('Error loading safe routes:', error);
-      // Fallback to mock data
-      setSafeRoutes(mockRoutes);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          setUserLocation({ lat: 25.5788, lng: 91.8933 });
-        }
-      );
-    } else {
-      setUserLocation({ lat: 25.5788, lng: 91.8933 });
-    }
-  };
-
-  const checkNavigationTarget = () => {
-    const target = localStorage.getItem('navigationTarget');
-    if (target) {
-      setNavigationTarget(JSON.parse(target));
-      localStorage.removeItem('navigationTarget');
-    }
-  };
-
-  const mockRoutes: SafeRoute[] = [
+  const safeRoutes: SafeRoute[] = [
     {
       id: '1',
       name: 'Shillong to Cherrapunji',
@@ -139,6 +62,54 @@ const RoutesScreen: React.FC = () => {
       ],
       warnings: ['Border area - carry valid ID', 'Limited fuel stations after Pynursla'],
       lastUpdated: '2024-01-14'
+    },
+    {
+      id: '3',
+      name: 'Guwahati to Shillong',
+      from: 'Guwahati Railway Station',
+      to: 'Shillong Police Bazaar',
+      distance: '100 km',
+      duration: '3 hours',
+      safetyRating: 4.6,
+      coordinates: [
+        [91.7362, 26.1445],
+        [91.7800, 26.1200],
+        [91.8200, 26.0400],
+        [91.8014, 25.9441],
+        [91.8600, 25.8000],
+        [91.8800, 25.7000],
+        [91.8933, 25.5788]
+      ],
+      waypoints: [
+        { lat: 26.1445, lng: 91.7362, name: 'Guwahati Railway Station', type: 'checkpoint' },
+        { lat: 25.9441, lng: 91.8014, name: 'Jorabat Police Station', type: 'emergency' },
+        { lat: 25.5788, lng: 91.8933, name: 'Shillong Police Bazaar', type: 'checkpoint' }
+      ],
+      warnings: ['Heavy traffic during peak hours (8-10 AM, 5-7 PM)', 'Toll plaza at Jorabat'],
+      lastUpdated: '2024-01-16'
+    },
+    {
+      id: '4',
+      name: 'Shillong to Mawlynnong',
+      from: 'Shillong Police Bazaar',
+      to: 'Mawlynnong Village',
+      distance: '90 km',
+      duration: '2.5 hours',
+      safetyRating: 4.3,
+      coordinates: [
+        [91.8933, 25.5788],
+        [91.8500, 25.4000],
+        [91.8000, 25.3000],
+        [91.7639, 25.2677],
+        [91.8833, 25.2167]
+      ],
+      waypoints: [
+        { lat: 25.5788, lng: 91.8933, name: 'Shillong Police Bazaar', type: 'checkpoint' },
+        { lat: 25.2677, lng: 91.7639, name: 'Pynursla Police Station', type: 'emergency' },
+        { lat: 25.2167, lng: 91.8833, name: 'Mawlynnong Village', type: 'landmark' }
+      ],
+      warnings: ['Narrow village roads', 'Limited mobile network in some areas'],
+      lastUpdated: '2024-01-13'
     }
   ];
 
@@ -182,10 +153,10 @@ const RoutesScreen: React.FC = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">
-              {selectedRoute ? t('routeDetails') : t('safeRoutes')}
+              {selectedRoute ? 'Route Details' : 'Safe Routes'}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {selectedRoute ? selectedRoute.name : t('verifiedSafeTravelRoutes')}
+              {selectedRoute ? selectedRoute.name : 'Verified safe travel routes'}
             </p>
           </div>
         </div>
@@ -200,9 +171,9 @@ const RoutesScreen: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-sm">{t('realTimeRouteMonitoring')}</p>
+                    <p className="font-medium text-sm">Real-time Route Monitoring</p>
                     <p className="text-xs text-muted-foreground">
-                      {t('allRoutesMonitored')}
+                      All routes are monitored 24/7 with regular safety updates
                     </p>
                   </div>
                 </div>
@@ -223,7 +194,7 @@ const RoutesScreen: React.FC = () => {
                         <div className="flex items-center gap-2 mt-1">
                           <Star className={`w-4 h-4 ${getSafetyColor(route.safetyRating)}`} />
                           <span className="text-sm font-medium">{route.safetyRating}</span>
-                          <span className="text-xs text-muted-foreground">{t('safetyRating')}</span>
+                          <span className="text-xs text-muted-foreground">safety rating</span>
                         </div>
                       </div>
                     </div>
@@ -243,11 +214,11 @@ const RoutesScreen: React.FC = () => {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-sm">
                         <MapPin className="w-4 h-4 text-success" />
-                        <span>{t('from')}: {route.from}</span>
+                        <span>From: {route.from}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <MapPin className="w-4 h-4 text-primary" />
-                        <span>{t('to')}: {route.to}</span>
+                        <span>To: {route.to}</span>
                       </div>
                     </div>
 
@@ -256,7 +227,7 @@ const RoutesScreen: React.FC = () => {
                         <div className="flex items-start gap-2">
                           <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
                           <div>
-                            <p className="text-xs font-medium text-warning">{t('travelAdvisory')}</p>
+                            <p className="text-xs font-medium text-warning">Travel Advisory</p>
                             <p className="text-xs text-muted-foreground">
                               {route.warnings[0]}
                             </p>
@@ -273,7 +244,7 @@ const RoutesScreen: React.FC = () => {
                         onClick={() => setSelectedRoute(route)}
                       >
                         <Info className="w-4 h-4 mr-1" />
-                        {t('viewDetails')}
+                        View Details
                       </Button>
                       <Button 
                         variant="default" 
@@ -285,7 +256,7 @@ const RoutesScreen: React.FC = () => {
                         }}
                       >
                         <Navigation className="w-4 h-4 mr-1" />
-{t('startNavigation')}
+                        Start Navigation
                       </Button>
                     </div>
                   </CardContent>
@@ -301,17 +272,17 @@ const RoutesScreen: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Route className="w-5 h-5 text-primary" />
-{t('routeOverview')}
+                  Route Overview
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium">{t('distance')}</p>
+                    <p className="text-sm font-medium">Distance</p>
                     <p className="text-lg font-bold text-primary">{selectedRoute.distance}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium">{t('duration')}</p>
+                    <p className="text-sm font-medium">Duration</p>
                     <p className="text-lg font-bold text-primary">{selectedRoute.duration}</p>
                   </div>
                 </div>
@@ -319,7 +290,7 @@ const RoutesScreen: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Star className={`w-5 h-5 ${getSafetyColor(selectedRoute.safetyRating)}`} />
                   <span className="font-medium">{selectedRoute.safetyRating}</span>
-                  <span className="text-sm text-muted-foreground">{t('safetyRating')}</span>
+                  <span className="text-sm text-muted-foreground">Safety Rating</span>
                 </div>
               </CardContent>
             </Card>
@@ -327,7 +298,7 @@ const RoutesScreen: React.FC = () => {
             {/* Waypoints */}
             <Card>
               <CardHeader>
-                <CardTitle>{t('routeWaypoints')}</CardTitle>
+                <CardTitle>Route Waypoints</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -356,7 +327,7 @@ const RoutesScreen: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5 text-warning" />
-                    {t('travelAdvisories')}
+                    Travel Advisories
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -375,14 +346,14 @@ const RoutesScreen: React.FC = () => {
             {/* Actions */}
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={() => setSelectedRoute(null)}>
-                {t('backToRoutes')}
+                Back to Routes
               </Button>
               <Button 
                 className="flex-1"
                 onClick={() => setIsNavigating(true)}
               >
                 <Navigation className="w-4 h-4 mr-2" />
-                {t('startNavigation')}
+                Start Navigation
               </Button>
             </div>
           </div>
