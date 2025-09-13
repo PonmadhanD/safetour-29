@@ -8,9 +8,11 @@ import {
   QrCode, Lock, Globe, HelpCircle, LogOut 
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SettingsScreen: React.FC = () => {
   const { setTouristPage, currentTourist } = useApp();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light/30 to-secondary-light/30">
@@ -228,7 +230,18 @@ const SettingsScreen: React.FC = () => {
               Help & Support
             </Button>
             
-            <Button variant="outline" className="w-full justify-start text-emergency hover:text-emergency">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start text-emergency hover:text-emergency"
+              onClick={async () => {
+                try {
+                  await signOut();
+                  setTouristPage('home');
+                } catch (error) {
+                  console.error('Logout error:', error);
+                }
+              }}
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>

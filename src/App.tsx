@@ -7,8 +7,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import TouristApp from "@/components/TouristApp";
 import AuthorityApp from "@/components/AuthorityApp";
-import ViewToggle from "@/components/ViewToggle";
-import AuthScreen from '@/components/auth/AuthScreen';
+import TouristAuthScreen from '@/components/auth/TouristAuthScreen';
+import AdminAuthScreen from '@/components/auth/AdminAuthScreen';
 import { useAuth } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient();
@@ -28,13 +28,19 @@ const AppContent = () => {
     );
   }
 
+  // Separate authentication flows
   if (!user) {
-    return <AuthScreen />;
+    // For mobile app (tourist), always show tourist login
+    if (currentView === 'tourist') {
+      return <TouristAuthScreen />;
+    }
+    // For admin dashboard, show admin login
+    return <AdminAuthScreen />;
   }
   
+  // User is authenticated, show appropriate app
   return (
     <>
-      <ViewToggle />
       {currentView === 'tourist' ? <TouristApp /> : <AuthorityApp />}
     </>
   );

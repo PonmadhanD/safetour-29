@@ -5,12 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mail, Lock, User, MapPin, Globe } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Globe, Smartphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
 import heroImage from '@/assets/northeast-hero.jpg';
 
-const AuthScreen: React.FC = () => {
+const TouristAuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -24,7 +24,10 @@ const AuthScreen: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signIn(email, password);
+      const { error } = await signIn(email, password);
+      if (!error) {
+        // Tourist login successful - will be redirected by App.tsx
+      }
     } finally {
       setLoading(false);
     }
@@ -34,7 +37,11 @@ const AuthScreen: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signUp(email, password, fullName);
+      const { error } = await signUp(email, password, fullName);
+      if (!error) {
+        // Account created successfully
+        setActiveTab('signin');
+      }
     } finally {
       setLoading(false);
     }
@@ -66,15 +73,15 @@ const AuthScreen: React.FC = () => {
         
         <div className="relative z-10 text-center text-white max-w-md">
           <div className="flex items-center justify-center mb-6">
-            <MapPin className="w-12 h-12 text-white" />
+            <Smartphone className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">SafeTour</h1>
+          <h1 className="text-4xl font-bold mb-4">SafeTour Mobile</h1>
           <p className="text-lg text-white/90 mb-6">
-            Your trusted companion for safe and secure travel in Northeast India
+            {t('welcome')} - Your trusted companion for safe travel in Northeast India
           </p>
           <div className="flex items-center justify-center gap-2 text-white/80">
-            <Globe className="w-4 h-4" />
-            <span className="text-sm">Real-time safety updates • Emergency assistance • Family tracking</span>
+            <MapPin className="w-4 h-4" />
+            <span className="text-sm">Real-time safety • Emergency assistance • Family tracking</span>
           </div>
         </div>
       </div>
@@ -101,9 +108,12 @@ const AuthScreen: React.FC = () => {
 
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">{t('welcome')}</CardTitle>
+              <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                <Smartphone className="w-6 h-6 text-primary" />
+                Tourist App Login
+              </CardTitle>
               <p className="text-muted-foreground">
-                Sign in to access your safety dashboard
+                Sign in to access your mobile safety features
               </p>
             </CardHeader>
             
@@ -240,7 +250,7 @@ const AuthScreen: React.FC = () => {
           </Card>
 
           <p className="text-center text-sm text-muted-foreground">
-            By signing in, you agree to our Terms of Service and Privacy Policy
+            For tourists only. By signing in, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>
       </div>
@@ -248,4 +258,4 @@ const AuthScreen: React.FC = () => {
   );
 };
 
-export default AuthScreen;
+export default TouristAuthScreen;
