@@ -1,146 +1,251 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   ArrowLeft, Navigation, MapPin, Clock, Shield, Star,
-  Route, AlertTriangle, Phone, Info, Search
+  Route, AlertTriangle, Phone, Info
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/integrations/supabase/client';
 import { SafeRoute } from '@/types';
 import NavigationScreen from './NavigationScreen';
 
 const RoutesScreen: React.FC = () => {
   const { setTouristPage } = useApp();
-  const { t } = useLanguage();
   const [selectedRoute, setSelectedRoute] = useState<SafeRoute | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
-  const [safeRoutes, setSafeRoutes] = useState<SafeRoute[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [navigationTarget, setNavigationTarget] = useState<any>(null);
 
-  useEffect(() => {
-    loadSafeRoutes();
-    getCurrentLocation();
-    checkNavigationTarget();
-  }, []);
-
-  const loadSafeRoutes = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('safe_routes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Transform database data to match SafeRoute interface
-      const routes = data.map(route => {
-        const pathCoords = route.path_coordinates as any;
-        return {
-          id: route.route_id,
-          name: route.name,
-          from: 'Start Location',
-          to: 'End Location',
-          distance: '0 km',
-          duration: '0 min',
-          safetyRating: route.safety_level === 'safe' ? 4.8 : route.safety_level === 'caution' ? 4.0 : 3.5,
-          coordinates: pathCoords?.coordinates || [],
-          waypoints: pathCoords?.waypoints || [],
-          warnings: pathCoords?.warnings || [],
-          lastUpdated: route.updated_at
-        };
-      });
-
-      setSafeRoutes(routes);
-    } catch (error) {
-      console.error('Error loading safe routes:', error);
-      // Fallback to mock data
-      setSafeRoutes(mockRoutes);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          setUserLocation({ lat: 25.5788, lng: 91.8933 });
-        }
-      );
-    } else {
-      setUserLocation({ lat: 25.5788, lng: 91.8933 });
-    }
-  };
-
-  const checkNavigationTarget = () => {
-    const target = localStorage.getItem('navigationTarget');
-    if (target) {
-      setNavigationTarget(JSON.parse(target));
-      localStorage.removeItem('navigationTarget');
-    }
-  };
-
-  const mockRoutes: SafeRoute[] = [
-    {
-      id: '1',
-      name: 'Shillong to Cherrapunji',
-      from: 'Shillong Police Bazaar',
-      to: 'Cherrapunji Main Market',
-      distance: '54 km',
-      duration: '1.5 hours',
-      safetyRating: 4.8,
-      coordinates: [
-        [91.8933, 25.5788],
-        [91.8700, 25.5500],
-        [91.8400, 25.5200],
-        [91.8000, 25.4800],
-        [91.7600, 25.4200],
-        [91.7326, 25.3011]
-      ],
-      waypoints: [
-        { lat: 25.5788, lng: 91.8933, name: 'Shillong Police Bazaar', type: 'checkpoint' },
-        { lat: 25.4526, lng: 91.7318, name: 'Mawkdok Police Station', type: 'emergency' },
-        { lat: 25.3011, lng: 91.7326, name: 'Cherrapunji Market', type: 'checkpoint' }
-      ],
-      warnings: ['Steep curves between km 25-35', 'Weather dependent visibility'],
-      lastUpdated: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'Shillong to Dawki',
-      from: 'Shillong Bus Stand',
-      to: 'Dawki Border',
-      distance: '96 km',
-      duration: '2.5 hours',
-      safetyRating: 4.5,
-      coordinates: [
-        [91.8967, 25.5738],
-        [91.8200, 25.4000],
-        [91.7800, 25.3000],
-        [91.7639, 25.2677],
-        [91.7667, 25.1167]
-      ],
-      waypoints: [
-        { lat: 25.5738, lng: 91.8967, name: 'Shillong Bus Stand', type: 'checkpoint' },
-        { lat: 25.2677, lng: 91.7639, name: 'Pynursla Police Station', type: 'emergency' },
-        { lat: 25.1167, lng: 91.7667, name: 'Dawki Border Checkpoint', type: 'checkpoint' }
-      ],
-      warnings: ['Border area - carry valid ID', 'Limited fuel stations after Pynursla'],
-      lastUpdated: '2024-01-14'
-    }
-  ];
+  const safeRoutes: SafeRoute[] = [
+  {
+    "id": "route_1",
+    "name": "Itanagar to Tawang Safe Route",
+    "from": "Itanagar",
+    "to": "Tawang Monastery",
+    "distance": "450 km",
+    "duration": "12 hours",
+    "safetyRating": 4.2,
+    "coordinates": [
+      [93.6098, 27.0960],
+      [93.5000, 27.0000],
+      [92.8000, 26.8000],
+      [92.4000, 26.5000],
+      [91.8665, 27.5853]
+    ],
+    "waypoints": [
+      { "lat": 27.0960, "lng": 93.6098, "name": "Itanagar Start", "type": "checkpoint" },
+      { "lat": 27.0000, "lng": 93.5000, "name": "Papum Pare Checkpoint", "type": "checkpoint" },
+      { "lat": 26.5000, "lng": 92.4000, "name": "Bomdila Junction", "type": "landmark" },
+      { "lat": 27.5853, "lng": 91.8665, "name": "Tawang Monastery", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Obtain Inner Line Permit (ILP) mandatory",
+      "Travel only during daylight (6 AM to 5 PM)",
+      "Check for landslides in monsoon",
+      "Roads challenging due to terrain"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_2",
+    "name": "Ziro Valley to Namdapha Trek Route",
+    "from": "Ziro Valley",
+    "to": "Namdapha National Park",
+    "distance": "350 km",
+    "duration": "10 hours",
+    "safetyRating": 4.0,
+    "coordinates": [
+      [93.8351, 27.5880],
+      [94.0000, 27.4000],
+      [94.5000, 27.2000],
+      [95.0000, 27.0000],
+      [95.5800, 27.4600]
+    ],
+    "waypoints": [
+      { "lat": 27.5880, "lng": 93.8351, "name": "Ziro Valley Start", "type": "checkpoint" },
+      { "lat": 27.4000, "lng": 94.0000, "name": "Hapoli Checkpoint", "type": "checkpoint" },
+      { "lat": 27.0000, "lng": 95.0000, "name": "Changlang District", "type": "landmark" },
+      { "lat": 27.4600, "lng": 95.5800, "name": "Namdapha National Park", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Wildlife encounters possible - maintain distance",
+      "Trekking requires guide and permits",
+      "Avoid during heavy rains due to flooding",
+      "Carry insect repellent for biodiversity hotspot"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_3",
+    "name": "Guwahati to Kaziranga Safari Route",
+    "from": "Guwahati",
+    "to": "Kaziranga National Park",
+    "distance": "220 km",
+    "duration": "4 hours",
+    "safetyRating": 4.7,
+    "coordinates": [
+      [91.7362, 26.1444],
+      [92.2000, 26.2000],
+      [92.5000, 26.4000],
+      [93.0000, 26.6000],
+      [93.2076, 26.6745]
+    ],
+    "waypoints": [
+      { "lat": 26.1444, "lng": 91.7362, "name": "Guwahati Start", "type": "checkpoint" },
+      { "lat": 26.2000, "lng": 92.2000, "name": "Nagaon Checkpoint", "type": "checkpoint" },
+      { "lat": 26.6000, "lng": 93.0000, "name": "Numaligarh", "type": "landmark" },
+      { "lat": 26.6745, "lng": 93.2076, "name": "Kaziranga National Park", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Stick to marked safari routes",
+      "Keep safe distance from wildlife like rhinos",
+      "Avoid night travel due to banditry risks",
+      "Book jeep/elephant safaris in advance"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_4",
+    "name": "Kaziranga to Majuli Island Ferry Route",
+    "from": "Kaziranga National Park",
+    "to": "Majuli Island",
+    "distance": "200 km",
+    "duration": "5 hours (including ferry)",
+    "safetyRating": 4.6,
+    "coordinates": [
+      [93.2076, 26.6745],
+      [93.5000, 26.8000],
+      [93.8000, 26.9000],
+      [94.1167, 26.9500]
+    ],
+    "waypoints": [
+      { "lat": 26.6745, "lng": 93.2076, "name": "Kaziranga Start", "type": "checkpoint" },
+      { "lat": 26.8000, "lng": 93.5000, "name": "Jorhat Checkpoint", "type": "checkpoint" },
+      { "lat": 26.9000, "lng": 93.8000, "name": "Nimati Ghat", "type": "ferry" },
+      { "lat": 26.9500, "lng": 94.1167, "name": "Majuli Island", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Check ferry timings at Nimati Ghat",
+      "Monsoon flooding affects access",
+      "Respect Vaishnavite satras and local culture",
+      "Use licensed boats for river safety"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_5",
+    "name": "Guwahati to Manas National Park Route",
+    "from": "Guwahati",
+    "to": "Manas National Park",
+    "distance": "150 km",
+    "duration": "3.5 hours",
+    "safetyRating": 4.4,
+    "coordinates": [
+      [91.7362, 26.1444],
+      [91.9000, 26.3000],
+      [91.9500, 26.4000],
+      [91.7362, 26.1445]
+    ],
+    "waypoints": [
+      { "lat": 26.1444, "lng": 91.7362, "name": "Guwahati Start", "type": "checkpoint" },
+      { "lat": 26.3000, "lng": 91.9000, "name": "Barpeta Road Checkpoint", "type": "checkpoint" },
+      { "lat": 26.4000, "lng": 91.9500, "name": "Bongaigaon", "type": "landmark" },
+      { "lat": 26.1445, "lng": 91.7362, "name": "Manas National Park", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Tiger reserve - follow guided safaris only",
+      "Border area with Bhutan - carry ID",
+      "Flood-prone in monsoon",
+      "Limited accommodations, book ahead"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_6",
+    "name": "Shillong to Cherrapunji Scenic Route",
+    "from": "Shillong",
+    "to": "Cherrapunji",
+    "distance": "54 km",
+    "duration": "1.5 hours",
+    "safetyRating": 4.8,
+    "coordinates": [
+      [91.8933, 25.5788],
+      [91.8700, 25.5500],
+      [91.8400, 25.5200],
+      [91.8000, 25.4800],
+      [91.7362, 25.2993]
+    ],
+    "waypoints": [
+      { "lat": 25.5788, "lng": 91.8933, "name": "Shillong Start", "type": "checkpoint" },
+      { "lat": 25.5500, "lng": 91.8700, "name": "Mawkdok Checkpoint", "type": "checkpoint" },
+      { "lat": 25.4800, "lng": 91.8000, "name": "Sohra Viewpoint", "type": "landmark" },
+      { "lat": 25.2993, "lng": 91.7362, "name": "Cherrapunji", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Heavy rainfall - check weather",
+      "Slippery roads near waterfalls",
+      "Monsoon restrictions on root bridges",
+      "Hire local guides for treks"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_7",
+    "name": "Shillong City to Mawlynnong Eco Route",
+    "from": "Shillong",
+    "to": "Mawlynnong",
+    "distance": "90 km",
+    "duration": "2.5 hours",
+    "safetyRating": 4.9,
+    "coordinates": [
+      [91.8933, 25.5788],
+      [91.9000, 25.5000],
+      [91.8500, 25.4000],
+      [91.8500, 25.3000],
+      [91.8667, 25.2667]
+    ],
+    "waypoints": [
+      { "lat": 25.5788, "lng": 91.8933, "name": "Shillong Start", "type": "checkpoint" },
+      { "lat": 25.5000, "lng": 91.9000, "name": "Pynursla Checkpoint", "type": "checkpoint" },
+      { "lat": 25.3000, "lng": 91.8500, "name": "Synthew", "type": "landmark" },
+      { "lat": 25.2667, "lng": 91.8667, "name": "Mawlynnong Village", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Eco-village - no plastics allowed",
+      "Short treks to root bridges - wear sturdy shoes",
+      "Limited parking, arrive early",
+      "Respect cleanliness rules"
+    ],
+    "lastUpdated": "2025-09-15"
+  },
+  {
+    "id": "route_8",
+    "name": "Mawlynnong to Dawki River Route",
+    "from": "Mawlynnong",
+    "to": "Dawki",
+    "distance": "20 km",
+    "duration": "45 minutes",
+    "safetyRating": 4.7,
+    "coordinates": [
+      [91.8667, 25.2667],
+      [91.8700, 25.2500],
+      [91.8800, 25.2000],
+      [92.0167, 25.2000]
+    ],
+    "waypoints": [
+      { "lat": 25.2667, "lng": 91.8667, "name": "Mawlynnong Start", "type": "checkpoint" },
+      { "lat": 25.2500, "lng": 91.8700, "name": "Shnongpdeng Junction", "type": "checkpoint" },
+      { "lat": 25.2000, "lng": 91.8800, "name": "Umngot River View", "type": "landmark" },
+      { "lat": 25.2000, "lng": 92.0167, "name": "Dawki Boating Point", "type": "checkpoint" }
+    ],
+    "warnings": [
+      "Border area - carry ID for checks",
+      "Boat rides on crystal river - life jackets mandatory",
+      "Avoid during high water levels",
+      "No swimming in Umngot River"
+    ],
+    "lastUpdated": "2025-09-15"
+  }
+];
 
   const getSafetyColor = (rating: number) => {
     if (rating >= 4.5) return 'text-success';
@@ -182,10 +287,10 @@ const RoutesScreen: React.FC = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">
-              {selectedRoute ? t('routeDetails') : t('safeRoutes')}
+              {selectedRoute ? 'Route Details' : 'Safe Routes'}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {selectedRoute ? selectedRoute.name : t('verifiedSafeTravelRoutes')}
+              {selectedRoute ? selectedRoute.name : 'Verified safe travel routes'}
             </p>
           </div>
         </div>
@@ -200,9 +305,9 @@ const RoutesScreen: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-sm">{t('realTimeRouteMonitoring')}</p>
+                    <p className="font-medium text-sm">Real-time Route Monitoring</p>
                     <p className="text-xs text-muted-foreground">
-                      {t('allRoutesMonitored')}
+                      All routes are monitored 24/7 with regular safety updates
                     </p>
                   </div>
                 </div>
@@ -223,7 +328,7 @@ const RoutesScreen: React.FC = () => {
                         <div className="flex items-center gap-2 mt-1">
                           <Star className={`w-4 h-4 ${getSafetyColor(route.safetyRating)}`} />
                           <span className="text-sm font-medium">{route.safetyRating}</span>
-                          <span className="text-xs text-muted-foreground">{t('safetyRating')}</span>
+                          <span className="text-xs text-muted-foreground">safety rating</span>
                         </div>
                       </div>
                     </div>
@@ -243,11 +348,11 @@ const RoutesScreen: React.FC = () => {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-sm">
                         <MapPin className="w-4 h-4 text-success" />
-                        <span>{t('from')}: {route.from}</span>
+                        <span>From: {route.from}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <MapPin className="w-4 h-4 text-primary" />
-                        <span>{t('to')}: {route.to}</span>
+                        <span>To: {route.to}</span>
                       </div>
                     </div>
 
@@ -256,7 +361,7 @@ const RoutesScreen: React.FC = () => {
                         <div className="flex items-start gap-2">
                           <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
                           <div>
-                            <p className="text-xs font-medium text-warning">{t('travelAdvisory')}</p>
+                            <p className="text-xs font-medium text-warning">Travel Advisory</p>
                             <p className="text-xs text-muted-foreground">
                               {route.warnings[0]}
                             </p>
@@ -273,7 +378,7 @@ const RoutesScreen: React.FC = () => {
                         onClick={() => setSelectedRoute(route)}
                       >
                         <Info className="w-4 h-4 mr-1" />
-                        {t('viewDetails')}
+                        View Details
                       </Button>
                       <Button 
                         variant="default" 
@@ -285,7 +390,7 @@ const RoutesScreen: React.FC = () => {
                         }}
                       >
                         <Navigation className="w-4 h-4 mr-1" />
-{t('startNavigation')}
+                        Start Navigation
                       </Button>
                     </div>
                   </CardContent>
@@ -301,17 +406,17 @@ const RoutesScreen: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Route className="w-5 h-5 text-primary" />
-{t('routeOverview')}
+                  Route Overview
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium">{t('distance')}</p>
+                    <p className="text-sm font-medium">Distance</p>
                     <p className="text-lg font-bold text-primary">{selectedRoute.distance}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium">{t('duration')}</p>
+                    <p className="text-sm font-medium">Duration</p>
                     <p className="text-lg font-bold text-primary">{selectedRoute.duration}</p>
                   </div>
                 </div>
@@ -319,7 +424,7 @@ const RoutesScreen: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Star className={`w-5 h-5 ${getSafetyColor(selectedRoute.safetyRating)}`} />
                   <span className="font-medium">{selectedRoute.safetyRating}</span>
-                  <span className="text-sm text-muted-foreground">{t('safetyRating')}</span>
+                  <span className="text-sm text-muted-foreground">Safety Rating</span>
                 </div>
               </CardContent>
             </Card>
@@ -327,7 +432,7 @@ const RoutesScreen: React.FC = () => {
             {/* Waypoints */}
             <Card>
               <CardHeader>
-                <CardTitle>{t('routeWaypoints')}</CardTitle>
+                <CardTitle>Route Waypoints</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -356,7 +461,7 @@ const RoutesScreen: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5 text-warning" />
-                    {t('travelAdvisories')}
+                    Travel Advisories
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -375,14 +480,14 @@ const RoutesScreen: React.FC = () => {
             {/* Actions */}
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={() => setSelectedRoute(null)}>
-                {t('backToRoutes')}
+                Back to Routes
               </Button>
               <Button 
                 className="flex-1"
                 onClick={() => setIsNavigating(true)}
               >
                 <Navigation className="w-4 h-4 mr-2" />
-                {t('startNavigation')}
+                Start Navigation
               </Button>
             </div>
           </div>

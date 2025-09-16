@@ -1,3 +1,4 @@
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,12 +11,13 @@ import AuthorityApp from "@/components/AuthorityApp";
 import TouristAuthScreen from '@/components/auth/TouristAuthScreen';
 import AdminAuthScreen from '@/components/auth/AdminAuthScreen';
 import { useAuth } from '@/contexts/AuthContext';
+import ViewToggle from '@/components/ViewToggle'; // Adjust path as needed
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { currentView } = useApp();
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuth(); // Added loading from AuthContext
 
   if (loading) {
     return (
@@ -28,19 +30,17 @@ const AppContent = () => {
     );
   }
 
-  // Separate authentication flows
   if (!user) {
-    // For mobile app (tourist), always show tourist login
     if (currentView === 'tourist') {
       return <TouristAuthScreen />;
     }
-    // For admin dashboard, show admin login
     return <AdminAuthScreen />;
   }
-  
-  // User is authenticated, show appropriate app
+
   return (
     <>
+      {/* View Toggle positioned at the top-right */}
+      <ViewToggle />
       {currentView === 'tourist' ? <TouristApp /> : <AuthorityApp />}
     </>
   );
