@@ -20,10 +20,17 @@ const mockTourists: Tourist[] = [
     currentLocation: {
       lat: 25.5788,
       lng: 91.8933,
-      address: 'Police Bazar, Shillong'
+      address: 'Police Bazar, Shillong, Meghalaya, India'
     },
-    emergencyContacts: [],
-    travelHistory: [],
+    emergencyContacts: [
+      { name: 'Mary Doe', phone: '+91-9988776655', relationship: 'Wife' }
+    ],
+    travelHistory: [
+      {
+        location: { lat: 25.5780, lng: 91.8900, address: 'Ward Lake, Shillong' },
+        timestamp: '2024-01-07T14:00:00Z'
+      }
+    ],
     status: 'safe',
     lastActive: '2024-01-08T10:30:00Z'
   },
@@ -37,14 +44,140 @@ const mockTourists: Tourist[] = [
     currentLocation: {
       lat: 25.5800,
       lng: 91.8950,
-      address: 'Laitumkhrah, Shillong'
+      address: 'Laitumkhrah, Shillong, Meghalaya, India'
+    },
+    emergencyContacts: [
+      { name: 'Peter Smith', phone: '+91-9988776656', relationship: 'Husband' }
+    ],
+    travelHistory: [
+      {
+        location: { lat: 25.5810, lng: 91.8960, address: 'Don Bosco Square, Shillong' },
+        timestamp: '2024-01-07T16:15:00Z'
+      }
+    ],
+    status: 'alert', // Could be an SOS or entered a caution zone
+    lastActive: '2024-01-08T10:25:00Z'
+  },
+  {
+    id: '3',
+    name: 'Alice Johnson',
+    email: 'alice@example.com',
+    phone: '+91-9876543212',
+    digitalId: 'TID003',
+    isVerified: false, // Example of unverified tourist
+    currentLocation: {
+      lat: 25.5680,
+      lng: 91.8820,
+      address: 'Elephant Falls, Shillong, Meghalaya, India'
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T10:25:00Z'
+    status: 'safe',
+    lastActive: '2024-01-08T10:10:00Z'
+  },
+  {
+    id: '4',
+    name: 'Robert Brown',
+    email: 'robert@example.com',
+    phone: '+91-9876543213',
+    digitalId: 'TID004',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5750,
+      lng: 91.8900,
+      address: 'Shillong Peak, Shillong, Meghalaya, India'
+    },
+    emergencyContacts: [
+      { name: 'Sarah Brown', phone: '+91-9988776657', relationship: 'Sister' },
+      { name: 'Emergency Services', phone: '112', relationship: 'General Emergency' }
+    ],
+    travelHistory: [
+      {
+        location: { lat: 25.5700, lng: 91.8850, address: 'Botanical Garden, Shillong' },
+        timestamp: '2024-01-07T09:45:00Z'
+      },
+      {
+        location: { lat: 25.5720, lng: 91.8880, address: 'Air Force Museum, Shillong' },
+        timestamp: '2024-01-07T11:30:00Z'
+      }
+    ],
+    status: 'sos', // Urgent SOS signal
+    lastActive: '2024-01-08T10:05:00Z'
+  },
+  {
+    id: '5',
+    name: 'Emily White',
+    email: 'emily@example.com',
+    phone: '+91-9876543214',
+    digitalId: 'TID005',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5705,
+      lng: 91.9020,
+      address: 'Don Bosco Museum, Shillong, Meghalaya, India'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'offline', // Example of a tourist whose app might be offline
+    lastActive: '2024-01-08T09:50:00Z' // Last known active
+  },
+  {
+    id: '6',
+    name: 'Michael Green',
+    email: 'michael@example.com',
+    phone: '+91-9876543215',
+    digitalId: 'TID006',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5840,
+      lng: 91.8850,
+      address: 'Golf Course, Shillong, Meghalaya, India'
+    },
+    emergencyContacts: [
+      { name: 'David Green', phone: '+91-9988776658', relationship: 'Brother' }
+    ],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T10:40:00Z'
+  },
+  {
+    id: '7',
+    name: 'Sophia Lee',
+    email: 'sophia@example.com',
+    phone: '+91-9876543216',
+    digitalId: 'TID007',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5600,
+      lng: 91.9050,
+      address: 'Mawphlang Sacred Forest, Meghalaya, India' // Outside Shillong city, but still Meghalaya
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T10:15:00Z'
+  },
+  {
+    id: '8',
+    name: 'David Kim',
+    email: 'david@example.com',
+    phone: '+91-9876543217',
+    digitalId: 'TID008',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5730,
+      lng: 91.8800,
+      address: 'Lady Hydari Park, Shillong, Meghalaya, India'
+    },
+    emergencyContacts: [
+      { name: 'Anna Kim', phone: '+91-9988776659', relationship: 'Mother' }
+    ],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T10:00:00Z'
   }
 ];
+
 
 const MapDashboard: React.FC = () => {
   const { setAuthorityPage } = useApp();
