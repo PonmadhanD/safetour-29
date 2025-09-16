@@ -264,43 +264,29 @@ function App() {
     getUser();
   }, []);
 
-  // Fetch family members with user details
-  useEffect(() => {
-    if (!isSupabaseReady || !userId) return;
+  // // Fetch family members with user details on mount
+  // useEffect(() => {
+  //   if (!isSupabaseReady || !userId) return;
 
-    const fetchFamilyMembers = async () => {
-      try {
-        const { data, error } = await supabase
-  .from("family_members")
-  .insert([{
-    user_id: userId,
-    name, // 👈 TS doesn’t like it but will compile
-    relationship: "family",
-    Phone,
-    status: "pending",
-    can_track: true,
-    location: null,
-    distance: null,
-    last_seen: null,
-    user_status: "unknown",
-  } as any]);
+  //   const fetchFamilyMembers = async () => {
+  //     try {
+  //       const { data, error } = await supabase
+  //         .from('family_members')
+  //         .select('*')
+  //         .eq('user_id', userId);
 
+  //       if (error) {
+  //         throw new Error(`Failed to fetch family members: ${error.message}`);
+  //       }
 
-        if (error) {
-          throw new Error(`Failed to fetch family members: ${error.message}`);
-        }
+  //       setFamilyMembers(data as FamilyMember[]);
+  //     } catch (error) {
+  //       console.error('Error fetching family members:', (error as Error).message);
+  //     }
+  //   };
 
-        setFamilyMembers(data as FamilyMember[]);
-      } catch (error) {
-        console.error('Error fetching family members:', (error as Error).message);
-      }
-    };
-
-    fetchFamilyMembers();
-    const intervalId = setInterval(fetchFamilyMembers, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [isSupabaseReady, userId]);
+  //   fetchFamilyMembers();
+  // }, [isSupabaseReady, userId]);
 
   const addFamilyMember = async (e: React.FormEvent, name: string, relationship: string, phone: string) => {
     e.preventDefault();
@@ -314,30 +300,48 @@ function App() {
     }
 
     try {
+      const newMember = {
+        id: crypto.randomUUID(), // Generate a local ID for now
+        relationship,
+        status: 'pending' as const,
+        can_track: true,
+        name,
+        phone,
+        location: null,
+        distance: null,
+        last_seen: null,
+        user_status: 'unknown' as const,
+      };
+
+      // Update local state immediately
+      setFamilyMembers(prev => [...prev, newMember]);
+
+      // Optional: Sync with Supabase (commented out for local storage focus)
+      /*
       const { error } = await supabase
-  .from('family_members')
-  .insert([{
-    user_id: userId,
-    name,
-    relationship,
-    phone,
-    status: 'pending',
-    can_track: true,
-    location: null,
-    distance: null,
-    last_seen: null,
-    user_status: 'unknown',
-  } as any]); // 👈 bypass type checking
-
-
-
+        .from('family_members')
+        .insert({
+          user_id: userId,
+          name,
+          relationship,
+          phone,
+          status: 'pending',
+          can_track: true,
+          location: null,
+          distance: null,
+          last_seen: null,
+          user_status: 'unknown',
+        });
       if (error) {
         throw new Error(`Failed to add member: ${error.message}`);
       }
+      */
 
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding family member:', (error as Error).message);
+      // Revert local state if Supabase sync fails (if enabled)
+      setFamilyMembers(prev => prev.filter(m => m.id !== (familyMembers[familyMembers.length - 1]?.id || '')));
     }
   };
 
@@ -348,17 +352,25 @@ function App() {
     }
 
     try {
+      // Update local state immediately
+      setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
+
+      // Optional: Sync with Supabase (commented out for local storage focus)
+      /*
       const { error } = await supabase
         .from('family_members')
         .delete()
         .eq('id', memberId)
         .eq('user_id', userId);
-
       if (error) {
         throw new Error(`Failed to delete member: ${error.message}`);
       }
+      */
     } catch (error) {
       console.error('Error deleting family member:', (error as Error).message);
+      // Revert local state if Supabase sync fails (if enabled)
+      const deletedMember = familyMembers.find(m => m.id === memberId);
+      if (deletedMember) setFamilyMembers(prev => [...prev, deletedMember]);
     }
   };
 
