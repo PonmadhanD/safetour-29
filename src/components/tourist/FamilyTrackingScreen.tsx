@@ -241,8 +241,6 @@ function App() {
   const [userId, setUserId] = useState<string | null>(null);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [locationSharing, setLocationSharing] = useState(true);
-<<<<<<< HEAD
-<<<<<<< HEAD
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Authenticate with Supabase
@@ -299,44 +297,8 @@ function App() {
     if (!isSupabaseReady || !userId) {
       console.error('App not ready.');
       return;
-=======
-  
-  // Mock family members data
-  const familyMembers = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      relationship: 'Wife',
-      phone: '+91-98765-43210',
-      lastSeen: '2 minutes ago',
-      location: 'Shillong, Meghalaya',
-      distance: '0.5 km away',
-      status: 'safe'
-    },
-    {
-      id: '2', 
-      name: 'Mike Johnson',
-      relationship: 'Son',
-      phone: '+91-87654-32109',
-      lastSeen: '15 minutes ago',
-      location: 'Police Bazaar',
-      distance: '1.2 km away', 
-      status: 'safe'
-    },
-    {
-      id: '3',
-      name: 'Emma Johnson', 
-      relationship: 'Daughter',
-      phone: '+91-76543-21098',
-      lastSeen: '1 hour ago',
-      location: 'Ward Lake',
-      distance: '3.5 km away',
-      status: 'alert'
->>>>>>> 40dbd09fb892bf4478ca6a3dde17e2e53af4e671
     }
-  ];
 
-<<<<<<< HEAD
     try {
       const newMember = {
         id: crypto.randomUUID(), // Generate a local ID for now
@@ -384,82 +346,12 @@ function App() {
   };
 
   const deleteFamilyMember = async (memberId: string) => {
-=======
-  const [showAddForm, setShowAddForm] = useState(false);
-
-  // Authenticate with Supabase
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          setUserId(user.id);
-        } else {
-          console.error('No user logged in');
-          // Optionally redirect to login or handle anonymous user
-        }
-      } catch (err) {
-        console.error('Authentication error:', (err as Error).message);
-      } finally {
-        setIsSupabaseReady(true);
-      }
-    };
-
-    getUser();
-  }, []);
-
-  // Fetch family members with user details
-  useEffect(() => {
-    if (!isSupabaseReady || !userId) return;
-
-    const fetchFamilyMembers = async () => {
-      try {
-        const { data, error } = await supabase
-  .from("family_members")
-  .insert([{
-    user_id: userId,
-    name, // 👈 TS doesn’t like it but will compile
-    relationship: "family",
-    Phone,
-    status: "pending",
-    can_track: true,
-    location: null,
-    distance: null,
-    last_seen: null,
-    user_status: "unknown",
-  } as any]);
-
-
-        if (error) {
-          throw new Error(`Failed to fetch family members: ${error.message}`);
-        }
-
-        setFamilyMembers(data as FamilyMember[]);
-      } catch (error) {
-        console.error('Error fetching family members:', (error as Error).message);
-      }
-    };
-
-    fetchFamilyMembers();
-    const intervalId = setInterval(fetchFamilyMembers, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [isSupabaseReady, userId]);
-
-  const addFamilyMember = async (e: React.FormEvent, name: string, relationship: string, phone: string) => {
-    e.preventDefault();
-    if (!name || !relationship || !phone) {
-      console.error('Please fill all fields.');
-      return;
-    }
->>>>>>> b2948e158c66c8cdc657f93e797c9bef8ffb297b
     if (!isSupabaseReady || !userId) {
       console.error('App not ready.');
       return;
     }
 
     try {
-<<<<<<< HEAD
       // Update local state immediately
       setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
 
@@ -479,66 +371,6 @@ function App() {
       // Revert local state if Supabase sync fails (if enabled)
       const deletedMember = familyMembers.find(m => m.id === memberId);
       if (deletedMember) setFamilyMembers(prev => [...prev, deletedMember]);
-    }
-  };
-
-  // Helper function to get status color
-  const getStatusColor = (status: string | null) => {
-=======
-  const getStatusColor = (status: string) => {
->>>>>>> 40dbd09fb892bf4478ca6a3dde17e2e53af4e671
-    switch (status) {
-      case 'safe': return 'bg-success text-success-foreground';
-      case 'alert': return 'bg-warning text-warning-foreground';
-      case 'emergency': return 'bg-emergency text-emergency-foreground';
-      default: return 'bg-muted text-muted-foreground';
-=======
-      const { error } = await supabase
-  .from('family_members')
-  .insert([{
-    user_id: userId,
-    name,
-    relationship,
-    phone,
-    status: 'pending',
-    can_track: true,
-    location: null,
-    distance: null,
-    last_seen: null,
-    user_status: 'unknown',
-  } as any]); // 👈 bypass type checking
-
-
-
-      if (error) {
-        throw new Error(`Failed to add member: ${error.message}`);
-      }
-
-      setShowAddForm(false);
-    } catch (error) {
-      console.error('Error adding family member:', (error as Error).message);
->>>>>>> b2948e158c66c8cdc657f93e797c9bef8ffb297b
-    }
-  };
-
-  const deleteFamilyMember = async (memberId: string) => {
-    if (!isSupabaseReady || !userId) {
-      console.error('App not ready.');
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('family_members')
-        .delete()
-        .eq('id', memberId)
-        .eq('user_id', userId);
-
-      if (error) {
-        throw new Error(`Failed to delete member: ${error.message}`);
-      }
-    } catch (error) {
-      console.error('Error deleting family member:', (error as Error).message);
     }
   };
 
