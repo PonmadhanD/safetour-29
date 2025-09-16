@@ -49,7 +49,7 @@ const HomeScreen: React.FC = () => {
         <div className="p-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {t('welcomeBack')} {user?.user_metadata?.full_name || user?.email?.split('@')[0]}!
+              {t('welcomeBack')}
             </h1>
             <p className="text-sm text-muted-foreground">{currentTourist?.name || 'Traveler'}</p>
           </div>
@@ -150,7 +150,7 @@ const HomeScreen: React.FC = () => {
             </div>
           </Button>
           
-          {/* Tourist Attractions */}
+          {/* Tourist Attractions
           <Button
             variant="outline"
             size="lg"
@@ -162,7 +162,7 @@ const HomeScreen: React.FC = () => {
               <div className="font-bold">🏛️ {t('touristAttractions')}</div>
               <div className="text-sm text-muted-foreground">Discover places</div>
             </div>
-          </Button>
+          </Button> */}
         </div>
 
         {/* Recent Alerts / Notifications */}
