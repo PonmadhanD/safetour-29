@@ -10,6 +10,7 @@ import MapView from '@/components/MapView';
 
 // Mock tourist data
 const mockTourists: Tourist[] = [
+  // Group 1: Shillong Central (5 tourists, mostly safe)
   {
     id: '1',
     name: 'John Doe',
@@ -20,17 +21,10 @@ const mockTourists: Tourist[] = [
     currentLocation: {
       lat: 25.5788,
       lng: 91.8933,
-      address: 'Police Bazar, Shillong, Meghalaya, India'
+      address: 'Police Bazar, Shillong'
     },
-    emergencyContacts: [
-      { name: 'Mary Doe', phone: '+91-9988776655', relationship: 'Wife' }
-    ],
-    travelHistory: [
-      {
-        location: { lat: 25.5780, lng: 91.8900, address: 'Ward Lake, Shillong' },
-        timestamp: '2024-01-07T14:00:00Z'
-      }
-    ],
+    emergencyContacts: [],
+    travelHistory: [],
     status: 'safe',
     lastActive: '2024-01-08T10:30:00Z'
   },
@@ -44,18 +38,11 @@ const mockTourists: Tourist[] = [
     currentLocation: {
       lat: 25.5800,
       lng: 91.8950,
-      address: 'Laitumkhrah, Shillong, Meghalaya, India'
+      address: 'Laitumkhrah, Shillong'
     },
-    emergencyContacts: [
-      { name: 'Peter Smith', phone: '+91-9988776656', relationship: 'Husband' }
-    ],
-    travelHistory: [
-      {
-        location: { lat: 25.5810, lng: 91.8960, address: 'Don Bosco Square, Shillong' },
-        timestamp: '2024-01-07T16:15:00Z'
-      }
-    ],
-    status: 'alert', // Could be an SOS or entered a caution zone
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
     lastActive: '2024-01-08T10:25:00Z'
   },
   {
@@ -64,98 +51,85 @@ const mockTourists: Tourist[] = [
     email: 'alice@example.com',
     phone: '+91-9876543212',
     digitalId: 'TID003',
-    isVerified: false, // Example of unverified tourist
+    isVerified: true,
     currentLocation: {
-      lat: 25.5680,
-      lng: 91.8820,
-      address: 'Elephant Falls, Shillong, Meghalaya, India'
+      lat: 25.5790,
+      lng: 91.8940,
+      address: 'Mawphlang, Shillong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T10:20:00Z'
+  },
+  {
+    id: '4',
+    name: 'Bob Wilson',
+    email: 'bob@example.com',
+    phone: '+91-9876543213',
+    digitalId: 'TID004',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5810,
+      lng: 91.8960,
+      address: 'Barik, Shillong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T10:15:00Z'
+  },
+  {
+    id: '5',
+    name: 'Emma Brown',
+    email: 'emma@example.com',
+    phone: '+91-9876543214',
+    digitalId: 'TID005',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.5770,
+      lng: 91.8920,
+      address: 'Happy Valley, Shillong'
     },
     emergencyContacts: [],
     travelHistory: [],
     status: 'safe',
     lastActive: '2024-01-08T10:10:00Z'
   },
-  {
-    id: '4',
-    name: 'Robert Brown',
-    email: 'robert@example.com',
-    phone: '+91-9876543213',
-    digitalId: 'TID004',
-    isVerified: true,
-    currentLocation: {
-      lat: 25.5750,
-      lng: 91.8900,
-      address: 'Shillong Peak, Shillong, Meghalaya, India'
-    },
-    emergencyContacts: [
-      { name: 'Sarah Brown', phone: '+91-9988776657', relationship: 'Sister' },
-      { name: 'Emergency Services', phone: '112', relationship: 'General Emergency' }
-    ],
-    travelHistory: [
-      {
-        location: { lat: 25.5700, lng: 91.8850, address: 'Botanical Garden, Shillong' },
-        timestamp: '2024-01-07T09:45:00Z'
-      },
-      {
-        location: { lat: 25.5720, lng: 91.8880, address: 'Air Force Museum, Shillong' },
-        timestamp: '2024-01-07T11:30:00Z'
-      }
-    ],
-    status: 'sos', // Urgent SOS signal
-    lastActive: '2024-01-08T10:05:00Z'
-  },
-  {
-    id: '5',
-    name: 'Emily White',
-    email: 'emily@example.com',
-    phone: '+91-9876543214',
-    digitalId: 'TID005',
-    isVerified: true,
-    currentLocation: {
-      lat: 25.5705,
-      lng: 91.9020,
-      address: 'Don Bosco Museum, Shillong, Meghalaya, India'
-    },
-    emergencyContacts: [],
-    travelHistory: [],
-    status: 'offline', // Example of a tourist whose app might be offline
-    lastActive: '2024-01-08T09:50:00Z' // Last known active
-  },
+  // Group 2: Cherrapunji Area (6 tourists, mixed status)
   {
     id: '6',
-    name: 'Michael Green',
+    name: 'Michael Garcia',
     email: 'michael@example.com',
     phone: '+91-9876543215',
     digitalId: 'TID006',
     isVerified: true,
     currentLocation: {
-      lat: 25.5840,
-      lng: 91.8850,
-      address: 'Golf Course, Shillong, Meghalaya, India'
-    },
-    emergencyContacts: [
-      { name: 'David Green', phone: '+91-9988776658', relationship: 'Brother' }
-    ],
-    travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T10:40:00Z'
-  },
-  {
-    id: '7',
-    name: 'Sophia Lee',
-    email: 'sophia@example.com',
-    phone: '+91-9876543216',
-    digitalId: 'TID007',
-    isVerified: true,
-    currentLocation: {
-      lat: 25.5600,
-      lng: 91.9050,
-      address: 'Mawphlang Sacred Forest, Meghalaya, India' // Outside Shillong city, but still Meghalaya
+      lat: 25.2993,
+      lng: 91.7362,
+      address: 'Sohra, Cherrapunji'
     },
     emergencyContacts: [],
     travelHistory: [],
     status: 'safe',
-    lastActive: '2024-01-08T10:15:00Z'
+    lastActive: '2024-01-08T09:45:00Z'
+  },
+  {
+    id: '7',
+    name: 'Sarah Lee',
+    email: 'sarah@example.com',
+    phone: '+91-9876543216',
+    digitalId: 'TID007',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.3000,
+      lng: 91.7370,
+      address: 'Nohkalikai Falls, Cherrapunji'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T09:40:00Z'
   },
   {
     id: '8',
@@ -165,19 +139,737 @@ const mockTourists: Tourist[] = [
     digitalId: 'TID008',
     isVerified: true,
     currentLocation: {
-      lat: 25.5730,
-      lng: 91.8800,
-      address: 'Lady Hydari Park, Shillong, Meghalaya, India'
+      lat: 25.2980,
+      lng: 91.7350,
+      address: 'Root Bridges, Cherrapunji'
     },
-    emergencyContacts: [
-      { name: 'Anna Kim', phone: '+91-9988776659', relationship: 'Mother' }
-    ],
+    emergencyContacts: [],
     travelHistory: [],
     status: 'safe',
-    lastActive: '2024-01-08T10:00:00Z'
+    lastActive: '2024-01-08T09:35:00Z'
+  },
+  {
+    id: '9',
+    name: 'Lisa Chen',
+    email: 'lisa@example.com',
+    phone: '+91-9876543218',
+    digitalId: 'TID009',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.3010,
+      lng: 91.7380,
+      address: 'Mawsmai Cave, Cherrapunji'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'emergency',
+    lastActive: '2024-01-08T09:30:00Z'
+  },
+  {
+    id: '10',
+    name: 'Tom Patel',
+    email: 'tom@example.com',
+    phone: '+91-9876543219',
+    digitalId: 'TID010',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.3020,
+      lng: 91.7390,
+      address: 'Seven Sister Falls, Cherrapunji'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T09:25:00Z'
+  },
+  {
+    id: '11',
+    name: 'Anna Singh',
+    email: 'anna@example.com',
+    phone: '+91-9876543220',
+    digitalId: 'TID011',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.3030,
+      lng: 91.7400,
+      address: 'Thangkharang Park, Cherrapunji'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T09:20:00Z'
+  },
+  // Group 3: Mawlynnong Village (7 tourists, mostly alert)
+  {
+    id: '12',
+    name: 'Raj Kumar',
+    email: 'raj@example.com',
+    phone: '+91-9876543221',
+    digitalId: 'TID012',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2667,
+      lng: 91.8667,
+      address: 'Mawlynnong Village'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T09:15:00Z'
+  },
+  {
+    id: '13',
+    name: 'Priya Sharma',
+    email: 'priya@example.com',
+    phone: '+91-9876543222',
+    digitalId: 'TID013',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2670,
+      lng: 91.8670,
+      address: 'Living Root Bridge, Mawlynnong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T09:10:00Z'
+  },
+  {
+    id: '14',
+    name: 'Vikram Reddy',
+    email: 'vikram@example.com',
+    phone: '+91-9876543223',
+    digitalId: 'TID014',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2680,
+      lng: 91.8680,
+      address: 'Sky View Point, Mawlynnong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T09:05:00Z'
+  },
+  {
+    id: '15',
+    name: 'Neha Gupta',
+    email: 'neha@example.com',
+    phone: '+91-9876543224',
+    digitalId: 'TID015',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2690,
+      lng: 91.8690,
+      address: 'Bamboo Bridge, Mawlynnong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T09:00:00Z'
+  },
+  {
+    id: '16',
+    name: 'Amit Singh',
+    email: 'amit@example.com',
+    phone: '+91-9876543225',
+    digitalId: 'TID016',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2700,
+      lng: 91.8700,
+      address: 'Eco Park, Mawlynnong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:55:00Z'
+  },
+  {
+    id: '17',
+    name: 'Riya Patel',
+    email: 'riya@example.com',
+    phone: '+91-9876543226',
+    digitalId: 'TID017',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2710,
+      lng: 91.8710,
+      address: 'Village Trail, Mawlynnong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T08:50:00Z'
+  },
+  {
+    id: '18',
+    name: 'Sanjay Joshi',
+    email: 'sanjay@example.com',
+    phone: '+91-9876543227',
+    digitalId: 'TID018',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2720,
+      lng: 91.8720,
+      address: 'Mawlynnong School, Mawlynnong'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:45:00Z'
+  },
+  // Group 4: Dawki River Area (8 tourists, varied status)
+  {
+    id: '19',
+    name: 'Kiran Desai',
+    email: 'kiran@example.com',
+    phone: '+91-9876543228',
+    digitalId: 'TID019',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2000,
+      lng: 92.0167,
+      address: 'Umngot River, Dawki'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:40:00Z'
+  },
+  {
+    id: '20',
+    name: 'Meera Nair',
+    email: 'meera@example.com',
+    phone: '+91-9876543229',
+    digitalId: 'TID020',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2010,
+      lng: 92.0170,
+      address: 'Dawki Boating Point'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T08:35:00Z'
+  },
+  {
+    id: '21',
+    name: 'Rohan Mehta',
+    email: 'rohan@example.com',
+    phone: '+91-9876543230',
+    digitalId: 'TID021',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2020,
+      lng: 92.0180,
+      address: 'Bangladesh Border View, Dawki'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'emergency',
+    lastActive: '2024-01-08T08:30:00Z'
+  },
+  {
+    id: '22',
+    name: 'Sita Raman',
+    email: 'sita@example.com',
+    phone: '+91-9876543231',
+    digitalId: 'TID022',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2030,
+      lng: 92.0190,
+      address: 'Umiam Lake View, Dawki'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:25:00Z'
+  },
+  {
+    id: '23',
+    name: 'Arjun Bose',
+    email: 'arjun@example.com',
+    phone: '+91-9876543232',
+    digitalId: 'TID023',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2040,
+      lng: 92.0200,
+      address: 'Dawki Market'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T08:20:00Z'
+  },
+  {
+    id: '24',
+    name: 'Lila Kaur',
+    email: 'lila@example.com',
+    phone: '+91-9876543233',
+    digitalId: 'TID024',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2050,
+      lng: 92.0210,
+      address: 'River Bridge, Dawki'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:15:00Z'
+  },
+  {
+    id: '25',
+    name: 'Vikas Thakur',
+    email: 'vikas@example.com',
+    phone: '+91-9876543234',
+    digitalId: 'TID025',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2060,
+      lng: 92.0220,
+      address: 'Dawki Forest Trail'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:10:00Z'
+  },
+  {
+    id: '26',
+    name: 'Pooja Yadav',
+    email: 'pooja@example.com',
+    phone: '+91-9876543235',
+    digitalId: 'TID026',
+    isVerified: true,
+    currentLocation: {
+      lat: 25.2070,
+      lng: 92.0230,
+      address: 'Umngot River Bank, Dawki'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T08:05:00Z'
+  },
+  // Group 5: Kaziranga National Park (5 tourists, mostly safe)
+  {
+    id: '27',
+    name: 'Rahul Verma',
+    email: 'rahul@example.com',
+    phone: '+91-9876543236',
+    digitalId: 'TID027',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.6745,
+      lng: 93.2076,
+      address: 'Kaziranga National Park Entrance'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T08:00:00Z'
+  },
+  {
+    id: '28',
+    name: 'Anita Rao',
+    email: 'anita@example.com',
+    phone: '+91-9876543237',
+    digitalId: 'TID028',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.6750,
+      lng: 93.2080,
+      address: 'Jeep Safari Zone, Kaziranga'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:55:00Z'
+  },
+  {
+    id: '29',
+    name: 'Suresh Iyer',
+    email: 'suresh@example.com',
+    phone: '+91-9876543238',
+    digitalId: 'TID029',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.6760,
+      lng: 93.2090,
+      address: 'Rhino Viewing Area, Kaziranga'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T07:50:00Z'
+  },
+  {
+    id: '30',
+    name: 'Kavya Nair',
+    email: 'kavya@example.com',
+    phone: '+91-9876543239',
+    digitalId: 'TID030',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.6770,
+      lng: 93.2100,
+      address: 'Elephant Safari Point, Kaziranga'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:45:00Z'
+  },
+  {
+    id: '31',
+    name: 'Nikhil Das',
+    email: 'nikhil@example.com',
+    phone: '+91-9876543240',
+    digitalId: 'TID031',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.6780,
+      lng: 93.2110,
+      address: 'Bird Watching Tower, Kaziranga'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:40:00Z'
+  },
+  // Group 6: Majuli Island (5 tourists, emergency heavy)
+  {
+    id: '32',
+    name: 'Deepa Malhotra',
+    email: 'deepa@example.com',
+    phone: '+91-9876543241',
+    digitalId: 'TID032',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.9500,
+      lng: 94.1167,
+      address: 'Satra Monastery, Majuli'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'emergency',
+    lastActive: '2024-01-08T07:35:00Z'
+  },
+  {
+    id: '33',
+    name: 'Gaurav Kapoor',
+    email: 'gaurav@example.com',
+    phone: '+91-9876543242',
+    digitalId: 'TID033',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.9510,
+      lng: 94.1170,
+      address: 'Brahmaputra River Bank, Majuli'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T07:30:00Z'
+  },
+  {
+    id: '34',
+    name: 'Tara Bose',
+    email: 'tara@example.com',
+    phone: '+91-9876543243',
+    digitalId: 'TID034',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.9520,
+      lng: 94.1180,
+      address: 'Cultural Village, Majuli'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'emergency',
+    lastActive: '2024-01-08T07:25:00Z'
+  },
+  {
+    id: '35',
+    name: 'Rajesh Kumar',
+    email: 'rajesh@example.com',
+    phone: '+91-9876543244',
+    digitalId: 'TID035',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.9530,
+      lng: 94.1190,
+      address: 'Ferry Ghat, Majuli'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:20:00Z'
+  },
+  {
+    id: '36',
+    name: 'Sonal Gupta',
+    email: 'sonal@example.com',
+    phone: '+91-9876543245',
+    digitalId: 'TID036',
+    isVerified: true,
+    currentLocation: {
+      lat: 26.9540,
+      lng: 94.1200,
+      address: 'Island Trail, Majuli'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'emergency',
+    lastActive: '2024-01-08T07:15:00Z'
+  },
+  // Group 7: Tawang Monastery (5 tourists, safe)
+  {
+    id: '37',
+    name: 'Aarav Singh',
+    email: 'aarav@example.com',
+    phone: '+91-9876543246',
+    digitalId: 'TID037',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5853,
+      lng: 91.8665,
+      address: 'Tawang Monastery'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:10:00Z'
+  },
+  {
+    id: '38',
+    name: 'Kiara Khan',
+    email: 'kiara@example.com',
+    phone: '+91-9876543247',
+    digitalId: 'TID038',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5860,
+      lng: 91.8670,
+      address: 'Tawang Market'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:05:00Z'
+  },
+  {
+    id: '39',
+    name: 'Yash Patel',
+    email: 'yash@example.com',
+    phone: '+91-9876543248',
+    digitalId: 'TID039',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5870,
+      lng: 91.8680,
+      address: 'Sela Pass View, Tawang'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T07:00:00Z'
+  },
+  {
+    id: '40',
+    name: 'Mira Joshi',
+    email: 'mira@example.com',
+    phone: '+91-9876543249',
+    digitalId: 'TID040',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5880,
+      lng: 91.8690,
+      address: 'Tawang Lake'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:55:00Z'
+  },
+  {
+    id: '41',
+    name: 'Karan Dubey',
+    email: 'karan@example.com',
+    phone: '+91-9876543250',
+    digitalId: 'TID041',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5890,
+      lng: 91.8700,
+      address: 'Madhuri Lake, Tawang'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:50:00Z'
+  },
+  // Group 8: Ziro Valley (5 tourists, alert heavy)
+  {
+    id: '42',
+    name: 'Naina Roy',
+    email: 'naina@example.com',
+    phone: '+91-9876543251',
+    digitalId: 'TID042',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5880,
+      lng: 93.8351,
+      address: 'Ziro Valley Rice Fields'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T06:45:00Z'
+  },
+  {
+    id: '43',
+    name: 'Siddharth Verma',
+    email: 'siddharth@example.com',
+    phone: '+91-9876543252',
+    digitalId: 'TID043',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5890,
+      lng: 93.8360,
+      address: 'Apatani Village, Ziro'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T06:40:00Z'
+  },
+  {
+    id: '44',
+    name: 'Rhea Das',
+    email: 'rhea@example.com',
+    phone: '+91-9876543253',
+    digitalId: 'TID044',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5900,
+      lng: 93.8370,
+      address: 'Ziro Music Festival Site'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:35:00Z'
+  },
+  {
+    id: '45',
+    name: 'Aryan Khan',
+    email: 'aryan@example.com',
+    phone: '+91-9876543254',
+    digitalId: 'TID045',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5910,
+      lng: 93.8380,
+      address: 'Talley Valley, Ziro'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T06:30:00Z'
+  },
+  {
+    id: '46',
+    name: 'Saanvi Sharma',
+    email: 'saanvi@example.com',
+    phone: '+91-9876543255',
+    digitalId: 'TID046',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.5920,
+      lng: 93.8390,
+      address: 'Ziro Wildlife Sanctuary'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'alert',
+    lastActive: '2024-01-08T06:25:00Z'
+  },
+  // Group 9: Namdapha National Park (5 tourists, safe)
+  {
+    id: '47',
+    name: 'Dev Sharma',
+    email: 'dev@example.com',
+    phone: '+91-9876543256',
+    digitalId: 'TID047',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.4600,
+      lng: 95.5800,
+      address: 'Namdapha Trekking Trail'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:20:00Z'
+  },
+  {
+    id: '48',
+    name: 'Isha Malik',
+    email: 'isha@example.com',
+    phone: '+91-9876543257',
+    digitalId: 'TID048',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.4610,
+      lng: 95.5810,
+      address: 'Tiger Reserve Zone, Namdapha'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:15:00Z'
+  },
+  {
+    id: '49',
+    name: 'Ravi Chawla',
+    email: 'ravi@example.com',
+    phone: '+91-9876543258',
+    digitalId: 'TID049',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.4620,
+      lng: 95.5820,
+      address: 'Snow Leopard Viewing, Namdapha'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:10:00Z'
+  },
+  {
+    id: '50',
+    name: 'Tanya Sethi',
+    email: 'tanya@example.com',
+    phone: '+91-9876543259',
+    digitalId: 'TID050',
+    isVerified: true,
+    currentLocation: {
+      lat: 27.4630,
+      lng: 95.5830,
+      address: 'Biodiversity Hotspot, Namdapha'
+    },
+    emergencyContacts: [],
+    travelHistory: [],
+    status: 'safe',
+    lastActive: '2024-01-08T06:05:00Z'
   }
 ];
-
 
 const MapDashboard: React.FC = () => {
   const { setAuthorityPage } = useApp();
