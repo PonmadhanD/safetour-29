@@ -51,8 +51,6 @@ const translations: Record<Language, Translation> = {
     viewMap: "View Map & Safe Zones",
     familyTracking: "Family Tracking",
     recentAlerts: "Recent Alerts",
-    currentLocation: "Current Location",
-    recentActivity: "Recent Activity",
     // Map & Navigation
     mapNavigation: "Map & Navigation",
     safeZonesRoutes: "Safe zones and routes",
@@ -104,8 +102,6 @@ const translations: Record<Language, Translation> = {
     viewMap: "मैप और सुरक्षित क्षेत्र देखें",
     familyTracking: "पारिवारिक ट्रैकिंग",
     recentAlerts: "हाल की अलर्ट",
-    currentLocation: "वर्तमान स्थान",
-    recentActivity: "हाल की गतिविधि",
     // Map & Navigation
     mapNavigation: "मैप और नेवीगेशन",
     safeZonesRoutes: "सुरक्षित क्षेत्र और रूट",
@@ -157,8 +153,6 @@ const translations: Record<Language, Translation> = {
     viewMap: "வரைபடம் & பாதுகாப்பு மண்டலங்கள்",
     familyTracking: "குடும்ப கண்காணிப்பு",
     recentAlerts: "சமீபத்திய எச்சரிக்கைகள்",
-    currentLocation: "தற்போதைய இடம்",
-    recentActivity: "சமீபத்திய செயல்பாடு",
     // Map & Navigation
     mapNavigation: "வரைபடம் & வழிசெலுத்தல்",
     safeZonesRoutes: "பாதுகாப்பு மண்டலங்கள் மற்றும் பாதைகள்",

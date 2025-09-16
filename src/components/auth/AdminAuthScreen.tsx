@@ -49,7 +49,7 @@ const AdminAuthScreen: React.FC = () => {
       // Set authority profile for admin dashboard
       const authority = {
         id: Date.now().toString(),
-        name: formData.fullName,
+        name: formData.fullName || 'Authority User',
         email: formData.email,
         role: 'officer' as const,
         department: 'Northeast Police Department',

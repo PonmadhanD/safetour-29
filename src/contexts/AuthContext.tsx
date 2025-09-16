@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<any>;
-  signIn: (email: string, password: string) => Promise<any>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,125 +25,193 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Initial loading state
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSession = async () => {
-      setLoading(true); // Start loading
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
+        setSession(session);
         setUser(session?.user ?? null);
-      } catch (error) {
-        console.error('Error fetching session:', error);
-        setUser(null);
-      } finally {
-        setLoading(false); // Stop loading regardless of success or error
+        
+        // Create user record and preferences if new user
+        if (event === 'SIGNED_IN' && session?.user) {
+          setTimeout(async () => {
+            try {
+              // Check if user exists in users table
+              const { data: existingUser } = await supabase
+                .from('users')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single();
+
+              if (!existingUser) {
+                // Create user record
+                const { error: userError } = await supabase
+                  .from('users')
+                  .insert({
+                    user_id: session.user.id,
+                    email: session.user.email || '',
+                    role: 'tourist'
+                  });
+
+                if (userError) {
+                  console.error('Error creating user:', userError);
+                }
+
+                // Create user preferences
+                const { error: prefsError } = await supabase
+                  .from('user_preferences')
+                  .insert({
+                    user_id: session.user.id,
+                    language: 'en',
+                    notifications_enabled: true,
+                    location_sharing: true
+                  });
+
+                if (prefsError) {
+                  console.error('Error creating user preferences:', prefsError);
+                }
+              }
+            } catch (error) {
+              console.error('Error in auth state change:', error);
+            }
+          }, 0);
+        }
+        
+        setLoading(false);
       }
-    };
+    );
 
-    fetchSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-      setLoading(true); // Start loading during state change
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false); // Stop loading after update
+      setLoading(false);
     });
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  async function signUp(email: string, password: string, fullName: string) {
-    setLoading(true); // Start loading
-    try {
-      // Check if user already exists
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('user_id')
-        .eq('email', email)
-        .single();
-
-      if (existingUser) {
-        throw new Error('User already exists');
-      }
-
-      // Sign up with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName } }
-      });
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // Insert into custom users table
-        const { error: userError } = await supabase
-          .from('users')
-          .insert({
-            user_id: authData.user.id,
-            email,
-            full_name: fullName,
-          });
-        if (userError) throw new Error('Error creating user: ' + userError.message);
-
-        // Create user preferences
-        const { error: prefError } = await supabase
-          .from('user_preferences')
-          .upsert(
-            {
-              user_id: authData.user.id,
-              language: 'en',
-            },
-            { onConflict: 'user_id' }
-          );
-        if (prefError) throw new Error('Error creating user preferences: ' + prefError.message);
-      }
-
-      return authData;
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw error;
-    } finally {
-      setLoading(false); // Stop loading
-    }
-  }
-
   const signIn = async (email: string, password: string) => {
-    setLoading(true); // Start loading
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
-      return data;
+      
+      if (error) {
+        toast({
+          title: "Sign In Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+      
+      toast({
+        title: "Welcome back!",
+        description: "Successfully signed in.",
+      });
+      
+      return { error: null };
     } catch (error) {
-      console.error('Error signing in:', error);
-      throw error;
-    } finally {
-      setLoading(false); // Stop loading
+      const err = error as Error;
+      return { error: err };
+    }
+  };
+
+  const signUp = async (email: string, password: string, fullName: string) => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: fullName,
+          }
+        }
+      });
+      
+      if (error) {
+        toast({
+          title: "Sign Up Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+      
+      toast({
+        title: "Account Created!",
+        description: "Please check your email for verification link.",
+      });
+      
+      return { error: null };
+    } catch (error) {
+      const err = error as Error;
+      return { error: err };
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      
+      if (error) {
+        toast({
+          title: "Google Sign In Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+      
+      return { error: null };
+    } catch (error) {
+      const err = error as Error;
+      return { error: err };
     }
   };
 
   const signOut = async () => {
-    setLoading(true); // Start loading
     try {
-      await supabase.auth.signOut();
-      setUser(null);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: "Sign Out Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Signed Out",
+          description: "Successfully signed out.",
+        });
+      }
     } catch (error) {
       console.error('Error signing out:', error);
-    } finally {
-      setLoading(false); // Stop loading
     }
   };
 
   const value: AuthContextType = {
     user,
+    session,
     loading,
-    signUp,
     signIn,
+    signUp,
     signOut,
+    signInWithGoogle,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

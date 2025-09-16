@@ -18,139 +18,55 @@ const ZonesScreen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const zones: Zone[] = [
-  {
-    id: 'tawang_monastery',
-    name: 'Tawang Monastery',
-    description: 'Historic Buddhist site at high altitude, known for scenic views and cultural festivals',
-    category: 'religious',
-    safetyLevel: 'high',
-    location: { lat: 27.5853, lng: 91.8665, address: 'Tawang, Arunachal Pradesh' },
-    features: ['Scenic Views', 'Cultural Festivals', 'Monastery Tour'],
-    bestTime: '6 AM - 6 PM',
-    guidelines: ['Obtain Inner Line Permit (ILP)', 'Dress modestly', 'Respect religious practices'],
-    emergencyContacts: ['+91-3794-222222']
-  },
-  {
-    id: 'ziro_valley',
-    name: 'Ziro Valley',
-    description: 'Famous for rice fields, tribal culture, and the Ziro Music Festival',
-    category: 'cultural',
-    safetyLevel: 'medium',
-    location: { lat: 27.5880, lng: 93.8351, address: 'Ziro, Arunachal Pradesh' },
-    features: ['Rice Fields', 'Tribal Culture', 'Music Festival'],
-    bestTime: '8 AM - 5 PM',
-    guidelines: ['Respect local tribal customs', 'Carry insect repellent', 'Avoid during heavy rains'],
-    emergencyContacts: ['+91-3794-223344']
-  },
-  {
-    id: 'namdapha_national_park',
-    name: 'Namdapha National Park',
-    description: 'Biodiversity hotspot with trekking and rare wildlife (tigers, snow leopards)',
-    category: 'adventure',
-    safetyLevel: 'medium',
-    location: { lat: 27.4600, lng: 95.5800, address: 'Changlang, Arunachal Pradesh' },
-    features: ['Trekking', 'Wildlife Safari', 'Nature Photography'],
-    bestTime: '7 AM - 4 PM',
-    guidelines: ['Hire certified guides', 'Carry trekking gear', 'Avoid wildlife encounters'],
-    emergencyContacts: ['+91-3794-224455']
-  },
-  {
-    id: 'kaziranga_national_park',
-    name: 'Kaziranga National Park',
-    description: 'UNESCO World Heritage Site, home to one-horned rhinos and jeep safaris',
-    category: 'adventure',
-    safetyLevel: 'high',
-    location: { lat: 26.6745, lng: 93.2076, address: 'Golaghat, Assam' },
-    features: ['Jeep Safari', 'Wildlife Viewing', 'Photography'],
-    bestTime: '6 AM - 5 PM',
-    guidelines: ['Book safaris in advance', 'Stay on marked routes', 'Keep distance from animals'],
-    emergencyContacts: ['+91-3776-268095']
-  },
-  {
-    id: 'majuli_island',
-    name: 'Majuli Island',
-    description: 'World’s largest river island, featuring Vaishnavite monasteries and cultural performances',
-    category: 'cultural',
-    safetyLevel: 'medium',
-    location: { lat: 26.9500, lng: 94.1167, address: 'Majuli, Assam' },
-    features: ['Monastery Visits', 'Cultural Performances', 'Boating'],
-    bestTime: '8 AM - 6 PM',
-    guidelines: ['Check ferry timings', 'Respect satra customs', 'Avoid during monsoon flooding'],
-    emergencyContacts: ['+91-3775-277444']
-  },
-  {
-    id: 'kamakhya_temple',
-    name: 'Kamakhya Temple',
-    description: 'Sacred Hindu temple in Guwahati, a major pilgrimage site',
-    category: 'religious',
-    safetyLevel: 'high',
-    location: { lat: 26.1664, lng: 91.7055, address: 'Guwahati, Assam' },
-    features: ['Pilgrimage', 'Religious Rituals', 'Cultural Significance'],
-    bestTime: '5 AM - 8 PM',
-    guidelines: ['Dress modestly', 'Follow temple protocols', 'Avoid peak festival crowds'],
-    emergencyContacts: ['+91-361-2734624']
-  },
-  {
-    id: 'manas_national_park',
-    name: 'Manas National Park',
-    description: 'Tiger reserve with diverse flora and fauna',
-    category: 'adventure',
-    safetyLevel: 'medium',
-    location: { lat: 26.7176, lng: 90.9602, address: 'Barpeta, Assam' },
-    features: ['Wildlife Safari', 'Bird Watching', 'Nature Trails'],
-    bestTime: '6 AM - 5 PM',
-    guidelines: ['Follow guided tours', 'Carry ID for border checks', 'Avoid monsoon season'],
-    emergencyContacts: ['+91-3666-261413']
-  },
-  {
-    id: 'cherrapunji',
-    name: 'Cherrapunji (Sohra)',
-    description: 'Known for living root bridges, waterfalls (e.g., Nohkalikai), and heavy rainfall',
-    category: 'nature',
-    safetyLevel: 'medium',
-    location: { lat: 25.2993, lng: 91.7362, address: 'Cherrapunji, Meghalaya' },
-    features: ['Root Bridges', 'Waterfalls', 'Trekking'],
-    bestTime: '8 AM - 5 PM',
-    guidelines: ['Wear non-slip shoes', 'Hire local guides', 'Check weather for heavy rain'],
-    emergencyContacts: ['+91-364-2222108']
-  },
-  {
-    id: 'shillong',
-    name: 'Shillong',
-    description: '“Scotland of the East” with lakes, peaks, and colonial architecture',
-    category: 'tourist',
-    safetyLevel: 'high',
-    location: { lat: 25.5788, lng: 91.8933, address: 'Shillong, Meghalaya' },
-    features: ['Lakes', 'Colonial Sites', 'Local Markets'],
-    bestTime: '9 AM - 6 PM',
-    guidelines: ['Explore markets safely', 'Follow local traffic rules', 'Respect cultural sites'],
-    emergencyContacts: ['+91-364-2222108']
-  },
-  {
-    id: 'mawlynnong',
-    name: 'Mawlynnong',
-    description: 'Asia’s cleanest village, featuring bamboo bridges and eco-tourism',
-    category: 'cultural',
-    safetyLevel: 'high',
-    location: { lat: 25.2667, lng: 91.8667, address: 'Mawlynnong, Meghalaya' },
-    features: ['Bamboo Bridges', 'Eco-Tourism', 'Village Walks'],
-    bestTime: '8 AM - 5 PM',
-    guidelines: ['No plastics allowed', 'Wear sturdy shoes for treks', 'Respect village rules'],
-    emergencyContacts: ['+91-364-2222108']
-  },
-  {
-    id: 'dawki',
-    name: 'Dawki',
-    description: 'Crystal-clear Umngot River for boating and border views',
-    category: 'adventure',
-    safetyLevel: 'medium',
-    location: { lat: 25.2000, lng: 92.0167, address: 'Dawki, Meghalaya' },
-    features: ['Boating', 'Photography', 'Border Views'],
-    bestTime: '9 AM - 4 PM',
-    guidelines: ['Wear life jackets', 'Carry ID for border checks', 'Avoid during high water levels'],
-    emergencyContacts: ['+91-364-2222108']
-  }
-];
+    {
+      id: '1',
+      name: 'Shillong Peak',
+      description: 'Highest point in Shillong with panoramic views',
+      category: 'nature',
+      safetyLevel: 'high',
+      location: { lat: 25.5788, lng: 91.8933, address: 'Shillong Peak, Meghalaya' },
+      features: ['Scenic Views', 'Photography', 'Trekking'],
+      bestTime: '6 AM - 6 PM',
+      guidelines: ['Carry warm clothes', 'Maintain cleanliness', 'Follow designated paths'],
+      emergencyContacts: ['+91-364-2222108']
+    },
+    {
+      id: '2',
+      name: 'Elephant Falls',
+      description: 'Three-tiered waterfall near Shillong',
+      category: 'nature',
+      safetyLevel: 'medium',
+      location: { lat: 25.5394, lng: 91.8947, address: 'Elephant Falls, Shillong' },
+      features: ['Waterfall', 'Photography', 'Nature Walk'],
+      bestTime: '9 AM - 5 PM',
+      guidelines: ['Wear non-slip shoes', 'Stay on marked paths', 'No littering'],
+      emergencyContacts: ['+91-364-2222108']
+    },
+    {
+      id: '3',
+      name: 'Don Bosco Museum',
+      description: 'Cultural museum showcasing Northeast heritage',
+      category: 'cultural',
+      safetyLevel: 'high',
+      location: { lat: 25.5644, lng: 91.8789, address: 'Mawlai, Shillong' },
+      features: ['Cultural Exhibits', 'Educational', 'Indoor Activity'],
+      bestTime: '9 AM - 5:30 PM',
+      guidelines: ['Photography restrictions apply', 'Maintain silence', 'Follow museum rules'],
+      emergencyContacts: ['+91-364-2553813']
+    },
+    {
+      id: '4',
+      name: 'Umiam Lake',
+      description: 'Scenic lake perfect for water sports',
+      category: 'adventure',
+      safetyLevel: 'medium',
+      location: { lat: 25.6855, lng: 91.9086, address: 'Umiam Lake, Meghalaya' },
+      features: ['Water Sports', 'Boating', 'Kayaking', 'Camping'],
+      bestTime: '8 AM - 6 PM',
+      guidelines: ['Life jackets mandatory', 'Swimming prohibited in deep areas', 'Weather dependent'],
+      emergencyContacts: ['+91-364-2570644']
+    }
+  ];
 
   const categories = [
     { id: 'all', name: 'All', icon: MapPin },
