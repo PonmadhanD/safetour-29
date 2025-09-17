@@ -1,19 +1,27 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, MapPin } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import appIcon from '@/assets/app-icon.jpg';
 
 const SplashScreen: React.FC = () => {
-  const { setTouristPage } = useApp();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
+    // If user is already authenticated, skip splash and go to home
+    if (user) {
+      navigate('/tourist/app');
+      return;
+    }
+
     const timer = setTimeout(() => {
-      setTouristPage('onboarding');
+      navigate('/tourist');
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [setTouristPage]);
+  }, [navigate, user]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-primary text-primary-foreground p-6">
@@ -42,7 +50,7 @@ const SplashScreen: React.FC = () => {
           <Button
             variant="secondary"
             size="lg"
-            onClick={() => setTouristPage('onboarding')}
+            onClick={() => navigate('/tourist')}
             className="shadow-lg font-semibold"
           >
             Get Started

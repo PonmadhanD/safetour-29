@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { AppProvider } from '@/contexts/AppContext';
 import MapDashboard from '@/components/authority/MapDashboard';
 import VerificationScreen from '@/components/authority/VerificationScreen';
 import AlertsScreen from '@/components/authority/AlertsScreen';
@@ -7,7 +8,7 @@ import EFirScreen from '@/components/authority/EFirScreen';
 import AnalyticsScreen from '@/components/authority/AnalyticsScreen';
 import SettingsScreen from '@/components/authority/SettingsScreen';
 
-const AuthorityApp: React.FC = () => {
+const AdminAppContent: React.FC = () => {
   const { authorityPage } = useApp();
 
   const renderPage = () => {
@@ -36,4 +37,12 @@ const AuthorityApp: React.FC = () => {
   );
 };
 
-export default AuthorityApp;
+const AdminApp: React.FC = () => {
+  return (
+    <AppProvider>
+      <AdminAppContent />
+    </AppProvider>
+  );
+};
+
+export default AdminApp;
