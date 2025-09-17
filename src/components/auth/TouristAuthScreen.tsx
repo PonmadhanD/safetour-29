@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,7 +11,6 @@ import { useLanguage, Language } from '@/contexts/LanguageContext';
 import heroImage from '@/assets/northeast-hero.jpg';
 
 const TouristAuthScreen: React.FC = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -27,11 +25,8 @@ const TouristAuthScreen: React.FC = () => {
     setLoading(true);
     try {
       const { error } = await signIn(email, password);
-      if (error) {
-        console.error('Sign in error:', error);
-      } else {
-        // Tourist login successful - navigate to tourist app
-        navigate('/tourist/app');
+      if (!error) {
+        // Tourist login successful - will be redirected by App.tsx
       }
     } finally {
       setLoading(false);
@@ -43,10 +38,8 @@ const TouristAuthScreen: React.FC = () => {
     setLoading(true);
     try {
       const { error } = await signUp(email, password, fullName);
-      if (error) {
-        console.error('Sign up error:', error);
-      } else {
-        // Account created successfully - switch to sign in tab
+      if (!error) {
+        // Account created successfully
         setActiveTab('signin');
       }
     } finally {
@@ -57,10 +50,7 @@ const TouristAuthScreen: React.FC = () => {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const { error } = await signInWithGoogle();
-      if (!error) {
-        navigate('/tourist/app');
-      }
+      await signInWithGoogle();
     } finally {
       setLoading(false);
     }

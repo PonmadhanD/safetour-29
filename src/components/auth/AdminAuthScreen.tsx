@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,9 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Eye, EyeOff, Lock, User, Phone, AlertTriangle, Monitor } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useApp } from '@/contexts/AppContext';
 
 const AdminAuthScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const { setAuthorityPage, setCurrentAuthority } = useApp();
   const { signIn, signUp } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -20,6 +20,7 @@ const AdminAuthScreen: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +46,54 @@ const AdminAuthScreen: React.FC = () => {
         return;
       }
 
-      // Admin login successful - navigate to admin dashboard
-      navigate('/admin/dashboard');
+      // Set authority profile for admin dashboard
+      const authority = {
+        id: Date.now().toString(),
+        name: formData.fullName,
+        email: formData.email,
+        role: 'officer' as const,
+        department: 'Northeast Police Department',
+        badge: 'NE-2024-001',
+        permissions: ['view_tourists', 'create_efir', 'send_alerts', 'verify_ids']
+      };
+      
+      setCurrentAuthority(authority);
+      setAuthorityPage('dashboard');
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password || !formData.fullName) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error: signUpError } = await signUp(formData.email, formData.password, formData.fullName);
+
+      if (signUpError) {
+        if (signUpError.message.includes('already registered')) {
+          setError('An account with this email already exists. Please sign in instead.');
+        } else {
+          setError(signUpError.message);
+        }
+        return;
+      }
+
+      setError('Account created successfully! Please check your email to confirm your account, then sign in.');
+      setIsSignUp(false);
+    } catch (err) {
+      setError('An unexpected error occurred during sign up. Please try again.');
+      console.error('Sign up error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +118,7 @@ const AdminAuthScreen: React.FC = () => {
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2 text-xl">
               <Shield className="w-5 h-5 text-primary" />
-              Admin Access
+              {isSignUp ? 'Create Admin Account' : 'Admin Access'}
             </CardTitle>
             <div className="flex justify-center gap-2 mt-3">
               <Badge variant="outline" className="border-primary text-primary">
@@ -93,7 +137,26 @@ const AdminAuthScreen: React.FC = () => {
               </Alert>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="fullName"
+                      type="text"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                      placeholder="Enter your full name"
+                      className="pl-10"
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="email">Official Email</Label>
                 <div className="relative">
@@ -120,7 +183,7 @@ const AdminAuthScreen: React.FC = () => {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="Enter your password"
+                    placeholder={isSignUp ? "Create a strong password" : "Enter your password"}
                     className="pl-10 pr-10"
                     disabled={isLoading}
                     required
@@ -147,7 +210,18 @@ const AdminAuthScreen: React.FC = () => {
                   disabled={isLoading}
                 >
                   <Shield className="w-4 h-4 mr-2" />
-                  {isLoading ? 'Signing In...' : 'Access Dashboard'}
+                  {isLoading ? (isSignUp ? 'Creating Account...' : 'Signing In...') : (isSignUp ? 'Create Account' : 'Access Dashboard')}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  size="sm"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  disabled={isLoading}
+                >
+                  {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
                 </Button>
               </div>
             </form>
@@ -175,11 +249,6 @@ const AdminAuthScreen: React.FC = () => {
         <div className="text-center text-primary-foreground/70 text-sm">
           <p className="font-medium">Government of India • Ministry of Tourism</p>
           <p>Admin Portal v3.0 • Northeast Region</p>
-          <p className="mt-2 text-xs">
-            <a href="/tourist" className="underline hover:text-white">
-              Tourist Portal →
-            </a>
-          </p>
         </div>
       </div>
     </div>

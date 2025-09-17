@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '@/contexts/AppContext';
+import LoginScreen from '@/components/authority/LoginScreen';
 import MapDashboard from '@/components/authority/MapDashboard';
 import VerificationScreen from '@/components/authority/VerificationScreen';
 import AlertsScreen from '@/components/authority/AlertsScreen';
@@ -12,6 +13,8 @@ const AuthorityApp: React.FC = () => {
 
   const renderPage = () => {
     switch (authorityPage) {
+      case 'login':
+        return <LoginScreen />;
       case 'dashboard':
         return <MapDashboard />;
       case 'verification':
@@ -25,7 +28,7 @@ const AuthorityApp: React.FC = () => {
       case 'settings':
         return <SettingsScreen />;
       default:
-        return <MapDashboard />;
+        return <LoginScreen />;
     }
   };
 

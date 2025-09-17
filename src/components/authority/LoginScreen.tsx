@@ -1,13 +1,19 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Shield, Eye, EyeOff, Lock, User, Phone, AlertTriangle } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const LoginScreen: React.FC = () => {
-  const navigate = useNavigate();
   const { setAuthorityPage, setCurrentAuthority } = useApp();
-
-  useEffect(() => {
-    // Auto-setup authority user and redirect to dashboard
+  
+  // Redirect to dashboard if already authenticated via main auth system
+  React.useEffect(() => {
     const authority = {
       id: Date.now().toString(),
       name: 'Authority User',

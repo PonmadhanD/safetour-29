@@ -1,5 +1,4 @@
 import React from 'react';
-import { AppProvider } from '@/contexts/AppContext';
 import { useApp } from '@/contexts/AppContext';
 import SplashScreen from '@/components/tourist/SplashScreen';
 import OnboardingScreen from '@/components/tourist/OnboardingScreen';
@@ -14,7 +13,7 @@ import SettingsScreen from '@/components/tourist/SettingsScreen';
 import FamilyTrackingScreen from '@/components/tourist/FamilyTrackingScreen';
 import BottomNavigation from '@/components/tourist/BottomNavigation';
 
-const TouristAppContent: React.FC = () => {
+const TouristApp: React.FC = () => {
   const { touristPage } = useApp();
 
   const renderPage = () => {
@@ -57,14 +56,6 @@ const TouristAppContent: React.FC = () => {
         {showBottomNav && <BottomNavigation />}
       </div>
     </div>
-  );
-};
-
-const TouristApp: React.FC = () => {
-  return (
-    <AppProvider>
-      <TouristAppContent />
-    </AppProvider>
   );
 };
 
