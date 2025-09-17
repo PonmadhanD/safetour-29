@@ -37,6 +37,12 @@ const translations: Record<Language, Translation> = {
     fullName: "Full Name",
     welcome: "Welcome",
     welcomeBack: "Welcome back!",
+    // Travel History
+    travelHistory: "Travel History",
+    destinations: "Destinations",
+    statesVisited: "States Visited",
+    journey: "Your journey across Northeast India",
+    journeyRoute: "Journey Route",
     // Navigation
     home: "Home",
     map: "Map",
@@ -97,6 +103,12 @@ const translations: Record<Language, Translation> = {
     routes: "रूट",
     history: "इतिहास",
     settings: "सेटिंग्स",
+    // Travel History
+    travelHistory: "यात्रा इतिहास",
+    destinations: "गंतव्य",
+    statesVisited: "दौरा किए गए राज्य",
+    journey: "आपकी यात्रा उत्तर पूर्व भारत में",
+    journeyRoute: "यात्रा मार्ग",
     // Dashboard
     safetyScore: "सुरक्षा स्कोर",
     quickActions: "त्वरित कार्य",
@@ -150,6 +162,12 @@ const translations: Record<Language, Translation> = {
     routes: "பாதைகள்",
     history: "வரலாறு",
     settings: "அமைப்புகள்",
+    // Travel History
+    travelHistory: "பயண வரலாறு",
+    destinations: "இடங்கள்",
+    statesVisited: "பயணித்த மாநிலங்கள்",
+    journey: "உங்கள் பயணம் வடகிழக்கு இந்தியா முழுவதும்",
+    journeyRoute: "பயண பாதை",
     // Dashboard
     safetyScore: "பாதுகாப்பு மதிப்பீடு",
     quickActions: "விரைவு நடவடிக்கைகள்",
