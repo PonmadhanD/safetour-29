@@ -7,6 +7,8 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   Locate, Navigation, AlertTriangle, Shield, 
   Users, MapPin, Route, Phone 
@@ -37,10 +39,10 @@ const createCustomIcon = (color: string, icon: string) => {
 };
 
 // Icon definitions
-export const safeZoneIcon = createCustomIcon('bg-green-500', 'S');
-export const touristIcon = createCustomIcon('bg-blue-500', 'T');
-export const alertIcon = createCustomIcon('bg-red-500', '!');
-export const waypointIcon = createCustomIcon('bg-primary', 'W');
+const safeZoneIcon = createCustomIcon('bg-green-500', 'S');
+const touristIcon = createCustomIcon('bg-blue-500', 'T');
+const alertIcon = createCustomIcon('bg-red-500', '!');
+const waypointIcon = createCustomIcon('bg-primary', 'W');
 
 interface MapViewProps {
   mode: 'tourist' | 'authority';
@@ -54,7 +56,6 @@ interface MapViewProps {
   showPanicButton?: boolean;
   className?: string;
 }
-
 
 const MapView: React.FC<MapViewProps> = ({
   mode,
@@ -78,20 +79,22 @@ const MapView: React.FC<MapViewProps> = ({
   const [selectedRoute, setSelectedRoute] = useState<SafeRoute | null>(null);
   const [routingError, setRoutingError] = useState<string | null>(null);
   const { setEmergencyActive, setTouristPage } = useApp();
+  const [heatmapMode, setHeatmapMode] = useState<'all' | 'risk'>('all');
 
+  // Utility functions
   const getZoneColor = (safetyLevel: string | number) => {
-    const level = typeof safetyLevel === 'string' ? 
-      (safetyLevel === 'high' ? 5 : safetyLevel === 'medium' ? 3 : 1) : 
-      safetyLevel;
+    const level = typeof safetyLevel === 'string' 
+      ? (safetyLevel === 'high' ? 5 : safetyLevel === 'medium' ? 3 : 1) 
+      : safetyLevel;
     if (level >= 4) return '#10b981';
     if (level >= 3) return '#f59e0b';
     return '#ef4444';
   };
 
   const getZoneColorClass = (safetyLevel: string | number) => {
-    const level = typeof safetyLevel === 'string' ? 
-      (safetyLevel === 'high' ? 5 : safetyLevel === 'medium' ? 3 : 1) : 
-      safetyLevel;
+    const level = typeof safetyLevel === 'string' 
+      ? (safetyLevel === 'high' ? 5 : safetyLevel === 'medium' ? 3 : 1) 
+      : safetyLevel;
     if (level >= 4) return 'bg-green-500';
     if (level >= 3) return 'bg-yellow-500';
     return 'bg-red-500';
@@ -130,6 +133,7 @@ const MapView: React.FC<MapViewProps> = ({
     return R * c;
   };
 
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
@@ -147,6 +151,7 @@ const MapView: React.FC<MapViewProps> = ({
     };
   }, []);
 
+  // Render layers
   useEffect(() => {
     if (!map.current) return;
 
@@ -234,9 +239,7 @@ const MapView: React.FC<MapViewProps> = ({
           `);
         });
       });
-    }
 
-    if (mode === 'authority') {
       tourists.forEach((tourist) => {
         if (!map.current || !tourist.currentLocation) return;
 
@@ -260,19 +263,31 @@ const MapView: React.FC<MapViewProps> = ({
         marker.on('click', () => onTouristSelect?.(tourist));
       });
 
-      if (tourists.length > 0 && window.L?.heatLayer) {
-        const heatData: [number, number, number][] = tourists
-          .filter(t => t.currentLocation)
-          .map(t => [t.currentLocation!.lat, t.currentLocation!.lng, 1]);
-        
-        if (heatData.length > 0) {
-          heatmapLayer.current = window.L.heatLayer(heatData, {
+      // Heatmap toggle logic
+const toHeatTuple = (lat: number, lng: number): [number, number, number] => [lat, lng, 1];
+
+const allTouristsData = tourists
+  .filter(t => t.currentLocation)
+  .map(t => toHeatTuple(t.currentLocation!.lat, t.currentLocation!.lng));
+
+const riskTouristsData = tourists
+  .filter(t => (t.status === 'alert' || t.status === 'emergency') && t.currentLocation)
+  .map(t => toHeatTuple(t.currentLocation!.lat, t.currentLocation!.lng));
+
+
+      if (allTouristsData.length > 0 && window.L?.heatLayer) {
+        if (heatmapLayer.current) {
+          map.current.removeLayer(heatmapLayer.current);
+        }
+        heatmapLayer.current = window.L.heatLayer(
+          heatmapMode === 'all' ? allTouristsData : riskTouristsData,
+          {
             radius: 50,
             blur: 35,
             maxZoom: 17,
             gradient: { 0.2: 'blue', 0.4: 'cyan', 0.6: 'lime', 0.8: 'yellow', 1.0: 'red' }
-          }).addTo(map.current);
-        }
+          }
+        ).addTo(map.current);
       }
     }
 
@@ -290,7 +305,7 @@ const MapView: React.FC<MapViewProps> = ({
         `);
     });
 
-  }, [zones, routes, tourists, alerts, mode, onTouristSelect, userLocation]);
+  }, [zones, routes, tourists, alerts, mode, onTouristSelect, userLocation, heatmapMode]);
 
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -476,6 +491,20 @@ const MapView: React.FC<MapViewProps> = ({
     <div className={`relative ${className}`}>
       <div ref={mapContainer} className="w-full h-[500px] rounded-lg" />
 
+      {/* Heatmap Toggle Switch */}
+      <div className="absolute top-4 right-4 z-[1000] bg-white p-2 rounded-lg shadow-lg">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="heatmap-toggle"
+            checked={heatmapMode === 'risk'}
+            onCheckedChange={(checked) => setHeatmapMode(checked ? 'risk' : 'all')}
+          />
+          <Label htmlFor="heatmap-toggle">
+            {heatmapMode === 'all' ? 'Normal Heatmap' : 'Risk Heatmap'}
+          </Label>
+        </div>
+      </div>
+
       {mode === 'tourist' && (
         <>
           <Button
@@ -555,7 +584,7 @@ const MapView: React.FC<MapViewProps> = ({
         </>
       )}
 
-      <Card className="absolute top-4 left-4 z-[1000] bg-card/95 backdrop-blur-sm">
+      <Card className="absolute top-24 left-4 z-[1000] bg-card/95 backdrop-blur-sm">
         <CardContent className="p-3">
           <h4 className="text-sm font-medium mb-2">Legend</h4>
           <div className="space-y-1 text-xs">
@@ -578,7 +607,7 @@ const MapView: React.FC<MapViewProps> = ({
       </Card>
 
       {locationError && (
-        <Card className="absolute top-16 left-4 right-4 z-[1000] bg-destructive/10 border-destructive">
+        <Card className="absolute top-40 left-4 right-4 z-[1000] bg-destructive/10 border-destructive">
           <CardContent className="p-3">
             <div className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="w-4 h-4" />
@@ -589,7 +618,7 @@ const MapView: React.FC<MapViewProps> = ({
       )}
 
       {routingError && (
-        <Card className="absolute top-32 left-4 right-4 z-[1000] bg-destructive/10 border-destructive">
+        <Card className="absolute top-56 left-4 right-4 z-[1000] bg-destructive/10 border-destructive">
           <CardContent className="p-3">
             <div className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="w-4 h-4" />

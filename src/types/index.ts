@@ -18,6 +18,7 @@ export interface Tourist {
   id: string;
   name: string;
   email: string;
+  // coordinates: [number, number];
   phone: string;
   digitalId: string;
   isVerified: boolean;

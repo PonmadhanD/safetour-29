@@ -11,6 +11,7 @@
       "lng": 91.8933,
       "address": "Police Bazar, Shillong"
     },
+    "coordinates": [25.5788, 91.8933],
     "emergencyContacts": [
       {
         "id": "ec_1",
@@ -36,6 +37,7 @@
       "lng": 91.7362,
       "address": "Cherrapunji, Meghalaya"
     },
+    "coordinates": [25.2993, 91.7362],
     "emergencyContacts": [
       {
         "id": "ec_2",
@@ -61,6 +63,7 @@
       "lng": 91.7458,
       "address": "Guwahati Railway Station"
     },
+    "coordinates": [26.1844, 91.7458],
     "emergencyContacts": [
       {
         "id": "ec_3",
@@ -82,10 +85,11 @@
     "digitalId": "NE-DID-2024-004",
     "isVerified": true,
     "currentLocation": {
-      "lat": 25.4500,
-      "lng": 91.9500,
+      "lat": 25.45,
+      "lng": 91.95,
       "address": "Remote Hills, East Khasi"
     },
+    "coordinates": [25.45, 91.95],
     "emergencyContacts": [
       {
         "id": "ec_4",
@@ -107,10 +111,11 @@
     "digitalId": "NE-DID-2024-005",
     "isVerified": true,
     "currentLocation": {
-      "lat": 25.5750,
-      "lng": 91.8950,
+      "lat": 25.575,
+      "lng": 91.895,
       "address": "Laitumkhrah, Shillong"
     },
+    "coordinates": [25.575, 91.895],
     "emergencyContacts": [
       {
         "id": "ec_5",
@@ -132,10 +137,11 @@
     "digitalId": "NE-DID-2024-006",
     "isVerified": true,
     "currentLocation": {
-      "lat": 25.5680,
-      "lng": 91.9020,
+      "lat": 25.568,
+      "lng": 91.902,
       "address": "Ward's Lake, Shillong"
     },
+    "coordinates": [25.568, 91.902],
     "emergencyContacts": [
       {
         "id": "ec_6",
