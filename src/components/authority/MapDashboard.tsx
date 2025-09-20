@@ -13,7 +13,7 @@ import { touristsData } from '@/data/Touristdata';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils'; // Assuming you have a cn utility for classnames
+import { cn } from '@/lib/utils'; // Assuming you have a cn utility for classnamesgi
 
 // Mock tourist data (unchanged)
 
