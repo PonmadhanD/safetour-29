@@ -8,6 +8,8 @@ import {
   XCircle, User, MapPin, Phone, Calendar, Camera
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const VerificationScreen: React.FC = () => {
   const { setAuthorityPage } = useApp();
@@ -31,7 +33,6 @@ const VerificationScreen: React.FC = () => {
   };
 
   const handleSearch = () => {
-    // Simulate verification process
     setTimeout(() => {
       setVerificationResult(mockTourist);
     }, 1500);
@@ -39,7 +40,6 @@ const VerificationScreen: React.FC = () => {
 
   const handleQRScan = () => {
     setScanning(true);
-    // Simulate QR code scanning
     setTimeout(() => {
       setScanning(false);
       setVerificationResult(mockTourist);
@@ -47,229 +47,284 @@ const VerificationScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-accent">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="p-4 flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setAuthorityPage('dashboard')}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold">Tourist ID Verification</h1>
-            <p className="text-sm text-muted-foreground">Verify digital tourist identification</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
-        {/* Search & Scan */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-primary" />
-                Search by ID
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter Digital ID or Tourist Name"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Button onClick={handleSearch} disabled={!searchQuery}>
-                  <Search className="w-4 h-4" />
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white shadow-md border-b sticky top-0 z-40"
+        >
+          <div className="p-4 max-w-4xl mx-auto flex items-center gap-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setAuthorityPage('dashboard')}
+                  className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50"
+                >
+                  <ArrowLeft className="w-5 h-5" />
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <QrCode className="w-5 h-5 text-secondary" />
-                QR Code Scanner
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                variant="outline" 
-                className="w-full h-16"
-                onClick={handleQRScan}
-                disabled={scanning}
-              >
-                {scanning ? (
-                  <>
-                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Scanning...
-                  </>
-                ) : (
-                  <>
-                    <Camera className="w-6 h-6 mr-2" />
-                    Scan QR Code
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Verification Result */}
-        {verificationResult && (
-          <Card className="border-2 border-success">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="w-6 h-6 text-success" />
-                  Verification Successful
-                </span>
-                <Badge className="bg-success text-white">
-                  <Shield className="w-3 h-3 mr-1" />
-                  Verified
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Personal Information */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg border-b pb-2">Personal Information</h3>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Full Name</p>
-                        <p className="font-medium">{verificationResult.name}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <Shield className="w-4 h-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Digital ID</p>
-                        <p className="font-medium font-mono">{verificationResult.digitalId}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Phone Number</p>
-                        <p className="font-medium">{verificationResult.phone}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Current Location</p>
-                        <p className="font-medium">{verificationResult.currentLocation}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Verification Details */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg border-b pb-2">Verification Details</h3>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Issue Date</p>
-                        <p className="font-medium">{verificationResult.issueDate}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Expiry Date</p>
-                        <p className="font-medium">{verificationResult.expiryDate}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Status</p>
-                      <div className="flex gap-2">
-                        <Badge className="bg-success text-white">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Valid ID
-                        </Badge>
-                        <Badge className="bg-primary text-white">
-                          Blockchain Verified
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-success-light p-3 rounded-lg">
-                      <p className="text-sm font-medium text-success">✓ Digital signature valid</p>
-                      <p className="text-sm font-medium text-success">✓ Blockchain verification passed</p>
-                      <p className="text-sm font-medium text-success">✓ Document not tampered</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Emergency Information */}
-              <div className="mt-6 p-4 bg-emergency-light rounded-lg">
-                <h4 className="font-semibold text-emergency mb-2">Emergency Contact</h4>
-                <p className="text-sm">
-                  <span className="font-medium">Contact:</span> {verificationResult.emergencyContact}
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-6 flex gap-3">
-                <Button variant="success" className="flex-1">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Mark as Verified
-                </Button>
-                <Button variant="outline" className="flex-1">
-                  View Travel History
-                </Button>
-                <Button variant="warning">
-                  Flag for Review
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Recent Verifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Verifications</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-success rounded-full"></div>
-                    <div>
-                      <p className="font-medium text-sm">Tourist ID Verified</p>
-                      <p className="text-xs text-muted-foreground">John Doe - DID_1642857600000</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Badge className="bg-success text-white">Verified</Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{i} hour{i !== 1 ? 's' : ''} ago</p>
-                  </div>
-                </div>
-              ))}
+              </TooltipTrigger>
+              <TooltipContent>Back to Dashboard</TooltipContent>
+            </Tooltip>
+            <div>
+              <h1 className="text-2xl font-bold text-indigo-800">Tourist ID Verification</h1>
+              <p className="text-sm text-indigo-600">Verify digital tourist identification</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
+
+        <div className="p-6 max-w-4xl mx-auto space-y-6">
+          {/* Search & Scan */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
+              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Search className="w-5 h-5 text-indigo-600" />
+                  Search by ID
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 p-6">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter Digital ID or Tourist Name"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="border-indigo-300 focus:border-indigo-500"
+                  />
+                  <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+                    <Button 
+                      onClick={handleSearch} 
+                      disabled={!searchQuery}
+                      className="bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </motion.div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
+              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <QrCode className="w-5 h-5 text-indigo-600" />
+                  QR Code Scanner
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-16 border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                    onClick={handleQRScan}
+                    disabled={scanning}
+                  >
+                    {scanning ? (
+                      <>
+                        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Scanning...
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-6 h-6 mr-2 text-indigo-600" />
+                        Scan QR Code
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Verification Result */}
+          <AnimatePresence>
+            {verificationResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="border-2 border-green-500 shadow-lg bg-white">
+                  <CardHeader className="pb-3 bg-gradient-to-r from-green-50 to-indigo-50">
+                    <CardTitle className="flex items-center justify-between text-lg">
+                      <span className="flex items-center gap-2 text-green-700">
+                        <CheckCircle className="w-6 h-6" />
+                        Verification Successful
+                      </span>
+                      <Badge className="bg-green-600 text-white">
+                        <Shield className="w-3 h-3 mr-1" />
+                        Verified
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Personal Information */}
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg border-b pb-2 text-indigo-800">Personal Information</h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <User className="w-4 h-4 text-indigo-600" />
+                            <div>
+                              <p className="text-sm text-indigo-600">Full Name</p>
+                              <p className="font-medium text-indigo-800">{verificationResult.name}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Shield className="w-4 h-4 text-indigo-600" />
+                            <div>
+                              <p className="text-sm text-indigo-600">Digital ID</p>
+                              <p className="font-medium font-mono text-indigo-800">{verificationResult.digitalId}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Phone className="w-4 h-4 text-indigo-600" />
+                            <div>
+                              <p className="text-sm text-indigo-600">Phone Number</p>
+                              <p className="font-medium text-indigo-800">{verificationResult.phone}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <MapPin className="w-4 h-4 text-indigo-600" />
+                            <div>
+                              <p className="text-sm text-indigo-600">Current Location</p>
+                              <p className="font-medium text-indigo-800">{verificationResult.currentLocation}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Verification Details */}
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg border-b pb-2 text-indigo-800">Verification Details</h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <Calendar className="w-4 h-4 text-indigo-600" />
+                            <div>
+                              <p className="text-sm text-indigo-600">Issue Date</p>
+                              <p className="font-medium text-indigo-800">{verificationResult.issueDate}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Calendar className="w-4 h-4 text-indigo-600" />
+                            <div>
+                              <p className="text-sm text-indigo-600">Expiry Date</p>
+                              <p className="font-medium text-indigo-800">{verificationResult.expiryDate}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-sm text-indigo-600">Status</p>
+                            <div className="flex gap-2">
+                              <Badge className="bg-green-600 text-white">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Valid ID
+                              </Badge>
+                              <Badge className="bg-indigo-600 text-white">
+                                Blockchain Verified
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="bg-green-50 p-3 rounded-lg">
+                            <p className="text-sm font-medium text-green-700">✓ Digital signature valid</p>
+                            <p className="text-sm font-medium text-green-700">✓ Blockchain verification passed</p>
+                            <p className="text-sm font-medium text-green-700">✓ Document not tampered</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Emergency Information */}
+                    <div className="mt-6 p-4 bg-indigo-50 rounded-lg">
+                      <h4 className="font-semibold text-indigo-800 mb-2">Emergency Contact</h4>
+                      <p className="text-sm text-indigo-600">
+                        <span className="font-medium">Contact:</span> {verificationResult.emergencyContact}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="mt-6 flex gap-3">
+                      <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+                        <Button 
+                          variant="default" 
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Mark as Verified
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+                        <Button 
+                          variant="outline" 
+                          className="flex-1 border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                        >
+                          View Travel History
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+                        <Button 
+                          variant="destructive" 
+                          className="flex-1"
+                        >
+                          Flag for Review
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Recent Verifications */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <Card className="shadow-md bg-white">
+              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
+                <CardTitle className="text-lg">Recent Verifications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center justify-between p-3 border border-indigo-100 rounded-lg hover:bg-indigo-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                          <p className="font-medium text-sm text-indigo-800">Tourist ID Verified</p>
+                          <p className="text-xs text-indigo-600">John Doe - DID_1642857600000</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge className="bg-green-600 text-white">Verified</Badge>
+                        <p className="text-xs text-indigo-500 mt-1">{i} hour{i !== 1 ? 's' : ''} ago</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 
