@@ -1,4 +1,4 @@
-import { Tourist } from "../types";
+import { Tourist } from "../../types/index";
 
 export const touristsData: Tourist[] = [
   // Group 1: Shillong Central (5 tourists, mostly safe)

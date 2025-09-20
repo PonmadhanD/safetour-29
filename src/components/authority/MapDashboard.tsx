@@ -9,7 +9,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tourist } from '@/types';
 import MapView from '@/components/MapView';
-import { touristsData } from '@/data/Touristdata';
+import { touristsData } from '@/assets/data/touristData';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
