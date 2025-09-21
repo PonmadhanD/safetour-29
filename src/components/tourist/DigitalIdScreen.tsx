@@ -3,51 +3,88 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Camera, Check, Upload, QrCode } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { generateDigitalId, type DigitalIdData } from '@/utils/digitalIdGeneration';
 import digitalIdImage from '@/assets/digital-id.jpg';
 
 const DigitalIdScreen: React.FC = () => {
   const { setTouristPage, setCurrentTourist } = useApp();
+  const { signUpWithDigitalId } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    password: '',
     emergencyContact: '',
     emergencyPhone: ''
   });
   const [photoUploaded, setPhotoUploaded] = useState(false);
   const [documentsUploaded, setDocumentsUploaded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleCreateId = () => {
-    const newTourist = {
-      id: 'tourist_' + Date.now(),
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      digitalId: 'DID_' + Date.now(),
-      isVerified: true,
-      emergencyContacts: [{
-        id: 'ec_1',
-        name: formData.emergencyContact,
-        relationship: 'Emergency Contact',
-        phone: formData.emergencyPhone,
-        isPrimary: true
-      }],
-      travelHistory: [],
-      status: 'safe' as const,
-      lastActive: new Date().toISOString()
-    };
+  const handleCreateId = async () => {
+    if (!isFormValid) return;
     
-    setCurrentTourist(newTourist);
-    setTouristPage('home');
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const digitalIdData: DigitalIdData = {
+        fullName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        emergencyContactName: formData.emergencyContact,
+        emergencyContactPhone: formData.emergencyPhone
+      };
+
+      const { data: result, error: createError } = await signUpWithDigitalId(digitalIdData);
+      
+      if (createError) {
+        throw new Error(createError.message || 'Failed to create digital ID');
+      }
+
+      if (result) {
+        // Create tourist object for app state
+        const newTourist = {
+          id: result.userId,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          digitalId: result.digitalId,
+          isVerified: result.isVerified,
+          emergencyContacts: [{
+            id: 'ec_1',
+            name: formData.emergencyContact,
+            relationship: 'Emergency Contact',
+            phone: formData.emergencyPhone,
+            isPrimary: true
+          }],
+          travelHistory: [],
+          status: 'safe' as const,
+          lastActive: new Date().toISOString()
+        };
+        
+        setCurrentTourist(newTourist);
+        setTouristPage('home');
+      }
+    } catch (err) {
+      console.error('Digital ID creation error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create digital ID');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const isFormValid = formData.name && formData.email && formData.phone && 
+  const isFormValid = formData.name && formData.email && formData.phone && formData.password &&
                      formData.emergencyContact && formData.emergencyPhone && 
                      photoUploaded && documentsUploaded;
 
@@ -85,6 +122,12 @@ const DigitalIdScreen: React.FC = () => {
         {/* Form */}
         <Card className="bg-white/95 backdrop-blur shadow-lg">
           <CardContent className="space-y-4 pt-6">
+            {error && (
+              <Alert className="border-destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -92,6 +135,7 @@ const DigitalIdScreen: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 placeholder="Enter your full name"
+                disabled={loading}
               />
             </div>
 
@@ -103,6 +147,7 @@ const DigitalIdScreen: React.FC = () => {
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 placeholder="your.email@example.com"
+                disabled={loading}
               />
             </div>
 
@@ -113,9 +158,22 @@ const DigitalIdScreen: React.FC = () => {
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder="+91 XXXXX XXXXX"
+                disabled={loading}
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                placeholder="Create a secure password"
+                disabled={loading}
+                minLength={6}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="emergency-contact">Emergency Contact Name</Label>
               <Input
@@ -123,6 +181,7 @@ const DigitalIdScreen: React.FC = () => {
                 value={formData.emergencyContact}
                 onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
                 placeholder="Emergency contact name"
+                disabled={loading}
               />
             </div>
 
@@ -133,6 +192,7 @@ const DigitalIdScreen: React.FC = () => {
                 value={formData.emergencyPhone}
                 onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
                 placeholder="+91 XXXXX XXXXX"
+                disabled={loading}
               />
             </div>
 
@@ -143,6 +203,7 @@ const DigitalIdScreen: React.FC = () => {
                 variant={photoUploaded ? "success" : "outline"}
                 className="w-full"
                 onClick={() => setPhotoUploaded(true)}
+                disabled={loading}
               >
                 {photoUploaded ? (
                   <>
@@ -165,6 +226,7 @@ const DigitalIdScreen: React.FC = () => {
                 variant={documentsUploaded ? "success" : "outline"}
                 className="w-full"
                 onClick={() => setDocumentsUploaded(true)}
+                disabled={loading}
               >
                 {documentsUploaded ? (
                   <>
@@ -188,9 +250,16 @@ const DigitalIdScreen: React.FC = () => {
           size="lg"
           className="w-full"
           onClick={handleCreateId}
-          disabled={!isFormValid}
+          disabled={!isFormValid || loading}
         >
-          Create Digital ID
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Creating Digital ID...
+            </>
+          ) : (
+            'Create Digital ID'
+          )}
         </Button>
       </div>
     </div>
