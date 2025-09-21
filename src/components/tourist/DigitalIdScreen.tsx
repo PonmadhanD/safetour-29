@@ -200,7 +200,7 @@ const DigitalIdScreen: React.FC = () => {
             <div className="space-y-2">
               <Label>Profile Photo</Label>
               <Button
-                variant={photoUploaded ? "success" : "outline"}
+                variant={photoUploaded ? "hero" : "outline"}
                 className="w-full"
                 onClick={() => setPhotoUploaded(true)}
                 disabled={loading}
@@ -223,7 +223,7 @@ const DigitalIdScreen: React.FC = () => {
             <div className="space-y-2">
               <Label>Identity Documents</Label>
               <Button
-                variant={documentsUploaded ? "success" : "outline"}
+                variant={documentsUploaded ? "hero" : "outline"}
                 className="w-full"
                 onClick={() => setDocumentsUploaded(true)}
                 disabled={loading}
