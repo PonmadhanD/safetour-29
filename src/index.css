@@ -10,6 +10,7 @@ Deep Blue authority theme with warm yellow accents
   :root {
     --background: 0 0% 96%;
     --foreground: 210 100% 10%;
+    --bg-primary-grey: #f0f0f0;
 
     --card: 0 0% 100%;
     --card-foreground: 210 100% 10%;
@@ -17,8 +18,8 @@ Deep Blue authority theme with warm yellow accents
     --popover: 0 0% 100%;
     --popover-foreground: 210 100% 10%;
 
-    /* Primary Tourism Blue - Calm and trustworthy */
-    --primary: 265 80% 30%;
+
+    --primary: 265 70% 30%;
     --primary-foreground: 0 0% 100%;
     --primary-light: 265 80% 85%;
     --primary-dark: 265 80% 15%;
@@ -30,7 +31,7 @@ Deep Blue authority theme with warm yellow accents
     --secondary-light: 160 100% 85%;
     
     /* Tourism gradient combinations */
-    --gradient-tourism: linear-gradient(135deg, hsl(210 100% 45%), hsl(160 100% 45%));
+    --gradient-tourism: linear-gradient(135deg, hsl(265, 88%, 55%), hsl(266, 100%, 74%));
     --gradient-hero: linear-gradient(135deg, hsl(160 100% 30%), hsl(160 100% 35%));
 
     /* Success Green - Safety and security */
