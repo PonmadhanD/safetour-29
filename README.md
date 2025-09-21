@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+🗺️ Tourist Safety App
+A React-based application designed to enhance tourist safety by providing real-time alerts, detailed analytics, and location tracking. This app is built for authorities to manage tourist safety effectively and includes features like customizable notifications and a responsive dashboard.
 
-## Project info
+✨ Features
+Real-time Location Tracking: Utilizes Supabase for precise, real-time tracking of tourist locations.
 
-**URL**: https://lovable.dev/projects/4bc44bce-faa2-4327-b1fb-e85db47cf97f
+Customizable Alert System: Send notifications to tourists with multiple severity levels (Low, Medium, High, Critical).
 
-## How can I edit this code?
+Detailed Analytics Dashboard: Gain insights into tourist statistics, including location distribution and incident trends.
 
-There are several ways of editing your application.
+Intuitive Multi-tab Interface: Easily manage alerts, view active notifications, and access historical data.
 
-**Use Lovable**
+Responsive Design: The application adapts seamlessly to various screen sizes.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4bc44bce-faa2-4327-b1fb-e85db47cf97f) and start prompting.
+🛠️ Installation
+To get this project up and running on your local machine, follow these steps:
 
-Changes made via Lovable will be committed automatically to this repo.
+Clone the repository:
 
-**Use your preferred IDE**
+Bash
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+git clone https://github.com/yourusername/tourist-safety-app.git
+Navigate to the project directory:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Bash
 
-Follow these steps:
+cd tourist-safety-app
+Install dependencies:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Bash
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+npm install
+Set up environment variables:
+Create a .env file in the root directory and add your Supabase credentials. Replace the placeholder values with your own:
 
-# Step 3: Install the necessary dependencies.
-npm i
+Plaintext
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+VITE_SUPABASE_URL=https://your-supabase-url.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+Start the development server:
+
+Bash
+
 npm run dev
-```
+🚀 Usage
+Once the application is running, you can access its features and test its functionality.
 
-**Edit a file directly in GitHub**
+Dashboard: View the analytics dashboard to see real-time tourist statistics and trends.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Alerts: Use the Alerts screen to send notifications to tourists, customizing them by type, severity, and location.
 
-**Use GitHub Codespaces**
+Testing: To test the alert system, you can send a sample alert and observe the output in your browser's console.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+JavaScript
 
-## What technologies are used for this project?
+const sampleAlert = {
+  title: "Test Alert",
+  message: "This is a test message"
+};
+console.log(sampleAlert);
+💻 Screenshots
+📄 License
+This project is licensed under the MIT License. See the LICENSE file for more details.
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4bc44bce-faa2-4327-b1fb-e85db47cf97f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Feel free to ask if you need to add or modify any other sections, such as a "Contributing" or "Technologies Used" section!
