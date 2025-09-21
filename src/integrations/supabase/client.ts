@@ -5,13 +5,52 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://jcegbqutxqldvsaoupni.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjZWdicXV0eHFsZHZzYW91cG5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MTU1MzUsImV4cCI6MjA3Mjk5MTUzNX0.vf4FC0EUStSUet8R7xYbCvJklgqyWBm0cHuaNieMhF0";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: typeof window !== 'undefined' ? localStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   }
 });
+
+// Helper functions for type-safe database operations
+export const getUserProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('users')
+    .select(`
+      *,
+      tourist_profiles(*),
+      authority_profiles(*)
+    `)
+    .eq('user_id', userId)
+    .single();
+  
+  return { data, error };
+};
+
+export const getTouristProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('tourist_profiles')
+    .select('*')
+    .eq('tourist_id', userId)
+    .single();
+  
+  return { data, error };
+};
+
+export const getAuthorityProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('authority_profiles')
+    .select('*')
+    .eq('authority_id', userId)
+    .single();
+  
+  return { data, error };
+};
+
+// Export types for easier imports
+export type { Database } from './types';
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];

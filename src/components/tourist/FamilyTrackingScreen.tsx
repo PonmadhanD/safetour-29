@@ -4,36 +4,23 @@ import {
   Clock, Phone, MessageCircle, Map, Trash2, Plus, 
   UserPlus
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  addFamilyMember, 
+  getFamilyMembers, 
+  removeFamilyMember,
+  shareLocationWithFamily,
+  sendEmergencyAlertToFamily,
+  type FamilyMemberData,
+  type FamilyMemberResult
+} from '@/utils/familyMembersGeneration';
 
-// Define interfaces for data
-interface User {
-  id: string;
-  name: string;
-  phone: string | null;
-  location: string | null;
-  distance: string | null;
-  last_seen: string | null;
-  status: string | null;
-}
-
-interface FamilyMember {
-  id: string;
-  relationship: string | null;
-  status: 'active' | 'inactive' | 'pending';
-  can_track: boolean;
-  name: string;
-  phone: string | null;
-  location: string | null;
-  distance: string | null;
-  last_seen: string | null;
-  user_status: string | null;
-}
 
 // Define props for AddFamilyMemberForm
 interface AddFamilyMemberFormProps {
-  addFamilyMember: (e: React.FormEvent, name: string, relationship: string, phone: string) => Promise<void>;
+  onAddFamilyMember: (e: React.FormEvent, name: string, relationship: string, phone: string, email?: string) => Promise<void>;
   setShowAddForm: Dispatch<SetStateAction<boolean>>;
+  loading: boolean;
 }
 
 // Define props for Input component
@@ -46,11 +33,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   required?: boolean;
 }
 
-// Memoized AddFamilyMemberForm component
-const AddFamilyMemberForm = React.memo(({ addFamilyMember, setShowAddForm }: AddFamilyMemberFormProps) => {
+const AddFamilyMemberForm = React.memo(({ onAddFamilyMember, setShowAddForm, loading }: AddFamilyMemberFormProps) => {
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
 
   return (
     <Card>
@@ -63,10 +50,11 @@ const AddFamilyMemberForm = React.memo(({ addFamilyMember, setShowAddForm }: Add
       <CardContent>
         <form
           onSubmit={(e) => {
-            addFamilyMember(e, name, relationship, phone);
+            onAddFamilyMember(e, name, relationship, phone, email);
             setName('');
             setRelationship('');
             setPhone('');
+            setEmail('');
           }}
           className="space-y-4"
         >
@@ -75,6 +63,7 @@ const AddFamilyMemberForm = React.memo(({ addFamilyMember, setShowAddForm }: Add
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            disabled={loading}
             required
           />
           <Input
@@ -82,6 +71,7 @@ const AddFamilyMemberForm = React.memo(({ addFamilyMember, setShowAddForm }: Add
             placeholder="Relationship (e.g., Wife, Son)"
             value={relationship}
             onChange={(e) => setRelationship(e.target.value)}
+            disabled={loading}
             required
           />
           <Input
@@ -89,18 +79,27 @@ const AddFamilyMemberForm = React.memo(({ addFamilyMember, setShowAddForm }: Add
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            disabled={loading}
             required
           />
+          <Input
+            type="email"
+            placeholder="Email (optional)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
           <div className="flex gap-2">
-            <Button type="submit" className="flex-1">
+            <Button type="submit" className="flex-1" disabled={loading}>
               <Plus className="w-4 h-4 mr-2" />
-              Add Member
+              {loading ? 'Adding...' : 'Add Member'}
             </Button>
             <Button
               type="button"
               variant="outline"
               className="flex-1"
               onClick={() => setShowAddForm(false)}
+              disabled={loading}
             >
               Cancel
             </Button>
@@ -237,145 +236,147 @@ const Input = React.memo(({ type, placeholder, value, onChange, className = '', 
 
 function App() {
   const [activePage, setActivePage] = useState('tracking');
-  const [isSupabaseReady, setIsSupabaseReady] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+  const { user } = useAuth();
+  const [familyMembers, setFamilyMembers] = useState<FamilyMemberResult[]>([]);
   const [locationSharing, setLocationSharing] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Authenticate with Supabase
+  // Load family members when user is available
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          setUserId(user.id);
-        } else {
-          console.error('No user logged in');
-          // Optionally redirect to login or handle anonymous user
-        }
-      } catch (err) {
-        console.error('Authentication error:', (err as Error).message);
-      } finally {
-        setIsSupabaseReady(true);
-      }
-    };
+    if (user) {
+      loadFamilyMembers();
+    }
+  }, [user]);
 
-    getUser();
-  }, []);
+  const loadFamilyMembers = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const members = await getFamilyMembers(user.id);
+      setFamilyMembers(members);
+    } catch (err) {
+      console.error('Error loading family members:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load family members');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // // Fetch family members with user details on mount
-  // useEffect(() => {
-  //   if (!isSupabaseReady || !userId) return;
-
-  //   const fetchFamilyMembers = async () => {
-  //     try {
-  //       const { data, error } = await supabase
-  //         .from('family_members')
-  //         .select('*')
-  //         .eq('user_id', userId);
-
-  //       if (error) {
-  //         throw new Error(`Failed to fetch family members: ${error.message}`);
-  //       }
-
-  //       setFamilyMembers(data as FamilyMember[]);
-  //     } catch (error) {
-  //       console.error('Error fetching family members:', (error as Error).message);
-  //     }
-  //   };
-
-  //   fetchFamilyMembers();
-  // }, [isSupabaseReady, userId]);
-
-  const addFamilyMember = async (e: React.FormEvent, name: string, relationship: string, phone: string) => {
+  const handleAddFamilyMember = async (
+    e: React.FormEvent, 
+    name: string, 
+    relationship: string, 
+    phone: string, 
+    email?: string
+  ) => {
     e.preventDefault();
-    if (!name || !relationship || !phone) {
-      console.error('Please fill all fields.');
+    if (!name || !relationship || !phone || !user) {
+      setError('Please fill all required fields.');
       return;
     }
-    if (!isSupabaseReady || !userId) {
-      console.error('App not ready.');
-      return;
-    }
+    
+    setLoading(true);
+    setError(null);
 
     try {
-      const newMember = {
-        id: crypto.randomUUID(), // Generate a local ID for now
-        relationship,
-        status: 'pending' as const,
-        can_track: true,
+      const memberData: FamilyMemberData = {
         name,
+        relationship,
         phone,
-        location: null,
-        distance: null,
-        last_seen: null,
-        user_status: 'unknown' as const,
+        email,
+        emergencyPriority: 1
       };
 
-      // Update local state immediately
+      const newMember = await addFamilyMember(user.id, memberData);
       setFamilyMembers(prev => [...prev, newMember]);
-
-      // Optional: Sync with Supabase (commented out for local storage focus)
-      /*
-      const { error } = await supabase
-        .from('family_members')
-        .insert({
-          user_id: userId,
-          name,
-          relationship,
-          phone,
-          status: 'pending',
-          can_track: true,
-          location: null,
-          distance: null,
-          last_seen: null,
-          user_status: 'unknown',
-        });
-      if (error) {
-        throw new Error(`Failed to add member: ${error.message}`);
-      }
-      */
 
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding family member:', (error as Error).message);
-      // Revert local state if Supabase sync fails (if enabled)
-      setFamilyMembers(prev => prev.filter(m => m.id !== (familyMembers[familyMembers.length - 1]?.id || '')));
+      setError(error instanceof Error ? error.message : 'Failed to add family member');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteFamilyMember = async (memberId: string) => {
-    if (!isSupabaseReady || !userId) {
-      console.error('App not ready.');
+  const handleDeleteFamilyMember = async (memberId: string) => {
+    if (!user) {
+      setError('User not authenticated.');
       return;
     }
 
-    try {
-      // Update local state immediately
-      setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
+    setLoading(true);
+    setError(null);
 
-      // Optional: Sync with Supabase (commented out for local storage focus)
-      /*
-      const { error } = await supabase
-        .from('family_members')
-        .delete()
-        .eq('id', memberId)
-        .eq('user_id', userId);
-      if (error) {
-        throw new Error(`Failed to delete member: ${error.message}`);
-      }
-      */
+    try {
+      await removeFamilyMember(user.id, memberId);
+      setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
     } catch (error) {
       console.error('Error deleting family member:', (error as Error).message);
-      // Revert local state if Supabase sync fails (if enabled)
-      const deletedMember = familyMembers.find(m => m.id === memberId);
-      if (deletedMember) setFamilyMembers(prev => [...prev, deletedMember]);
+      setError(error instanceof Error ? error.message : 'Failed to delete family member');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleShareLocation = async () => {
+    if (!user) return;
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await shareLocationWithFamily(
+              user.id,
+              position.coords.latitude,
+              position.coords.longitude,
+              'Location shared manually'
+            );
+          } catch (error) {
+            console.error('Error sharing location:', error);
+            setError('Failed to share location');
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          setError('Unable to get current location');
+        }
+      );
+    }
+  };
+
+  const handleEmergencyAlert = async () => {
+    if (!user) return;
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await sendEmergencyAlertToFamily(
+              user.id,
+              position.coords.latitude,
+              position.coords.longitude,
+              'Emergency alert from family tracking'
+            );
+          } catch (error) {
+            console.error('Error sending emergency alert:', error);
+            setError('Failed to send emergency alert');
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          setError('Unable to get current location for emergency alert');
+        }
+      );
+    }
+  };
   // Helper function to get status color
-  const getStatusColor = (status: string | null) => {
+  const getStatusColor = (status?: string | null) => {
     switch (status) {
       case 'safe':
         return 'bg-emerald-500 text-white';
@@ -388,10 +389,10 @@ function App() {
     }
   };
 
-  if (!isSupabaseReady) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
+        <p className="text-gray-600">Please log in to access family tracking</p>
       </div>
     );
   }
@@ -422,11 +423,27 @@ function App() {
           </Button>
         </div>
         <div className="p-2 text-xs text-center text-gray-400">
-          User ID: {userId || 'Not logged in'}
+          User ID: {user?.id || 'Not logged in'}
         </div>
       </div>
 
       <div className="p-4 space-y-6">
+        {error && (
+          <Card className="border-red-500/20 bg-red-50">
+            <CardContent className="p-4">
+              <p className="text-red-600 text-sm">{error}</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2"
+                onClick={() => setError(null)}
+              >
+                Dismiss
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Location Sharing Control */}
         <Card>
           <CardHeader>
@@ -454,8 +471,9 @@ function App() {
         {/* Add New Family Member Form */}
         {showAddForm && (
           <AddFamilyMemberForm
-            addFamilyMember={addFamilyMember}
+            onAddFamilyMember={handleAddFamilyMember}
             setShowAddForm={setShowAddForm}
+            loading={loading}
           />
         )}
 
@@ -468,14 +486,24 @@ function App() {
                 Family Members ({familyMembers.length})
               </span>
               {!showAddForm && (
-                <Button size="icon" onClick={() => setShowAddForm(true)} className="ml-2 bg-blue-600 text-white">
+                <Button 
+                  size="icon" 
+                  onClick={() => setShowAddForm(true)} 
+                  className="ml-2 bg-blue-600 text-white"
+                  disabled={loading}
+                >
                   <Plus className="w-5 h-5" />
                 </Button>
               )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {familyMembers.length === 0 ? (
+            {loading ? (
+              <div className="text-center text-gray-500 p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p>Loading family members...</p>
+              </div>
+            ) : familyMembers.length === 0 ? (
               <div className="text-center text-gray-500 p-8">
                 <UserPlus className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                 <p>No family members added yet.</p>
@@ -488,13 +516,13 @@ function App() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-800">{member.name}</h3>
-                        <Badge className={getStatusColor(member.user_status)}>
-                          {member.user_status || 'unknown'}
+                        <Badge className={getStatusColor(member.userStatus)}>
+                          {member.userStatus || 'unknown'}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-500">{member.relationship || 'Unknown'}</p>
                       <p className="text-sm text-gray-500">Status: {member.status}</p>
-                      <p className="text-sm text-gray-500">Tracking: {member.can_track ? 'Enabled' : 'Disabled'}</p>
+                      <p className="text-sm text-gray-500">Tracking: {member.canTrack ? 'Enabled' : 'Disabled'}</p>
                     </div>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon" onClick={() => console.log(`Calling ${member.phone}`)}>
@@ -503,7 +531,13 @@ function App() {
                       <Button variant="outline" size="icon" onClick={() => console.log(`Messaging ${member.name}`)}>
                         <MessageCircle className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteFamilyMember(member.id)} className="text-red-500 hover:text-red-700">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDeleteFamilyMember(member.id)} 
+                        className="text-red-500 hover:text-red-700"
+                        disabled={loading}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -511,7 +545,7 @@ function App() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <MapPin className="w-4 h-4 text-blue-600" />
-                      <span>{member.location || 'Unknown'}</span>
+                      <span>{member.location ? `${member.location.lat.toFixed(4)}, ${member.location.lng.toFixed(4)}` : 'Location unknown'}</span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
@@ -520,7 +554,7 @@ function App() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        <span>{member.last_seen || 'Unknown'}</span>
+                        <span>{member.lastSeen ? new Date(member.lastSeen).toLocaleString() : 'Unknown'}</span>
                       </div>
                     </div>
                   </div>
@@ -568,7 +602,8 @@ function App() {
             <Button
               variant="outline"
               className="w-full justify-start border-gray-300 hover:bg-gray-100"
-              onClick={() => console.log('Sending check-in')}
+              onClick={handleShareLocation}
+              disabled={loading}
             >
               <UserCheck className="w-4 h-4 mr-2" />
               Send Check-in to All Family
@@ -576,7 +611,8 @@ function App() {
             <Button
               variant="outline"
               className="w-full justify-start border-gray-300 hover:bg-gray-100"
-              onClick={() => console.log('Sharing location')}
+              onClick={handleShareLocation}
+              disabled={loading}
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share Current Location 
@@ -584,7 +620,8 @@ function App() {
             <Button 
               variant="destructive" 
               className="w-full"
-              onClick={() => console.log('Emergency alert triggered')}
+              onClick={handleEmergencyAlert}
+              disabled={loading}
             >
               <Phone className="w-4 h-4 mr-2" />
               Emergency Alert to Family
