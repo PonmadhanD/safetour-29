@@ -2,7 +2,7 @@ import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { 
   ArrowLeft, Users, MapPin, Share2, UserCheck, 
   Clock, Phone, MessageCircle, Map, Trash2, Plus, 
-  UserPlus
+  UserPlus, LogIn
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -389,10 +389,19 @@ function App() {
     }
   };
 
-  if (!user) {
+    if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Please log in to access family tracking</p>
+        <div className="text-center">
+          <LogIn className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+          <p className="text-gray-600 text-lg">Please log in to access your Family Tracking</p>
+          <a
+            href="/login"
+            className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Go to Login
+          </a>
+        </div>
       </div>
     );
   }
@@ -550,7 +559,8 @@ function App() {
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <UserCheck className="w-4 h-4" />
-                        <span>{member.distance || 'Unknown'}</span>
+                        {/* Distance error needs to be fixed over here */}
+                        <span>{'Unknown'}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
