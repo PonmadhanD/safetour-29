@@ -1,20 +1,33 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import { 
   ArrowLeft, Users, MapPin, Share2, UserCheck, 
   Clock, Phone, MessageCircle, Map, Trash2, Plus, 
   UserPlus, LogIn
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  addFamilyMember, 
-  getFamilyMembers, 
-  removeFamilyMember,
-  shareLocationWithFamily,
-  sendEmergencyAlertToFamily,
-  type FamilyMemberData,
-  type FamilyMemberResult
-} from '@/utils/familyMembersGeneration';
 
+// Define types for family members
+interface FamilyMemberData {
+  name: string;
+  relationship: string;
+  phone: string;
+  email?: string;
+  emergencyPriority: number;
+}
+
+interface FamilyMemberResult extends FamilyMemberData {
+  id: string;
+  userStatus: string | null;
+  status: string;
+  canTrack: boolean;
+  location: { lat: number; lng: number } | null;
+  lastSeen: string | null;
+  distance: string | null;
+}
+
+// Mock user for offline use
+const mockUser = {
+  id: 'offline-user-123',
+};
 
 // Define props for AddFamilyMemberForm
 interface AddFamilyMemberFormProps {
@@ -110,7 +123,7 @@ const AddFamilyMemberForm = React.memo(({ onAddFamilyMember, setShowAddForm, loa
   );
 });
 
-// Define custom UI components (unchanged)
+// Define custom UI components
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
     {children}
@@ -236,32 +249,42 @@ const Input = React.memo(({ type, placeholder, value, onChange, className = '', 
 
 function App() {
   const [activePage, setActivePage] = useState('tracking');
-  const { user } = useAuth();
-  const [familyMembers, setFamilyMembers] = useState<FamilyMemberResult[]>([]);
+  const [user] = useState(mockUser); // Mock user for offline use
+  const [familyMembers, setFamilyMembers] = useState<FamilyMemberResult[]>([
+    // Optional: Initialize with sample data for testing
+    {
+      id: 'member-1',
+      name: 'John Doe',
+      relationship: 'Brother',
+      phone: '+91 12345 67890',
+      email: 'john@example.com',
+      emergencyPriority: 1,
+      userStatus: 'safe',
+      status: 'active',
+      canTrack: true,
+      location: { lat: 12.9716, lng: 77.5946 },
+      lastSeen: new Date().toISOString(),
+      distance: '5 km',
+    },
+  ]);
   const [locationSharing, setLocationSharing] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load family members when user is available
-  useEffect(() => {
-    if (user) {
-      loadFamilyMembers();
-    }
-  }, [user]);
-
+  // Mock loadFamilyMembers (no backend)
   const loadFamilyMembers = async () => {
-    if (!user) return;
-    
     setLoading(true);
     setError(null);
-    
     try {
-      const members = await getFamilyMembers(user.id);
-      setFamilyMembers(members);
+      // Simulate fetching data (already in state, so just delay for realism)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Optionally load from localStorage if persistence is desired
+      // const saved = localStorage.getItem('familyMembers');
+      // if (saved) setFamilyMembers(JSON.parse(saved));
     } catch (err) {
       console.error('Error loading family members:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load family members');
+      setError('Failed to load family members');
     } finally {
       setLoading(false);
     }
@@ -275,7 +298,7 @@ function App() {
     email?: string
   ) => {
     e.preventDefault();
-    if (!name || !relationship || !phone || !user) {
+    if (!name || !relationship || !phone) {
       setError('Please fill all required fields.');
       return;
     }
@@ -284,59 +307,69 @@ function App() {
     setError(null);
 
     try {
-      const memberData: FamilyMemberData = {
+      const newMember: FamilyMemberResult = {
+        id: `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name,
         relationship,
         phone,
         email,
-        emergencyPriority: 1
+        emergencyPriority: 1,
+        userStatus: 'safe',
+        status: 'active',
+        canTrack: true,
+        location: null, // No real location data in offline mode
+        lastSeen: new Date().toISOString(),
+        distance: 'Unknown', // Mock distance
       };
 
-      const newMember = await addFamilyMember(user.id, memberData);
-      setFamilyMembers(prev => [...prev, newMember]);
+      setFamilyMembers(prev => {
+        const updated = [...prev, newMember];
+        // Optionally save to localStorage
+        // localStorage.setItem('familyMembers', JSON.stringify(updated));
+        return updated;
+      });
 
       setShowAddForm(false);
     } catch (error) {
-      console.error('Error adding family member:', (error as Error).message);
-      setError(error instanceof Error ? error.message : 'Failed to add family member');
+      console.error('Error adding family member:', error);
+      setError('Failed to add family member');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteFamilyMember = async (memberId: string) => {
-    if (!user) {
-      setError('User not authenticated.');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
     try {
-      await removeFamilyMember(user.id, memberId);
-      setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
+      setFamilyMembers(prev => {
+        const updated = prev.filter(member => member.id !== memberId);
+        // Optionally save to localStorage
+        // localStorage.setItem('familyMembers', JSON.stringify(updated));
+        return updated;
+      });
     } catch (error) {
-      console.error('Error deleting family member:', (error as Error).message);
-      setError(error instanceof Error ? error.message : 'Failed to delete family member');
+      console.error('Error deleting family member:', error);
+      setError('Failed to delete family member');
     } finally {
       setLoading(false);
     }
   };
 
   const handleShareLocation = async () => {
-    if (!user) return;
-    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
-            await shareLocationWithFamily(
-              user.id,
-              position.coords.latitude,
-              position.coords.longitude,
-              'Location shared manually'
-            );
+            // Mock sharing location
+            console.log('Mock sharing location:', {
+              userId: user.id,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              message: 'Location shared manually',
+            });
+            alert('Location shared (mocked for offline mode)');
           } catch (error) {
             console.error('Error sharing location:', error);
             setError('Failed to share location');
@@ -347,22 +380,24 @@ function App() {
           setError('Unable to get current location');
         }
       );
+    } else {
+      setError('Geolocation not supported in this browser');
     }
   };
 
   const handleEmergencyAlert = async () => {
-    if (!user) return;
-    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
-            await sendEmergencyAlertToFamily(
-              user.id,
-              position.coords.latitude,
-              position.coords.longitude,
-              'Emergency alert from family tracking'
-            );
+            // Mock sending emergency alert
+            console.log('Mock emergency alert:', {
+              userId: user.id,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              message: 'Emergency alert from family tracking',
+            });
+            alert('Emergency alert sent (mocked for offline mode)');
           } catch (error) {
             console.error('Error sending emergency alert:', error);
             setError('Failed to send emergency alert');
@@ -373,8 +408,11 @@ function App() {
           setError('Unable to get current location for emergency alert');
         }
       );
+    } else {
+      setError('Geolocation not supported in this browser');
     }
   };
+
   // Helper function to get status color
   const getStatusColor = (status?: string | null) => {
     switch (status) {
@@ -389,18 +427,13 @@ function App() {
     }
   };
 
-    if (!user) {
+  // Simulate login check (always logged in for offline mode)
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <LogIn className="w-12 h-12 mx-auto mb-4 text-gray-600" />
-          <p className="text-gray-600 text-lg">Please log in to access your Family Tracking</p>
-          <a
-            href="/login"
-            className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Go to Login
-          </a>
+          <p className="text-gray-600 text-lg">Offline mode: Using mock user</p>
         </div>
       </div>
     );
@@ -432,7 +465,7 @@ function App() {
           </Button>
         </div>
         <div className="p-2 text-xs text-center text-gray-400">
-          User ID: {user?.id || 'Not logged in'}
+          User ID: {user.id}
         </div>
       </div>
 
@@ -466,7 +499,7 @@ function App() {
               <div>
                 <p className="font-medium text-gray-800">Share my location with family</p>
                 <p className="text-sm text-gray-500">
-                  Allow family members to see your real-time location
+                  Allow family members to see your real-time location (mocked)
                 </p>
               </div>
               <Switch
@@ -559,8 +592,7 @@ function App() {
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <UserCheck className="w-4 h-4" />
-                        {/* Distance error needs to be fixed over here */}
-                        <span>{'Unknown'}</span>
+                        <span>{member.distance || 'Unknown'}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
@@ -586,7 +618,7 @@ function App() {
             <div className="h-40 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
               <div className="text-center text-gray-400">
                 <Map className="w-8 h-8 mx-auto mb-2" />
-                <p className="text-sm">Mini map with family member locations</p>
+                <p className="text-sm">Mini map with family member locations (mocked)</p>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -597,7 +629,7 @@ function App() {
                 </Button>
               </div>
             </div>
-          </CardContent>
+            </CardContent>
         </Card>
 
         {/* Emergency Actions */}
