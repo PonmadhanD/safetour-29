@@ -219,7 +219,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
             .from('user_preferences')
             .select('language')
             .eq('user_id', user.id)
-            .maybeSingle();
+            .single();
           
           if (data?.language) {
             setLanguageState(data.language as Language);
