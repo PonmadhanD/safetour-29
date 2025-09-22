@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,14 +6,43 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Camera, Check, Upload, QrCode } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { useApp } from '@/contexts/AppContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { generateDigitalId, type DigitalIdData } from '@/utils/digitalIdGeneration';
 import digitalIdImage from '@/assets/digital-id.jpg';
 
+// Mock AppContext functions
+const mockSetTouristPage = (page: string) => {
+  console.log(`Navigating to page: ${page}`);
+  // In a real app, this would navigate to the specified page
+};
+
+const mockSetCurrentTourist = (tourist: any) => {
+  console.log('Setting current tourist:', tourist);
+  localStorage.setItem('currentTourist', JSON.stringify(tourist));
+  // In a real app, this would update the app's tourist state
+};
+
+// Mock generateDigitalId function
+const mockGenerateDigitalId = async (data: DigitalIdData) => {
+  // Simulate digital ID generation
+  const digitalId = `DIGITAL-${data.fullName.replace(/\s+/g, '').toUpperCase()}-${Date.now()}`;
+  return {
+    userId: `user-${Date.now()}`,
+    digitalId,
+    isVerified: true, // Mock verification
+    timestamp: new Date().toISOString(),
+  };
+};
+
+// Define DigitalIdData type locally
+interface DigitalIdData {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+}
+
 const DigitalIdScreen: React.FC = () => {
-  const { setTouristPage, setCurrentTourist } = useApp();
-  const { signUpWithDigitalId, signIn } = useAuth();
   const [isRegisterMode, setIsRegisterMode] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -27,6 +56,15 @@ const DigitalIdScreen: React.FC = () => {
   const [documentsUploaded, setDocumentsUploaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentTourist, setCurrentTourist] = useState<any>(null);
+
+  // Load current tourist from localStorage on mount
+  useEffect(() => {
+    const savedTourist = localStorage.getItem('currentTourist');
+    if (savedTourist) {
+      setCurrentTourist(JSON.parse(savedTourist));
+    }
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -57,7 +95,7 @@ const DigitalIdScreen: React.FC = () => {
 
     try {
       if (isRegisterMode) {
-        // Registration logic
+        // Mock registration logic
         const digitalIdData: DigitalIdData = {
           fullName: formData.name,
           email: formData.email,
@@ -67,11 +105,8 @@ const DigitalIdScreen: React.FC = () => {
           emergencyContactPhone: formData.emergencyPhone
         };
 
-        const { data: result, error: createError } = await signUpWithDigitalId(digitalIdData);
-
-        if (createError) {
-          throw new Error(createError.message || 'Failed to create digital ID');
-        }
+        // Simulate digital ID generation
+        const result = await mockGenerateDigitalId(digitalIdData);
 
         if (result) {
           const newTourist = {
@@ -90,38 +125,42 @@ const DigitalIdScreen: React.FC = () => {
             }],
             travelHistory: [],
             status: 'safe' as const,
-            lastActive: new Date().toISOString()
+            lastActive: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
           };
+
+          // Save to localStorage
+          localStorage.setItem('tourists', JSON.stringify([...(JSON.parse(localStorage.getItem('tourists') || '[]')), newTourist]));
+          localStorage.setItem('currentTourist', JSON.stringify(newTourist));
 
           setCurrentTourist(newTourist);
-          setTouristPage('home');
+          mockSetCurrentTourist(newTourist);
+          mockSetTouristPage('home');
+          
+          // Simulate success
+          alert(`Digital ID created successfully!\nID: ${result.digitalId}`);
         }
       } else {
-        // Login logic
-        const { data: authData, error: loginError } = await signIn(formData.email, formData.password);
+        // Mock login logic
+        // Check if user exists in localStorage
+        const savedTourists = JSON.parse(localStorage.getItem('tourists') || '[]');
+        const existingTourist = savedTourists.find((t: any) => t.email === formData.email);
 
-        if (loginError) {
-          throw new Error(loginError.message || 'Failed to log in');
-        }
-
-        if (authData) {
+        if (existingTourist) {
+          // Simulate successful login
           const loggedInTourist = {
-            id: authData.userId,
-            name: authData.name || 'User',
-            email: formData.email,
-            phone: authData.phone || '',
-            digitalId: authData.digitalId || null,
-            isVerified: authData.isVerified || false,
-            emergencyContacts: authData.emergencyContacts || [],
-            travelHistory: authData.travelHistory || [],
-            status: 'safe' as const,
-            lastActive: new Date().toISOString()
+            ...existingTourist,
+            lastActive: new Date().toISOString(),
           };
 
+          localStorage.setItem('currentTourist', JSON.stringify(loggedInTourist));
           setCurrentTourist(loggedInTourist);
-          setTouristPage('home');
+          mockSetCurrentTourist(loggedInTourist);
+          mockSetTouristPage('home');
+          
+          alert(`Welcome back, ${existingTourist.name}!`);
         } else {
-          throw new Error('Login failed: No user data received');
+          throw new Error('No account found with this email. Please register first.');
         }
       }
     } catch (err) {
@@ -138,6 +177,46 @@ const DigitalIdScreen: React.FC = () => {
       photoUploaded && documentsUploaded
     : formData.email && formData.password;
 
+  // Check if already logged in
+  if (currentTourist) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-light to-secondary-light p-4 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-primary">Welcome Back!</CardTitle>
+            <p className="text-gray-600 mt-2">Digital ID Active</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center">
+              <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full mb-4">
+                <QrCode className="w-8 h-8 mx-auto mb-2" />
+                <p className="font-semibold">{currentTourist.name}</p>
+                <p className="text-sm">{currentTourist.digitalId}</p>
+              </div>
+              <Button 
+                className="w-full"
+                onClick={() => {
+                  localStorage.removeItem('currentTourist');
+                  setCurrentTourist(null);
+                  alert('Logged out successfully!');
+                }}
+              >
+                Log Out
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full mt-2"
+                onClick={() => mockSetTouristPage('home')}
+              >
+                Go to Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light to-secondary-light p-4">
       <div className="max-w-md mx-auto space-y-6">
@@ -145,7 +224,7 @@ const DigitalIdScreen: React.FC = () => {
         <div className="text-center text-black pt-8 pb-4">
           <h1 className="text-2xl font-bold">{isRegisterMode ? 'Create Digital Tourist ID' : 'Log In to Your Account'}</h1>
           <p className="text-black/90 mt-2">
-            {isRegisterMode ? 'Secure blockchain-verified identification' : 'Access your digital tourist ID'}
+            {isRegisterMode ? 'Offline digital identification' : 'Access your saved profile'}
           </p>
         </div>
 
@@ -178,7 +257,7 @@ const DigitalIdScreen: React.FC = () => {
                 />
               </div>
               <div className="text-center text-sm text-muted-foreground">
-                Powered by Blockchain Technology
+                Offline Digital Identification
               </div>
             </CardContent>
           </Card>
@@ -269,7 +348,7 @@ const DigitalIdScreen: React.FC = () => {
                 <div className="space-y-2">
                   <Label>Profile Photo</Label>
                   <Button
-                    variant={photoUploaded ? "hero" : "outline"}
+                    variant={photoUploaded ? "default" : "outline"}
                     className="w-full"
                     onClick={() => setPhotoUploaded(true)}
                     disabled={loading}
@@ -291,7 +370,7 @@ const DigitalIdScreen: React.FC = () => {
                 <div className="space-y-2">
                   <Label>Identity Documents</Label>
                   <Button
-                    variant={documentsUploaded ? "hero" : "outline"}
+                    variant={documentsUploaded ? "default" : "outline"}
                     className="w-full"
                     onClick={() => setDocumentsUploaded(true)}
                     disabled={loading}
@@ -316,9 +395,9 @@ const DigitalIdScreen: React.FC = () => {
 
         {/* Submit Button */}
         <Button
-          variant="hero"
+          variant="default"
           size="lg"
-          className="w-full"
+          className="w-full bg-primary hover:bg-primary/90"
           onClick={handleSubmit}
           disabled={!isFormValid || loading}
         >
