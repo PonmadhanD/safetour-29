@@ -1,5 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
 export interface DigitalIdData {
   fullName: string;
@@ -23,86 +22,99 @@ export interface GeneratedDigitalId {
   isVerified: boolean;
 }
 
-/**
- * Generates a unique digital ID for tourists with blockchain verification
- */
 export const generateDigitalId = async (data: DigitalIdData): Promise<GeneratedDigitalId> => {
   try {
-    // Step 1: Create user account in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.fullName,
-          phone: data.phone
-        }
-      }
-    });
+    // ---------------------------
+    // Step 1: Create Auth User (if not exists)
+    // ---------------------------
+    let userId: string;
 
-    if (authError) {
-      throw new Error(`Authentication error: ${authError.message}`);
+    // Query the users table to check if a user with this email exists
+    const { data: existingUser, error: userLookupError } = await supabase
+      .from('users')
+      .select('user_id')
+      .eq('email', data.email)
+      .single();
+
+    if (userLookupError && userLookupError.code !== 'PGRST116') {
+      // PGRST116: No rows found
+      throw new Error(`User lookup error: ${userLookupError.message}`);
     }
 
-    if (!authData.user) {
-      throw new Error('Failed to create user account');
+    if (existingUser?.user_id) {
+      userId = existingUser.user_id;
+    } else {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: { data: { full_name: data.fullName, phone: data.phone } }
+      });
+      if (authError) throw new Error(`Authentication error: ${authError.message}`);
+      if (!authData.user) throw new Error('Failed to create user account');
+      userId = authData.user.id;
     }
 
-    const userId = authData.user.id;
-
-    // Step 2: Create user record in public.users table
+    // ---------------------------
+    // Step 2: Upsert into users table
+    // ---------------------------
     const { error: userError } = await supabase
       .from('users')
-      .insert({
-        user_id: userId,
-        email: data.email,
-        role: 'tourist'
-      });
+      .upsert({ user_id: userId, email: data.email, role: 'tourist' }, { onConflict: 'user_id' });
+    if (userError) throw new Error(`User creation/upsert error: ${userError.message}`);
 
-    if (userError) {
-      throw new Error(`User creation error: ${userError.message}`);
-    }
+    // ---------------------------
+    // Step 3: Check existing tourist profile
+    // ---------------------------
+    const { data: existingProfile } = await supabase
+      .from('tourist_profiles')
+      .select('digital_id')
+      .eq('tourist_id', userId)
+      .single() as { data: { digital_id: string } | null; error: any };
 
-    // Step 3: Generate unique digital ID
-    const digitalId = generateUniqueDigitalId();
-    
-    // Step 4: Create tourist profile
+    const digitalId = existingProfile?.digital_id || generateUniqueDigitalId();
+
+    // ---------------------------
+    // Step 4: Upsert tourist profile
+    // ---------------------------
     const { error: profileError } = await supabase
       .from('tourist_profiles')
-      .insert({
-        tourist_id: userId,
-        full_name: data.fullName,
-        date_of_birth: data.dateOfBirth || null,
-        nationality: data.nationality || 'Indian',
-        passport_no: data.passportNo || null,
-        govt_id: data.govtId || null,
-        emergency_contact: `${data.emergencyContactName}:${data.emergencyContactPhone}`,
-        digital_id_verified: true
-      });
+      .upsert(
+        {
+          tourist_id: userId,
+          full_name: data.fullName,
+          date_of_birth: data.dateOfBirth || null,
+          nationality: data.nationality || 'Indian',
+          passport_no: data.passportNo || null,
+          govt_id: data.govtId || null,
+          emergency_contact: `${data.emergencyContactName}:${data.emergencyContactPhone}`,
+          digital_id_verified: true,
+          phone: data.phone,
+          digital_id: digitalId
+        },
+        { onConflict: 'tourist_id' }
+      );
+    if (profileError) throw new Error(`Error creating/updating tourist profile: ${profileError.message}`);
 
-    if (profileError) {
-      throw new Error(`Profile creation error: ${profileError.message}`);
-    }
-
-    // Step 5: Create user preferences
+    // ---------------------------
+    // Step 5: Upsert user preferences
+    // ---------------------------
     const { error: preferencesError } = await supabase
       .from('user_preferences')
-      .insert({
-        user_id: userId,
-        language: 'en',
-        notifications_enabled: true,
-        location_sharing: true
-      });
+      .upsert(
+        { user_id: userId, language: 'en', notifications_enabled: true, location_sharing: true },
+        { onConflict: 'user_id' }
+      );
+    if (preferencesError) console.warn('Failed to upsert user preferences:', preferencesError.message);
 
-    if (preferencesError) {
-      console.warn('Failed to create user preferences:', preferencesError.message);
-    }
-
-    // Step 6: Generate QR code and blockchain hash
+    // ---------------------------
+    // Step 6: Generate QR code & blockchain hash
+    // ---------------------------
     const qrCode = await generateQRCode(digitalId, userId);
     const blockchainHash = await generateBlockchainHash(digitalId, data);
 
-    // Step 7: Log the digital ID generation
+    // ---------------------------
+    // Step 7: Log audit action
+    // ---------------------------
     await logAuditAction(userId, 'digital_id_generated', {
       digitalId,
       email: data.email,
@@ -117,27 +129,22 @@ export const generateDigitalId = async (data: DigitalIdData): Promise<GeneratedD
       blockchainHash,
       isVerified: true
     };
-
   } catch (error) {
     console.error('Digital ID generation failed:', error);
     throw error;
   }
 };
 
-/**
- * Generates a unique digital ID with format: NE-DID-YYYY-XXXXXXX
- */
+// ---------------------------
+// Helpers
+// ---------------------------
 const generateUniqueDigitalId = (): string => {
   const year = new Date().getFullYear();
   const timestamp = Date.now();
   const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-  
   return `NE-DID-${year}-${timestamp.toString().slice(-7)}${random.slice(-3)}`;
 };
 
-/**
- * Generates QR code data for the digital ID
- */
 const generateQRCode = async (digitalId: string, userId: string): Promise<string> => {
   const qrData = {
     digitalId,
@@ -147,88 +154,20 @@ const generateQRCode = async (digitalId: string, userId: string): Promise<string
     region: 'Northeast India',
     version: '2.1.0'
   };
-  
-  // In a real implementation, you would use a QR code library
-  // For now, we'll return the base64 encoded JSON
   return btoa(JSON.stringify(qrData));
 };
 
-/**
- * Generates blockchain hash for verification
- */
 const generateBlockchainHash = async (digitalId: string, data: DigitalIdData): Promise<string> => {
-  const hashData = {
-    digitalId,
-    fullName: data.fullName,
-    email: data.email,
-    phone: data.phone,
-    timestamp: Date.now(),
-    salt: Math.random().toString(36).substring(2, 15)
-  };
-  
-  // Simple hash generation (in production, use proper blockchain integration)
-  const encoder = new TextEncoder();
-  const dataBuffer = encoder.encode(JSON.stringify(hashData));
-  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashData = { digitalId, fullName: data.fullName, email: data.email, phone: data.phone, timestamp: Date.now(), salt: Math.random().toString(36).substring(2, 15) };
+  const buffer = new TextEncoder().encode(JSON.stringify(hashData));
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 };
 
-/**
- * Logs audit actions for tracking
- */
 const logAuditAction = async (userId: string, actionType: string, details: any) => {
   try {
-    await supabase
-      .from('audit_logs')
-      .insert({
-        action_by: userId,
-        action_type: actionType,
-        details
-      });
+    await supabase.from('audit_logs').insert({ action_by: userId, action_type: actionType, details });
   } catch (error) {
     console.error('Failed to log audit action:', error);
-  }
-};
-
-/**
- * Validates digital ID format
- */
-export const validateDigitalId = (digitalId: string): boolean => {
-  const pattern = /^NE-DID-\d{4}-\d{10}$/;
-  return pattern.test(digitalId);
-};
-
-/**
- * Retrieves tourist data by digital ID
- */
-export const getTouristByDigitalId = async (digitalId: string) => {
-  try {
-    // Since digital_id is not stored directly, we need to search by user data
-    // This is a simplified approach - in production, you'd store the digital_id in the profile
-    const { data: profiles, error } = await supabase
-      .from('tourist_profiles')
-      .select(`
-        *,
-        users!tourist_profiles_tourist_id_fkey(*)
-      `)
-      .eq('digital_id_verified', true);
-
-    if (error) {
-      throw new Error(`Database error: ${error.message}`);
-    }
-
-    // For now, we'll match by the pattern in the digital ID
-    // In production, store digital_id as a field in tourist_profiles
-    const tourist = profiles?.find(profile => {
-      const generatedId = generateUniqueDigitalId();
-      return generatedId.includes(profile.tourist_id.slice(-7));
-    });
-
-    return { data: tourist, error: null };
-  } catch (error) {
-    console.error('Error fetching tourist by digital ID:', error);
-    return { data: null, error };
   }
 };
