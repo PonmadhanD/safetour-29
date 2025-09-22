@@ -11,6 +11,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
   createTouristProfile: (userId: string, profileData: any) => Promise<any>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Add setUser
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,11 +26,11 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Initial loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSession = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
@@ -37,16 +38,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('Error fetching session:', error);
         setUser(null);
       } finally {
-        setLoading(false); // Stop loading regardless of success or error
+        setLoading(false);
       }
     };
 
     fetchSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-      setLoading(true); // Start loading during state change
+      setLoading(true);
       setUser(session?.user ?? null);
-      setLoading(false); // Stop loading after update
+      setLoading(false);
     });
 
     return () => {
@@ -55,36 +56,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   async function signUp(email: string, password: string, fullName: string) {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
-      // Sign up with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: { 
+        options: {
           data: { full_name: fullName },
-          emailRedirectTo: window.location.origin
-        }
+          emailRedirectTo: window.location.origin,
+        },
       });
-      
+
       if (authError) throw authError;
 
       if (authData.user) {
-        // Insert into custom users table
         const { error: userError } = await supabase
           .from('users')
           .insert({
             user_id: authData.user.id,
             email,
             full_name: fullName,
-            role: 'tourist'
+            role: 'tourist',
           });
-        
+
         if (userError && !userError.message.includes('duplicate key')) {
           throw new Error('Error creating user: ' + userError.message);
         }
 
-        // Create user preferences
         const { error: prefError } = await supabase
           .from('user_preferences')
           .upsert(
@@ -92,11 +90,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               user_id: authData.user.id,
               language: 'en',
               notifications_enabled: true,
-              location_sharing: true
+              location_sharing: true,
             },
-            { onConflict: 'user_id' }
+            { onConflict: 'user_id' },
           );
-        
+
         if (prefError) throw new Error('Error creating user preferences: ' + prefError.message);
       }
 
@@ -105,7 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error creating user:', error);
       throw error;
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   }
 
@@ -134,7 +132,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           passport_no: profileData.passportNo || null,
           govt_id: profileData.govtId || null,
           emergency_contact: profileData.emergencyContact || null,
-          digital_id_verified: true
+          digital_id_verified: true,
         })
         .select()
         .single();
@@ -145,8 +143,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { data: null, error };
     }
   };
+
   const signIn = async (email: string, password: string) => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -158,19 +157,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error signing in:', error);
       throw error;
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       await supabase.auth.signOut();
       setUser(null);
     } catch (error) {
       console.error('Error signing out:', error);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -182,6 +181,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     signIn,
     signOut,
     createTouristProfile,
+    setUser, // Include setUser in the context value
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

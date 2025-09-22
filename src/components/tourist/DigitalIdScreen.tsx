@@ -92,9 +92,9 @@ const DigitalIdScreen: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-light to-secondary-light p-4">
       <div className="max-w-md mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center text-white pt-8 pb-4">
+        <div className="text-center text-black pt-8 pb-4">
           <h1 className="text-2xl font-bold">Create Digital Tourist ID</h1>
-          <p className="text-white/90 mt-2">Secure blockchain-verified identification</p>
+          <p className="text-black/90 mt-2">Secure blockchain-verified identification</p>
         </div>
 
         {/* ID Preview Card */}
@@ -200,7 +200,7 @@ const DigitalIdScreen: React.FC = () => {
             <div className="space-y-2">
               <Label>Profile Photo</Label>
               <Button
-                variant={photoUploaded ? "success" : "outline"}
+                variant={photoUploaded ? "hero" : "outline"}
                 className="w-full"
                 onClick={() => setPhotoUploaded(true)}
                 disabled={loading}
@@ -223,7 +223,7 @@ const DigitalIdScreen: React.FC = () => {
             <div className="space-y-2">
               <Label>Identity Documents</Label>
               <Button
-                variant={documentsUploaded ? "success" : "outline"}
+                variant={documentsUploaded ? "hero" : "outline"}
                 className="w-full"
                 onClick={() => setDocumentsUploaded(true)}
                 disabled={loading}

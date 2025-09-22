@@ -26,8 +26,26 @@ export interface FamilyMemberResult {
     address?: string;
   };
   lastSeen?: string;
-  userStatus?: 'safe' | 'alert' | 'emergency' | 'unknown';
+  userStatus?: 'safe' | 'active' | 'sos' | 'emergency' | 'unknown' | 'alert';
+
 }
+
+const mapStatus = (status: string | null | undefined): FamilyMemberResult['userStatus'] => {
+  switch (status) {
+    case 'active':
+      return 'active';
+    case 'sos':
+      return 'sos';
+    case 'emergency':
+      return 'emergency';
+    case 'safe':
+      return 'safe';
+    case 'alert':
+      return 'alert';
+    default:
+      return 'unknown';
+  }
+};
 
 /**
  * Adds a family member to the current user's family tracking list
@@ -241,37 +259,35 @@ export const getFamilyMembers = async (userId: string): Promise<FamilyMemberResu
       throw new Error(`Failed to fetch family members: ${error.message}`);
     }
 
-    const familyMembers = await Promise.all(
-      (data || []).map(async (member) => {
-        // Get latest location for each family member
-        const { data: locationData } = await supabase
-          .from('tourist_locations')
-          .select('latitude, longitude, timestamp, status')
-          .eq('tourist_id', member.family_member_id)
-          .order('timestamp', { ascending: false })
-          .limit(1)
-          .single();
+const familyMembers: FamilyMemberResult[] = await Promise.all(
+  (data || []).map(async (member) => {
+    const { data: locationData } = await supabase
+      .from('tourist_locations')
+      .select('latitude, longitude, timestamp, status')
+      .eq('tourist_id', member.family_member_id)
+      .order('timestamp', { ascending: false })
+      .limit(1)
+      .single();
 
-        return {
-          id: member.id,
-          userId: member.user_id,
-          familyMemberId: member.family_member_id,
-          relationship: member.relationship || 'Unknown',
-          status: member.status as 'active' | 'inactive' | 'pending',
-          canTrack: member.can_track,
-          name: (member.family_member as any)?.tourist_profiles?.full_name || 'Unknown',
-          phone: (member.family_member as any)?.email || '',
-          email: (member.family_member as any)?.email,
-          location: locationData ? {
-            lat: locationData.latitude,
-            lng: locationData.longitude
-          } : undefined,
-          lastSeen: locationData?.timestamp,
-          userStatus: locationData?.status === 'sos' ? 'emergency' : 
-                     locationData?.status === 'active' ? 'safe' : 'unknown'
-        };
-      })
-    );
+    return {
+      id: member.id,
+      userId: member.user_id,
+      familyMemberId: member.family_member_id,
+      relationship: member.relationship || 'Unknown',
+      status: member.status as 'active' | 'inactive' | 'pending',
+      canTrack: member.can_track,
+      name: (member.family_member as any)?.tourist_profiles?.full_name || 'Unknown',
+      phone: (member.family_member as any)?.email || '',
+      email: (member.family_member as any)?.email,
+      location: locationData ? {
+        lat: locationData.latitude,
+        lng: locationData.longitude
+      } : undefined,
+      lastSeen: locationData?.timestamp,
+      userStatus: mapStatus(locationData?.status)
+    };
+  })
+);
 
     return familyMembers;
 

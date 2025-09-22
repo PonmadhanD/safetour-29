@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Eye, EyeOff, Lock, User, Phone, AlertTriangle, Monitor } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
+import Logo from '../../../public/logo.jpeg';
 
 const AdminAuthScreen: React.FC = () => {
   const { setAuthorityPage, setCurrentAuthority } = useApp();
@@ -104,8 +105,10 @@ const AdminAuthScreen: React.FC = () => {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center text-primary-foreground space-y-4">
-          <div className="mx-auto w-16 h-16 bg-secondary rounded-full flex items-center justify-center shadow-lg">
-            <Monitor className="w-8 h-8 text-secondary-foreground" />
+          <div className="mx-auto w-24 h-24 bg-secondary rounded-full flex items-center justify-center shadow-lg">
+            {/* <Monitor className="w-8 h-8 text-secondary-foreground" /> */}
+            <img src={Logo} alt="Trip Bharat" className="w-24 h-24 object-cover rounded-full" />
+
           </div>
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>

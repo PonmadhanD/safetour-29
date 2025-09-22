@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Shield, MapPin } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
-import appIcon from '@/assets/app-icon.jpg';
+import appIcon from '../../../public/logo.jpeg';
 
 const SplashScreen: React.FC = () => {
   const { setTouristPage } = useApp();
@@ -23,7 +23,7 @@ const SplashScreen: React.FC = () => {
         </div>
         
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">SafeTravel NE</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Trip Bharat</h1>
           <p className="text-primary-foreground/90 text-lg">Northeast India Tourism Safety</p>
         </div>
         
@@ -40,7 +40,7 @@ const SplashScreen: React.FC = () => {
         
         <div className="pt-8">
           <Button
-            variant="secondary"
+            variant="hero"
             size="lg"
             onClick={() => setTouristPage('onboarding')}
             className="shadow-lg font-semibold"
