@@ -1,4 +1,5 @@
 import React, { useState, Dispatch, SetStateAction } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Users, MapPin, Share2, UserCheck, 
   Clock, Phone, MessageCircle, Map, Trash2, Plus, 
@@ -250,6 +251,7 @@ const Input = React.memo(({ type, placeholder, value, onChange, className = '', 
 function App() {
   const [activePage, setActivePage] = useState('tracking');
   const [user] = useState(mockUser); // Mock user for offline use
+  const navigate = useNavigate();
   const [familyMembers, setFamilyMembers] = useState<FamilyMemberResult[]>([
     // Optional: Initialize with sample data for testing
     {
@@ -447,7 +449,7 @@ function App() {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setActivePage('home')}
+            onClick={() => navigate('/')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
