@@ -175,12 +175,12 @@ const HomeScreen: React.FC = () => {
 
   // Mock navigation and panic button functions
 
-  const setEmergencyActive = (active: boolean) => {
-    console.log(`Emergency active: ${active}`);
-    if (active) {
-      alert('Panic button activated (offline mode)');
-    }
-  };
+  // const setEmergencyActive = (active: boolean) => {
+  //   console.log(`Emergency active: ${active}`);
+  //   if (active) {
+  //     alert('Panic button activated (offline mode)');
+  //   }
+  // };
 
   const signOut = () => {
     localStorage.removeItem('currentTourist');
@@ -201,6 +201,13 @@ const HomeScreen: React.FC = () => {
   };
 
   const safetyData = getSafetyScore();
+
+  function setTouristPage(page: string): void {
+    if (page === 'settings') {
+      navigate('/settings');
+    }
+    // Add more pages as needed
+  }
 
   return (
     <ErrorBoundary>
@@ -273,7 +280,7 @@ const HomeScreen: React.FC = () => {
                 size="lg"
                 className="w-full h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg rounded-2xl"
                 onClick={() => {
-                  setEmergencyActive(true);
+                  // setEmergencyActive(true);
                   navigate('/panic');
                 }}
               >
