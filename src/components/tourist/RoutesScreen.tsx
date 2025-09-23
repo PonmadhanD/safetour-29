@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,12 +7,11 @@ import {
   ArrowLeft, Navigation, MapPin, Clock, Shield, Star,
   Route, AlertTriangle, Phone, Info
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import { SafeRoute } from '@/types';
 import NavigationScreen from './NavigationScreen';
 
 const RoutesScreen: React.FC = () => {
-  const { setTouristPage } = useApp();
+  const navigate = useNavigate();
   const [selectedRoute, setSelectedRoute] = useState<SafeRoute | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -281,7 +281,7 @@ const RoutesScreen: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setTouristPage(selectedRoute ? 'routes' : 'zones')}
+            onClick={() => navigate(selectedRoute ? '/routes' : '/zones')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>

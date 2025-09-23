@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import SplashScreen from '@/components/tourist/SplashScreen';
 import OnboardingScreen from '@/components/tourist/OnboardingScreen';
@@ -14,46 +15,65 @@ import FamilyTrackingScreen from '@/components/tourist/FamilyTrackingScreen';
 import BottomNavigation from '@/components/tourist/BottomNavigation';
 
 const TouristApp: React.FC = () => {
-  const { touristPage } = useApp();
-
-  const renderPage = () => {
-    switch (touristPage) {
-      case 'splash':
-        return <SplashScreen />;
-      case 'onboarding':
-        return <OnboardingScreen />;
-      case 'digitalId':
-        return <DigitalIdScreen />;
-      case 'home':
-        return <HomeScreen />;
-      case 'map':
-        return <MapScreen />;
-      case 'zones':
-        return <ZonesScreen />;
-      case 'routes':
-        return <RoutesScreen />;
-      case 'panic':
-        return <PanicScreen />;
-      case 'history':
-        return <HistoryScreen />;
-      case 'settings':
-        return <SettingsScreen />;
-      case 'familyTracking':
-        return <FamilyTrackingScreen />;
-      default:
-        return <SplashScreen />;
-    }
-  };
-
-  const showBottomNav = ['digitalId', 'history', 'home', 'settings', 'map', 'familyTracking'].includes(touristPage);
+  const { currentTourist } = useApp();
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-md bg-card shadow-lg min-h-screen relative">
-        <div className={showBottomNav ? 'pb-16' : ''}>
-          {renderPage()}
-        </div>
-        {showBottomNav && <BottomNavigation />}
+        <Routes>
+          {/* Onboarding flow */}
+          <Route path="/splash" element={<SplashScreen />} />
+          <Route path="/onboarding" element={<OnboardingScreen />} />
+          <Route path="/digital-id" element={<DigitalIdScreen />} />
+          
+          {/* Main app routes with bottom navigation */}
+          <Route path="/" element={
+            <div className="pb-16">
+              <HomeScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          <Route path="/panic" element={<PanicScreen />} />
+          <Route path="/map" element={
+            <div className="pb-16">
+              <MapScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          <Route path="/family" element={
+            <div className="pb-16">
+              <FamilyTrackingScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          <Route path="/zones" element={
+            <div className="pb-16">
+              <ZonesScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          <Route path="/routes" element={
+            <div className="pb-16">
+              <RoutesScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          <Route path="/history" element={
+            <div className="pb-16">
+              <HistoryScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          <Route path="/settings" element={
+            <div className="pb-16">
+              <SettingsScreen />
+              <BottomNavigation />
+            </div>
+          } />
+          
+          {/* Redirect unknown routes to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
     </div>
   );

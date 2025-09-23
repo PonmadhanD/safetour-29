@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -126,6 +127,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const SettingsScreen: React.FC = () => {
   const [currentTourist, setCurrentTourist] = useState<TouristData | null>(null);
+  const navigate = useNavigate();
   const [language, setLanguage] = useState<Language>('en');
   const [settings, setSettings] = useState({
     biometricLock: true,
@@ -175,9 +177,6 @@ const SettingsScreen: React.FC = () => {
   }, []);
 
   // Mock navigation
-  const setTouristPage = (page: string) => {
-    console.log(`Navigating to page: ${page}`);
-  };
 
   // Mock translation function
   const t = (key: keyof typeof translations) => translations[key];
@@ -188,7 +187,7 @@ const SettingsScreen: React.FC = () => {
     setCurrentTourist(null);
     console.log('User signed out');
     alert('Signed out successfully');
-    setTouristPage('home');
+    navigate('/');
   };
 
   // Mock language change
@@ -222,7 +221,7 @@ const SettingsScreen: React.FC = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTouristPage('home')}
+                onClick={() => navigate('/')}
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>

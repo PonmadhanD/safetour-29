@@ -1,16 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import MapView from '../MapView';
 import FloatingPanicButton from './FloatingPanicButton';
 
 const MapScreen: React.FC = () => {
-  const { setTouristPage } = useApp();
+  const navigate = useNavigate();
 
   const handlePanicAlert = () => {
-    setTouristPage('panic');
+    navigate('/panic');
   };
 
   return (
@@ -21,7 +21,7 @@ const MapScreen: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setTouristPage('home')}
+            onClick={() => navigate('/')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -50,7 +50,7 @@ const MapScreen: React.FC = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setTouristPage('zones')}
+                onClick={() => navigate('/zones')}
                 className="flex-1"
               >
                 Safe Zones
@@ -58,7 +58,7 @@ const MapScreen: React.FC = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setTouristPage('routes')}
+                onClick={() => navigate('/routes')}
                 className="flex-1"
               >
                 Routes
@@ -66,7 +66,7 @@ const MapScreen: React.FC = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setTouristPage('history')}
+                onClick={() => navigate('/history')}
                 className="flex-1"
               >
                 History

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +8,6 @@ import {
   ArrowLeft, Navigation, MapPin, Clock, Shield, Phone,
   Compass, AlertTriangle, RefreshCw, Locate
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import { SafeRoute } from '@/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -34,7 +34,7 @@ const NavigationScreen: React.FC<NavigationScreenProps> = ({ route, onBack }) =>
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isTracking, setIsTracking] = useState(false);
   const [routeStarted, setRouteStarted] = useState(false);
-  const { setEmergencyActive, setTouristPage } = useApp();
+  const navigate = useNavigate();
 
   // Initialize map
   useEffect(() => {
@@ -193,8 +193,7 @@ const NavigationScreen: React.FC<NavigationScreenProps> = ({ route, onBack }) =>
   }, [currentLocation, route]);
 
   const handlePanic = () => {
-    setEmergencyActive(true);
-    setTouristPage('panic');
+    navigate('/panic');
   };
 
   const getSafetyColor = (rating: number) => {

@@ -1,18 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Phone } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 
 interface FloatingPanicButtonProps {
   className?: string;
 }
 
 const FloatingPanicButton: React.FC<FloatingPanicButtonProps> = ({ className = '' }) => {
-  const { setEmergencyActive, setTouristPage } = useApp();
+  const navigate = useNavigate();
 
   const handlePanic = () => {
-    setEmergencyActive(true);
-    setTouristPage('panic');
+    navigate('/panic');
   };
 
   return (
