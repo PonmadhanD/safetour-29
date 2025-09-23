@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -124,6 +125,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const HomeScreen: React.FC = () => {
   const [currentTourist, setCurrentTourist] = useState<TouristData | null>(null);
+  const navigate = useNavigate();
   const [activeAlerts] = useState([
     {
       id: '1',
@@ -172,16 +174,13 @@ const HomeScreen: React.FC = () => {
   }, []);
 
   // Mock navigation and panic button functions
-  const setTouristPage = (page: string) => {
-    console.log(`Navigating to page: ${page}`);
-  };
 
-  const setEmergencyActive = (active: boolean) => {
-    console.log(`Emergency active: ${active}`);
-    if (active) {
-      alert('Panic button activated (offline mode)');
-    }
-  };
+  // const setEmergencyActive = (active: boolean) => {
+  //   console.log(`Emergency active: ${active}`);
+  //   if (active) {
+  //     alert('Panic button activated (offline mode)');
+  //   }
+  // };
 
   const signOut = () => {
     localStorage.removeItem('currentTourist');
@@ -202,6 +201,13 @@ const HomeScreen: React.FC = () => {
   };
 
   const safetyData = getSafetyScore();
+
+  function setTouristPage(page: string): void {
+    if (page === 'settings') {
+      navigate('/settings');
+    }
+    // Add more pages as needed
+  }
 
   return (
     <ErrorBoundary>
@@ -274,8 +280,8 @@ const HomeScreen: React.FC = () => {
                 size="lg"
                 className="w-full h-16 bg-red-600 hover:bg-red-700 text-white shadow-lg rounded-2xl"
                 onClick={() => {
-                  setEmergencyActive(true);
-                  setTouristPage('panic');
+                  // setEmergencyActive(true);
+                  navigate('/panic');
                 }}
               >
                 <Phone className="w-6 h-6 mr-3" />
@@ -286,11 +292,14 @@ const HomeScreen: React.FC = () => {
               </Button>
 
               {/* Map & Safe Zones */}
-              <Button
+              <Link
+                to="/map"
+                className="w-full"
+              >
+                <Button
                 variant="outline"
                 size="lg"
-                className="w-full h-16 bg-white hover:bg-blue-50 rounded-2xl"
-                onClick={() => setTouristPage('map')}
+                  className="w-full h-16 bg-white hover:bg-blue-50 rounded-2xl"
               >
                 <Map className="w-6 h-6 mr-3 text-blue-600" />
                 <div className="text-left">
@@ -298,13 +307,17 @@ const HomeScreen: React.FC = () => {
                   <div className="text-sm text-gray-500">Navigate safely</div>
                 </div>
               </Button>
+              </Link>
 
               {/* Family Tracking */}
-              <Button
+              <Link
+                to="/family"
+                className="w-full"
+              >
+                <Button
                 variant="outline"
                 size="lg"
-                className="w-full h-16 bg-white hover:bg-green-50 rounded-2xl"
-                onClick={() => setTouristPage('familyTracking')}
+                  className="w-full h-16 bg-white hover:bg-green-50 rounded-2xl"
               >
                 <Users className="w-6 h-6 mr-3 text-green-600" />
                 <div className="text-left">
@@ -312,6 +325,7 @@ const HomeScreen: React.FC = () => {
                   <div className="text-sm text-gray-500">Stay connected</div>
                 </div>
               </Button>
+              </Link>
             </div>
 
             {/* Recent Alerts / Notifications */}

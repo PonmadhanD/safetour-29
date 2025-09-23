@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,10 +7,9 @@ import {
   Phone, MapPin, Clock, CheckCircle, X, Shield, 
   Navigation, Camera, Mic 
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 
 const PanicScreen: React.FC = () => {
-  const { setTouristPage, setEmergencyActive, currentTourist } = useApp();
+  const navigate = useNavigate();
   const [emergencyStatus, setEmergencyStatus] = useState<'active' | 'connecting' | 'connected'>('connecting');
   const [timer, setTimer] = useState(0);
 
@@ -31,8 +31,7 @@ const PanicScreen: React.FC = () => {
   }, []);
 
   const handleCancelEmergency = () => {
-    setEmergencyActive(false);
-    setTouristPage('home');
+    navigate('/');
   };
 
   const formatTime = (seconds: number) => {
@@ -124,7 +123,11 @@ const PanicScreen: React.FC = () => {
               <span className="font-semibold">Emergency Contacts Notified</span>
             </div>
             <div className="space-y-2 text-sm">
-              {currentTourist?.emergencyContacts.map((contact) => (
+              {/* Replace with your actual tourist data fetching logic */}
+              {[
+                { id: 1, name: "John Doe" },
+                { id: 2, name: "Jane Smith" }
+              ].map((contact) => (
                 <div key={contact.id} className="flex items-center justify-between">
                   <span>{contact.name}</span>
                   <Badge className="bg-success text-white">

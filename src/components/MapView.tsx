@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
@@ -13,7 +14,6 @@ import {
   Locate, Navigation, AlertTriangle, Shield, 
   Users, MapPin, Route, Phone 
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import { Tourist, Zone, SafeRoute, Alert as AlertType } from '@/types';
 
 // Import mock data
@@ -78,7 +78,7 @@ const MapView: React.FC<MapViewProps> = ({
   const [locationError, setLocationError] = useState<string | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<SafeRoute | null>(null);
   const [routingError, setRoutingError] = useState<string | null>(null);
-  const { setEmergencyActive, setTouristPage } = useApp();
+  const navigate = useNavigate();
   const [heatmapMode, setHeatmapMode] = useState<'all' | 'risk'>('all');
 
   // Utility functions
@@ -421,10 +421,9 @@ const riskTouristsData = tourists
   }, [userLocation]);
 
   const handlePanic = useCallback(() => {
-    setEmergencyActive(true);
-    setTouristPage('panic');
+    navigate('/panic');
     onPanicAlert?.();
-  }, [onPanicAlert, setEmergencyActive, setTouristPage]);
+  }, [onPanicAlert, navigate]);
 
   const findNearestSafeZone = useCallback(() => {
     if (!userLocation || zones.length === 0) return;

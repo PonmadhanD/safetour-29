@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Shield, MapPin } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import appIcon from '../../../public/logo.jpeg';
 
 const SplashScreen: React.FC = () => {
-  const { setTouristPage } = useApp();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTouristPage('onboarding');
+      navigate('/onboarding');
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [setTouristPage]);
+  }, [navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-primary text-primary-foreground p-6">
@@ -42,7 +42,7 @@ const SplashScreen: React.FC = () => {
           <Button
             variant="hero"
             size="lg"
-            onClick={() => setTouristPage('onboarding')}
+            onClick={() => navigate('/onboarding')}
             className="shadow-lg font-semibold"
           >
             Get Started

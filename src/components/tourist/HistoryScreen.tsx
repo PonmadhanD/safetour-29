@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -119,6 +120,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const HistoryScreen: React.FC = () => {
   const [currentTourist, setCurrentTourist] = useState<TouristData | null>(null);
+  const navigate = useNavigate();
   const [travelHistory, setTravelHistory] = useState<TravelHistoryItem[]>([
     {
       id: '1',
@@ -189,9 +191,6 @@ const HistoryScreen: React.FC = () => {
   }, [travelHistory]);
 
   // Mock navigation
-  const setTouristPage = (page: string) => {
-    console.log(`Navigating to page: ${page}`);
-  };
 
   // Mock translation function
   const t = (key: keyof typeof translations) => translations[key];
@@ -225,7 +224,7 @@ const HistoryScreen: React.FC = () => {
           {/* Header */}
           <div className="bg-white shadow-sm border-b">
             <div className="p-4 flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => setTouristPage('home')}>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>

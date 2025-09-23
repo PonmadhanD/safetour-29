@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,13 +8,12 @@ import {
   ArrowLeft, Search, MapPin, Star, Clock, Shield, 
   Mountain, Camera, Church, Trees, Users
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import { Zone } from '@/types';
 
 import FloatingPanicButton from './FloatingPanicButton';
 
 const ZonesScreen: React.FC = () => {
-  const { setTouristPage } = useApp();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -196,7 +196,7 @@ const ZonesScreen: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => setTouristPage('home')}
+            onClick={() => navigate('/')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -244,7 +244,7 @@ const ZonesScreen: React.FC = () => {
             <Button 
               variant="outline" 
               className="w-full"
-              onClick={() => setTouristPage('routes')}
+              onClick={() => navigate('/routes')}
             >
               <Shield className="w-4 h-4 mr-2" />
               View Safe Routes
