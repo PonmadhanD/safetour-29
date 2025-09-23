@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Shield, MapPin, Phone, IdCard } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
 import northeastHero from '@/assets/northeast-hero.jpg';
 
 const OnboardingScreen: React.FC = () => {
-  const { setTouristPage } = useApp();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
 
   const onboardingSteps = [
@@ -39,7 +39,7 @@ const OnboardingScreen: React.FC = () => {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      setTouristPage('digitalId');
+      navigate('/digital-id');
     }
   };
 
@@ -78,6 +78,7 @@ const OnboardingScreen: React.FC = () => {
         <Button 
           variant="ghost" 
           onClick={() => setTouristPage('digitalId')}
+          onClick={() => navigate('/digital-id')}
           className="text-muted-foreground"
         >
           Skip

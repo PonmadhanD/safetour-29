@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +10,6 @@ import { Switch } from '@/components/ui/switch';
 import digitalIdImage from '@/assets/digital-id.jpg';
 
 // Mock AppContext functions
-const mockSetTouristPage = (page: string) => {
-  console.log(`Navigating to page: ${page}`);
-  // In a real app, this would navigate to the specified page
-};
 
 const mockSetCurrentTourist = (tourist: any) => {
   console.log('Setting current tourist:', tourist);
@@ -44,6 +41,7 @@ interface DigitalIdData {
 
 const DigitalIdScreen: React.FC = () => {
   const [isRegisterMode, setIsRegisterMode] = useState(true);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -135,7 +133,7 @@ const DigitalIdScreen: React.FC = () => {
 
           setCurrentTourist(newTourist);
           mockSetCurrentTourist(newTourist);
-          mockSetTouristPage('home');
+          navigate('/');
           
           // Simulate success
           alert(`Digital ID created successfully!\nID: ${result.digitalId}`);
@@ -156,7 +154,7 @@ const DigitalIdScreen: React.FC = () => {
           localStorage.setItem('currentTourist', JSON.stringify(loggedInTourist));
           setCurrentTourist(loggedInTourist);
           mockSetCurrentTourist(loggedInTourist);
-          mockSetTouristPage('home');
+          navigate('/');
           
           alert(`Welcome back, ${existingTourist.name}!`);
         } else {
@@ -206,7 +204,7 @@ const DigitalIdScreen: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="w-full mt-2"
-                onClick={() => mockSetTouristPage('home')}
+                onClick={() => navigate('/')}
               >
                 Go to Home
               </Button>
