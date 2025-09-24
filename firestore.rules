@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to read and write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /user_preferences/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /tourist_profiles/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /authority_profiles/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allow authenticated users to create audit logs
+    match /audit_logs/{logId} {
+      allow create: if request.auth != null;
+    }
+  }
+}

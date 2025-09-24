@@ -14,38 +14,43 @@ import FamilyTrackingScreen from '@/components/tourist/FamilyTrackingScreen';
 import BottomNavigation from '@/components/tourist/BottomNavigation';
 
 const TouristApp: React.FC = () => {
-  const { touristPage } = useApp();
+  const { currentTourist, touristPage } = useApp();
 
   const renderPage = () => {
-    switch (touristPage) {
-      case 'splash':
-        return <SplashScreen />;
-      case 'onboarding':
-        return <OnboardingScreen />;
-      case 'digitalId':
-        return <DigitalIdScreen />;
-      case 'home':
-        return <HomeScreen />;
-      case 'map':
-        return <MapScreen />;
-      case 'zones':
-        return <ZonesScreen />;
-      case 'routes':
-        return <RoutesScreen />;
-      case 'panic':
-        return <PanicScreen />;
-      case 'history':
-        return <HistoryScreen />;
-      case 'settings':
-        return <SettingsScreen />;
-      case 'familyTracking':
-        return <FamilyTrackingScreen />;
-      default:
-        return <SplashScreen />;
+    if (currentTourist) {
+      switch (touristPage) {
+        case 'home':
+          return <HomeScreen />;
+        case 'map':
+          return <MapScreen />;
+        case 'zones':
+          return <ZonesScreen />;
+        case 'routes':
+          return <RoutesScreen />;
+        case 'panic':
+          return <PanicScreen />;
+        case 'history':
+          return <HistoryScreen />;
+        case 'settings':
+          return <SettingsScreen />;
+        case 'familyTracking':
+          return <FamilyTrackingScreen />;
+        default:
+          return <HomeScreen />;
+      }
+    } else {
+      switch (touristPage) {
+        case 'splash':
+          return <SplashScreen />;
+        case 'onboarding':
+          return <OnboardingScreen />;
+        default:
+          return <DigitalIdScreen />;
+      }
     }
   };
 
-  const showBottomNav = ['digitalId', 'history', 'home', 'settings', 'map', 'familyTracking'].includes(touristPage);
+  const showBottomNav = currentTourist && ['history', 'home', 'settings', 'map', 'familyTracking'].includes(touristPage);
 
   return (
     <div className="min-h-screen bg-background">

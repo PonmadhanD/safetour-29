@@ -4,7 +4,7 @@ import { Menu, Smartphone, Monitor, X } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 const ViewToggle: React.FC = () => {
-  const { currentView, setCurrentView } = useApp();
+  const { currentView, setCurrentView, setAuthorityPage } = useApp();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -32,6 +32,7 @@ const ViewToggle: React.FC = () => {
             size="sm"
             onClick={() => {
               setCurrentView('authority');
+              setAuthorityPage('login'); // Reset to login page
               setIsExpanded(false);
             }}
             className="flex items-center gap-2 w-full justify-start"

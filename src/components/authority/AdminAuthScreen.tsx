@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Eye, EyeOff, Lock, User, Phone, AlertTriangle, Monitor } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Shield, Eye, EyeOff, Lock, User, Phone, AlertTriangle, MapPin } from 'lucide-react';
+import { useAuthorityAuth } from '@/contexts/AuthorityAuthContext';
 import { useApp } from '@/contexts/AppContext';
 import Logo from '../../../public/logo.jpeg';
 
 const AdminAuthScreen: React.FC = () => {
   const { setAuthorityPage, setCurrentAuthority } = useApp();
-  const { signIn, signUp } = useAuth();
+  const { signInAuthority, signUpAuthority } = useAuthorityAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -22,6 +22,14 @@ const AdminAuthScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3000); // Splash screen for 3 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,10 +42,10 @@ const AdminAuthScreen: React.FC = () => {
     setError(null);
 
     try {
-      const { error: authError } = await signIn(formData.email, formData.password);
+      const { error: authError } = await signInAuthority(formData.email, formData.password);
 
       if (authError) {
-        if (authError.message.includes('Invalid login credentials')) {
+        if (authError.message.includes('invalid-credential')) {
           setError('Invalid email or password. Please try again.');
         } else if (authError.message.includes('Email not confirmed')) {
           setError('Please check your email and confirm your account before signing in.');
@@ -47,7 +55,6 @@ const AdminAuthScreen: React.FC = () => {
         return;
       }
 
-      // Set authority profile for admin dashboard
       const authority = {
         id: Date.now().toString(),
         name: formData.fullName,
@@ -79,10 +86,10 @@ const AdminAuthScreen: React.FC = () => {
     setError(null);
 
     try {
-      const { error: signUpError } = await signUp(formData.email, formData.password, formData.fullName);
+      const { error: signUpError } = await signUpAuthority(formData.email, formData.password, formData.fullName, 'officer');
 
       if (signUpError) {
-        if (signUpError.message.includes('already registered')) {
+        if (signUpError.message.includes('already-in-use')) {
           setError('An account with this email already exists. Please sign in instead.');
         } else {
           setError(signUpError.message);
@@ -93,22 +100,62 @@ const AdminAuthScreen: React.FC = () => {
       setError('Account created successfully! Please check your email to confirm your account, then sign in.');
       setIsSignUp(false);
     } catch (err) {
-      setError('An unexpected error occurred during sign up. Please try again.');
-      console.error('Sign up error:', err);
+        setError('An unexpected error occurred during sign up. Please try again.');
+        console.error('Sign up error:', err);
+        setFormData({
+            email: '',
+            password: '',
+            fullName: 'Authority User'
+        });
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (showSplash) {
+    return (
+      <div className="min-h-screen bg-primary text-primary-foreground flex flex-col items-center justify-center p-4 text-center">
+        <div className="flex-grow flex flex-col items-center justify-center space-y-6">
+            <div className="bg-white p-2 rounded-xl shadow-lg">
+                <img src={Logo} alt="Trip Bharat Logo" className="w-20 h-20 object-cover rounded-lg" />
+            </div>
+            <h1 className="text-5xl font-bold tracking-tight">Trip Bharat</h1>
+            <p className="text-xl text-primary-foreground/80">Northeast India Tourism Safety</p>
+        
+            <div className="flex gap-8 my-4">
+                <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    <span className="font-medium">Government Verified</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5" />
+                    <span className="font-medium">Real-time Safety</span>
+                </div>
+            </div>
+
+            <Button 
+                size="lg" 
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg"
+                onClick={() => setShowSplash(false)}
+            >
+                Get Started
+            </Button>
+        </div>
+
+        <div className="pb-6">
+            <p className="font-semibold">Government of India Initiative</p>
+            <p className="text-sm text-primary-foreground/70">Ministry of Tourism • Northeast Region</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Header */}
         <div className="text-center text-primary-foreground space-y-4">
           <div className="mx-auto w-24 h-24 bg-secondary rounded-full flex items-center justify-center shadow-lg">
-            {/* <Monitor className="w-8 h-8 text-secondary-foreground" /> */}
             <img src={Logo} alt="Trip Bharat" className="w-24 h-24 object-cover rounded-full" />
-
           </div>
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -116,7 +163,6 @@ const AdminAuthScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Login Card */}
         <Card className="bg-card shadow-lg border-0">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2 text-xl">
@@ -231,7 +277,6 @@ const AdminAuthScreen: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Quick Access */}
         <Card className="bg-card/50 border-primary/20">
           <CardContent className="p-4">
             <h3 className="font-semibold mb-3 text-foreground">Emergency Access</h3>
@@ -248,7 +293,6 @@ const AdminAuthScreen: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Footer */}
         <div className="text-center text-primary-foreground/70 text-sm">
           <p className="font-medium">Government of India • Ministry of Tourism</p>
           <p>Admin Portal v3.0 • Northeast Region</p>

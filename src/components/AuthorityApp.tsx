@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import AdminAuthScreen from './auth/AdminAuthScreen';
+import { useAuthorityAuth } from '@/contexts/AuthorityAuthContext';
+import AdminAuthScreen from '@/components/authority/AdminAuthScreen';
 import MapDashboard from '@/components/authority/MapDashboard';
 import VerificationScreen from '@/components/authority/VerificationScreen';
 import AlertsScreen from '@/components/authority/AlertsScreen';
@@ -11,7 +11,7 @@ import { useApp } from '@/contexts/AppContext';
 
 const AuthorityApp: React.FC = () => {
   const { authorityPage } = useApp();
-  const { user, loading } = useAuth(); // Assume AuthContext provides user and loading state
+  const { authorityUser, loading } = useAuthorityAuth();
 
   // If authentication is still loading, show a loading state
   if (loading) {
@@ -22,8 +22,13 @@ const AuthorityApp: React.FC = () => {
     );
   }
 
+  // If the page is 'login', always show the login screen
+  if (authorityPage === 'login') {
+    return <AdminAuthScreen />;
+  }
+
   // If no user is authenticated, show AdminAuthScreen
-  if (!user) {
+  if (!authorityUser) {
     return <AdminAuthScreen />;
   }
 

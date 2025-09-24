@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, MapPin, Clock, Calendar, Route, LogIn } from 'lucide-react';
 import FloatingPanicButton from './FloatingPanicButton';
+import { useApp } from '@/contexts/AppContext';
 
 // Mock tourist data type
 interface TouristData {
@@ -73,6 +74,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, Error
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTourist, setCurrentTourist] = useState<TouristData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { setTouristPage } = useApp();
 
   useEffect(() => {
     // Load tourist from localStorage
@@ -104,7 +106,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             onClick={() => {
               console.log('Navigating to login page');
-              // In a real app, navigate to login
+              setTouristPage('digital-id');
             }}
           >
             Go to Login
@@ -119,6 +121,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const HistoryScreen: React.FC = () => {
   const [currentTourist, setCurrentTourist] = useState<TouristData | null>(null);
+  const { setTouristPage } = useApp();
   const [travelHistory, setTravelHistory] = useState<TravelHistoryItem[]>([
     {
       id: '1',
@@ -187,11 +190,6 @@ const HistoryScreen: React.FC = () => {
       localStorage.setItem('currentTourist', JSON.stringify(mockTourist));
     }
   }, [travelHistory]);
-
-  // Mock navigation
-  const setTouristPage = (page: string) => {
-    console.log(`Navigating to page: ${page}`);
-  };
 
   // Mock translation function
   const t = (key: keyof typeof translations) => translations[key];
