@@ -141,11 +141,6 @@ const AdminAuthScreen: React.FC = () => {
                 Get Started
             </Button>
         </div>
-
-        <div className="pb-6">
-            <p className="font-semibold">Government of India Initiative</p>
-            <p className="text-sm text-primary-foreground/70">Ministry of Tourism • Northeast Region</p>
-        </div>
       </div>
     );
   }
@@ -173,7 +168,7 @@ const AdminAuthScreen: React.FC = () => {
               <Badge variant="outline" className="border-primary text-primary">
                 Admin Dashboard
               </Badge>
-              <Badge variant="outline" className="border-secondary text-secondary-foreground bg-secondary/10">
+              <Badge variant="outline" className="border-primary text-primary">
                 Web Portal
               </Badge>
             </div>
@@ -292,11 +287,6 @@ const AdminAuthScreen: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-
-        <div className="text-center text-primary-foreground/70 text-sm">
-          <p className="font-medium">Government of India • Ministry of Tourism</p>
-          <p>Admin Portal v3.0 • Northeast Region</p>
-        </div>
       </div>
     </div>
   );

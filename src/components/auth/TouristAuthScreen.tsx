@@ -7,8 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Mail, Lock, User, MapPin, Globe, Smartphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage, Language } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import heroImage from '@/assets/northeast-hero.jpg';
+
+type Language = 'en' | 'hi' | 'ta';
 
 const TouristAuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');

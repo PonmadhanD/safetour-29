@@ -50,10 +50,10 @@ const SplashScreen: React.FC = () => {
         </div>
       </div>
       
-      <div className="absolute bottom-6 text-center text-primary-foreground/70 text-sm">
+      {/* <div className="absolute bottom-6 text-center text-primary-foreground/70 text-sm">
         <p className="font-medium">Government of India Initiative</p>
         <p>Ministry of Tourism • Northeast Region</p>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -58,13 +58,13 @@ const AnalyticsScreen: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-purple-50">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white shadow-md border-b sticky top-0 z-40"
+          className="bg-primary/80 shadow-md border-b sticky top-0 z-40"
         >
           <div className="p-4 max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -74,22 +74,22 @@ const AnalyticsScreen: React.FC = () => {
                     variant="ghost" 
                     size="icon"
                     onClick={() => setAuthorityPage('dashboard')}
-                    className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50"
+                    className="text-purple-700 hover:text-purple-800 hover:bg-purple-50"
                   >
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="w-5 h-5 text-white" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Back to Dashboard</TooltipContent>
               </Tooltip>
               <div>
-                <h1 className="text-2xl font-bold text-indigo-800">Analytics Dashboard</h1>
-                <p className="text-sm text-indigo-600">Tourist safety insights and trends</p>
+                <h1 className="text-2xl font-semibold text-white">Analytics Dashboard</h1>
+                <p className="text-sm text-white">Tourist safety insights and trends</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
               <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-32 border-indigo-300 focus:border-indigo-500">
+                <SelectTrigger className="w-32 border-purple-300 focus:border-purple-500">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -101,7 +101,7 @@ const AnalyticsScreen: React.FC = () => {
               </Select>
               
               <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                <Button variant="outline" className="border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
                   <Download className="w-4 h-4 mr-2" />
                   Export
                 </Button>
@@ -119,7 +119,7 @@ const AnalyticsScreen: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
           >
             {[
-              { title: 'Total Tourists', value: analytics.tourists.total, sub: analytics.tourists.growth, icon: Users, color: 'indigo-600' },
+              { title: 'Total Tourists', value: analytics.tourists.total, sub: analytics.tourists.growth, icon: Users, color: 'purple-600' },
               { title: 'Active Now', value: analytics.tourists.active, sub: 'Real-time count', icon: TrendingUp, color: 'green-600' },
               { title: 'Incidents', value: analytics.incidents.total, sub: `${analytics.incidents.resolved} resolved`, icon: AlertTriangle, color: 'yellow-500' },
               { title: 'Response Rate', value: analytics.alerts.responseRate, sub: 'Alert acknowledgment', icon: BarChart3, color: 'blue-600' }
@@ -134,12 +134,12 @@ const AnalyticsScreen: React.FC = () => {
               >
                 <Card>
                   <CardContent className="p-4 relative">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-100 rounded-full -mr-8 -mt-8 opacity-50"></div>
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-purple-100 rounded-full -mr-8 -mt-8 opacity-50"></div>
                     <div className="flex items-center justify-between relative z-10">
                       <div>
-                        <p className="text-sm text-indigo-600">{metric.title}</p>
+                        <p className="text-sm text-purple-600">{metric.title}</p>
                         <p className={`text-2xl font-bold text-${metric.color}`}>{metric.value}</p>
-                        <p className="text-xs text-indigo-500">{metric.sub}</p>
+                        <p className="text-xs text-purple-500">{metric.sub}</p>
                       </div>
                       <div className={`w-10 h-10 bg-${metric.color}/10 rounded-full flex items-center justify-center`}>
                         {React.createElement(metric.icon, { className: `w-6 h-6 text-${metric.color}` })}
@@ -159,9 +159,9 @@ const AnalyticsScreen: React.FC = () => {
           >
             {/* Tourist Distribution */}
             <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <MapPin className="w-5 h-5 text-indigo-600" />
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <MapPin className="w-5 h-5 text-white" />
                   Tourist Distribution by Location
                 </CardTitle>
               </CardHeader>
@@ -175,16 +175,16 @@ const AnalyticsScreen: React.FC = () => {
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600`}>
+                      <div className={`w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-black`}>
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-medium text-indigo-800">{location.name}</p>
-                        <p className="text-sm text-indigo-600">{location.count} tourists</p>
+                        <p className="font-medium text-black">{location.name}</p>
+                        <p className="text-sm text-purple-600">{location.count} tourists</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant="outline" className="border-indigo-300 text-indigo-700">{location.percentage}%</Badge>
+                      <Badge variant="outline" className="border-purple-300 text-black">{location.percentage}%</Badge>
                     </div>
                   </motion.div>
                 ))}
@@ -193,9 +193,9 @@ const AnalyticsScreen: React.FC = () => {
 
             {/* Incident Analytics */}
             <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <AlertTriangle className="w-5 h-5 text-yellow-500" />
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <AlertTriangle className="w-5 h-5 text-white" />
                   Incident Analytics
                 </CardTitle>
               </CardHeader>
@@ -213,15 +213,15 @@ const AnalyticsScreen: React.FC = () => {
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-indigo-600">Resolution Rate</span>
-                    <span className="font-medium text-indigo-800">{Math.round((analytics.incidents.resolved / analytics.incidents.total) * 100)}%</span>
+                    <span className="text-sm text-black">Resolution Rate</span>
+                    <span className="font-medium text-purple-800">{Math.round((analytics.incidents.resolved / analytics.incidents.total) * 100)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-indigo-600">Avg Resolution Time</span>
-                    <span className="font-medium text-indigo-800">{analytics.incidents.avgResolution}</span>
+                    <span className="text-sm text-black">Avg Resolution Time</span>
+                    <span className="font-medium text-purple-800">{analytics.incidents.avgResolution}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-indigo-600">Emergency Cases</span>
+                    <span className="text-sm text-black">Emergency Cases</span>
                     <Badge className="bg-red-600 text-white">{analytics.incidents.emergency}</Badge>
                   </div>
                 </div>
@@ -237,14 +237,14 @@ const AnalyticsScreen: React.FC = () => {
             className="shadow-md bg-white"
           >
             <Card>
-              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
+              <CardHeader className="pb-3 bg-primary/80">
                 <CardTitle className="flex items-center justify-between text-lg">
-                  <span className="flex items-center gap-2 text-indigo-800">
-                    <BarChart3 className="w-5 h-5" />
+                  <span className="flex items-center gap-2 text-white">
+                    <BarChart3 className="w-5 h-5 text-white" />
                     7-Day Trends
                   </span>
                   <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-                    <SelectTrigger className="w-40 border-indigo-300 focus:border-indigo-500">
+                    <SelectTrigger className="w-40 border-purple-300 focus:border-purple-500">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -264,14 +264,14 @@ const AnalyticsScreen: React.FC = () => {
                     transition={{ delay: index * 0.1 }}
                     className="flex items-center gap-4"
                   >
-                    <div className="w-20 text-sm text-indigo-600">
+                    <div className="w-20 text-sm text-black">
                       {trend.period}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-4">
-                        <div className="flex-1 bg-indigo-100 rounded-full h-2 relative">
+                        <div className="flex-1 bg-purple-100 rounded-full h-2 relative">
                           <div 
-                            className="bg-indigo-600 rounded-full h-2" 
+                            className="bg-purple-600 rounded-full h-2" 
                             style={{ 
                               width: `${selectedMetric === 'tourists' ? (trend.tourists / 100) * 100 : 
                                        selectedMetric === 'incidents' ? (trend.incidents / 5) * 100 : 
@@ -279,7 +279,7 @@ const AnalyticsScreen: React.FC = () => {
                             }}
                           ></div>
                         </div>
-                        <div className="w-16 text-right font-medium text-indigo-800">
+                        <div className="w-16 text-right font-medium text-black">
                           {selectedMetric === 'tourists' ? trend.tourists : 
                            selectedMetric === 'incidents' ? trend.incidents : 
                            trend.alerts}
@@ -308,7 +308,7 @@ const AnalyticsScreen: React.FC = () => {
               { title: 'Verification Stats', data: [
                 { label: 'Verified IDs', value: analytics.tourists.verified },
                 { label: 'Verification Rate', value: `${Math.round((analytics.tourists.verified / analytics.tourists.total) * 100)}%` },
-                { label: 'New Today', value: analytics.tourists.newToday, badge: 'border-indigo-300' }
+                { label: 'New Today', value: analytics.tourists.newToday, badge: 'border-purple-300' }
               ] },
               { title: 'System Health', data: [
                 { label: 'API Status', value: 'Online', badge: 'bg-green-600' },
@@ -325,17 +325,17 @@ const AnalyticsScreen: React.FC = () => {
                 className="shadow-md hover:shadow-lg transition-shadow bg-white"
               >
                 <Card>
-                  <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <CardTitle className="text-lg text-indigo-800">{metric.title}</CardTitle>
+                  <CardHeader className="pb-3 bg-primary/80">
+                    <CardTitle className="text-lg text-white">{metric.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-3">
                     {metric.data.map((item, i) => (
                       <div key={i} className="flex justify-between items-center">
-                        <span className="text-sm text-indigo-600">{item.label}</span>
+                        <span className="text-sm text-black">{item.label}</span>
                         {item.badge ? (
                           <Badge className={item.badge + ' text-white'}>{item.value}</Badge>
                         ) : (
-                          <span className="font-medium text-indigo-800">{item.value}</span>
+                          <span className="font-medium text-black">{item.value}</span>
                         )}
                       </div>
                     ))}

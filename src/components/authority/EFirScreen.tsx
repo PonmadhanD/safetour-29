@@ -85,13 +85,13 @@ const EFirScreen: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-purple-50">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white shadow-md border-b sticky top-0 z-40"
+          className="bg-primary/80 shadow-md border-b sticky top-0 z-40"
         >
           <div className="p-4 max-w-6xl mx-auto flex items-center gap-3">
             <Tooltip>
@@ -100,16 +100,16 @@ const EFirScreen: React.FC = () => {
                   variant="ghost" 
                   size="icon"
                   onClick={() => setAuthorityPage('dashboard')}
-                  className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50"
+                  className="text-purple-700 hover:text-purple-800 hover:bg-indigo-50"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-5 h-5 text-white" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Back to Dashboard</TooltipContent>
             </Tooltip>
             <div>
-              <h1 className="text-2xl font-bold text-indigo-800">E-FIR Management</h1>
-              <p className="text-sm text-indigo-600">Electronic First Information Report System</p>
+              <h1 className="text-2xl font-semibold text-white">E-FIR Management</h1>
+              <p className="text-sm text-white">Electronic First Information Report System</p>
             </div>
           </div>
         </motion.div>
@@ -126,7 +126,7 @@ const EFirScreen: React.FC = () => {
               <Button 
                 variant={activeTab === 'create' ? 'default' : 'outline'}
                 onClick={() => setActiveTab('create')}
-                className={activeTab === 'create' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'border-indigo-300 text-indigo-700 hover:bg-indigo-50'}
+                className={activeTab === 'create' ? 'bg-purple-500 text-white hover:bg-purple-700' : 'border-purple-300 text-purple-700 hover:bg-purple-50'}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create E-FIR
@@ -136,7 +136,7 @@ const EFirScreen: React.FC = () => {
               <Button 
                 variant={activeTab === 'pending' ? 'default' : 'outline'}
                 onClick={() => setActiveTab('pending')}
-                className={activeTab === 'pending' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'border-indigo-300 text-indigo-700 hover:bg-indigo-50'}
+                className={activeTab === 'pending' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-purple-300 text-purple-700 hover:bg-purple-50'}
               >
                 <Clock className="w-4 h-4 mr-2" />
                 Pending ({pendingFirs.filter(f => f.status === 'pending').length})
@@ -146,7 +146,7 @@ const EFirScreen: React.FC = () => {
               <Button 
                 variant={activeTab === 'all' ? 'default' : 'outline'}
                 onClick={() => setActiveTab('all')}
-                className={activeTab === 'all' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'border-indigo-300 text-indigo-700 hover:bg-indigo-50'}
+                className={activeTab === 'all' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-purple-300 text-purple-700 hover:bg-purple-50'}
               >
                 <FileText className="w-4 h-4 mr-2" />
                 All FIRs
@@ -165,25 +165,25 @@ const EFirScreen: React.FC = () => {
                 className="grid grid-cols-1 lg:grid-cols-3 gap-6"
               >
                 <Card className="lg:col-span-2 shadow-md hover:shadow-lg transition-shadow bg-white">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <CardTitle className="text-lg">Create New E-FIR</CardTitle>
+                  <CardHeader className="pb-3 bg-primary/80">
+                    <CardTitle className="text-lg text-white">Create New E-FIR</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4 p-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-indigo-700">Tourist ID</Label>
+                        <Label className="text-purple-700">Tourist ID</Label>
                         <Input
                           value={firForm.touristId}
                           onChange={(e) => setFirForm(prev => ({ ...prev, touristId: e.target.value }))}
                           placeholder="Enter Digital Tourist ID"
-                          className="border-indigo-300 focus:border-indigo-500"
+                          className="border-purple-300 focus:border-purple-500"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-indigo-700">Incident Type</Label>
+                        <Label className="text-purple-700">Incident Type</Label>
                         <Select value={firForm.incidentType} onValueChange={(value) => setFirForm(prev => ({ ...prev, incidentType: value }))}>
-                          <SelectTrigger className="border-indigo-300 focus:border-indigo-500">
+                          <SelectTrigger className="border-purple-300 focus:border-purple-500">
                             <SelectValue placeholder="Select incident type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -201,9 +201,9 @@ const EFirScreen: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-indigo-700">Priority</Label>
+                        <Label className="text-purple-700">Priority</Label>
                         <Select value={firForm.priority} onValueChange={(value) => setFirForm(prev => ({ ...prev, priority: value }))}>
-                          <SelectTrigger className="border-indigo-300 focus:border-indigo-500">
+                          <SelectTrigger className="border-purple-300 focus:border-purple-500">
                             <SelectValue placeholder="Select priority" />
                           </SelectTrigger>
                           <SelectContent>
@@ -216,58 +216,58 @@ const EFirScreen: React.FC = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-indigo-700">Date & Time of Incident</Label>
+                        <Label className="text-purple-700">Date & Time of Incident</Label>
                         <Input
                           type="datetime-local"
                           value={firForm.dateTime}
                           onChange={(e) => setFirForm(prev => ({ ...prev, dateTime: e.target.value }))}
-                          className="border-indigo-300 focus:border-indigo-500"
+                          className="border-purple-300 focus:border-purple-500"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-indigo-700">Incident Location</Label>
+                      <Label className="text-purple-700">Incident Location</Label>
                       <Input
                         value={firForm.location}
                         onChange={(e) => setFirForm(prev => ({ ...prev, location: e.target.value }))}
                         placeholder="Enter detailed location of incident"
-                        className="border-indigo-300 focus:border-indigo-500"
+                        className="border-purple-300 focus:border-purple-500"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-indigo-700">Incident Description</Label>
+                      <Label className="text-purple-700">Incident Description</Label>
                       <Textarea
                         value={firForm.description}
                         onChange={(e) => setFirForm(prev => ({ ...prev, description: e.target.value }))}
                         placeholder="Provide detailed description of the incident"
                         rows={5}
-                        className="border-indigo-300 focus:border-indigo-500"
+                        className="border-purple-300 focus:border-purple-500"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-indigo-700">Witnesses (if any)</Label>
+                      <Label className="text-purple-700">Witnesses (if any)</Label>
                       <Textarea
                         value={firForm.witnesses}
                         onChange={(e) => setFirForm(prev => ({ ...prev, witnesses: e.target.value }))}
                         placeholder="Names and contact details of witnesses"
                         rows={3}
-                        className="border-indigo-300 focus:border-indigo-500"
+                        className="border-purple-300 focus:border-purple-500"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-4">
                       <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                        <Button variant="outline" className="w-full border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                        <Button variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-indigo-50">
                           Save as Draft
                         </Button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                         <Button 
                           variant="default" 
-                          className="w-full bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300"
+                          className="w-full bg-purple-500 text-white hover:bg-purple-700 disabled:bg-purple-300"
                           onClick={handleCreateFir}
                           disabled={!firForm.touristId || !firForm.incidentType || !firForm.description}
                         >
@@ -280,44 +280,44 @@ const EFirScreen: React.FC = () => {
                 </Card>
 
                 <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <CardTitle className="text-lg">Quick Actions</CardTitle>
+                  <CardHeader className="pb-3 bg-primary/80">
+                    <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 p-6">
                     <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                      <Button variant="outline" className="w-full justify-start border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                      <Button variant="outline" className="w-full justify-start border-purple-300 text-purple-700 hover:bg-indigo-50">
                         <Search className="w-4 h-4 mr-2" />
                         Search Tourist
                       </Button>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                      <Button variant="outline" className="w-full justify-start border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                      <Button variant="outline" className="w-full justify-start border-purple-300 text-purple-700 hover:bg-indigo-50">
                         <MapPin className="w-4 h-4 mr-2" />
                         Mark Location
                       </Button>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                      <Button variant="outline" className="w-full justify-start border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                      <Button variant="outline" className="w-full justify-start border-purple-300 text-purple-700 hover:bg-indigo-50">
                         <FileText className="w-4 h-4 mr-2" />
                         Upload Evidence
                       </Button>
                     </motion.div>
                     
-                    <div className="pt-4 border-t border-indigo-100">
-                      <h4 className="font-semibold text-indigo-800 mb-2">Templates</h4>
+                    <div className="pt-4 border-t border-purple-100">
+                      <h4 className="font-semibold text-purple-800 mb-2">Templates</h4>
                       <div className="space-y-2">
                         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-indigo-700 hover:bg-indigo-50">
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-purple-700 hover:bg-indigo-50">
                             Theft Report Template
                           </Button>
                         </motion.div>
                         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-indigo-700 hover:bg-indigo-50">
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-purple-700 hover:bg-indigo-50">
                             Lost Documents Template
                           </Button>
                         </motion.div>
                         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-indigo-700 hover:bg-indigo-50">
+                          <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-purple-700 hover:bg-indigo-50">
                             Harassment Report Template
                           </Button>
                         </motion.div>
@@ -352,8 +352,8 @@ const EFirScreen: React.FC = () => {
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-4">
                             <div>
-                              <h3 className="font-semibold text-indigo-800">{fir.id}</h3>
-                              <p className="text-sm text-indigo-600">{fir.incidentType}</p>
+                              <h3 className="font-semibold text-purple-800">{fir.id}</h3>
+                              <p className="text-sm text-purple-600">{fir.incidentType}</p>
                             </div>
                             <div className="flex gap-2">
                               <Badge variant="outline" className={getPriorityColor(fir.priority) + ' border-2'}>
@@ -368,34 +368,34 @@ const EFirScreen: React.FC = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-indigo-600" />
+                            <User className="w-4 h-4 text-purple-600" />
                             <div>
-                              <p className="text-indigo-600">Tourist</p>
-                              <p className="font-medium text-indigo-800">{fir.touristName}</p>
+                              <p className="text-purple-600">Tourist</p>
+                              <p className="font-medium text-purple-800">{fir.touristName}</p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-indigo-600" />
+                            <MapPin className="w-4 h-4 text-purple-600" />
                             <div>
-                              <p className="text-indigo-600">Location</p>
-                              <p className="font-medium text-indigo-800">{fir.location}</p>
+                              <p className="text-purple-600">Location</p>
+                              <p className="font-medium text-purple-800">{fir.location}</p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-indigo-600" />
+                            <Calendar className="w-4 h-4 text-purple-600" />
                             <div>
-                              <p className="text-indigo-600">Reported</p>
-                              <p className="font-medium text-indigo-800">{new Date(fir.reportedAt).toLocaleDateString()}</p>
+                              <p className="text-purple-600">Reported</p>
+                              <p className="font-medium text-purple-800">{new Date(fir.reportedAt).toLocaleDateString()}</p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-indigo-600" />
+                            <User className="w-4 h-4 text-purple-600" />
                             <div>
-                              <p className="text-indigo-600">Assigned To</p>
-                              <p className="font-medium text-indigo-800">{fir.assignedOfficer || 'Unassigned'}</p>
+                              <p className="text-purple-600">Assigned To</p>
+                              <p className="font-medium text-purple-800">{fir.assignedOfficer || 'Unassigned'}</p>
                             </div>
                           </div>
                         </div>
@@ -407,12 +407,12 @@ const EFirScreen: React.FC = () => {
                             </Button>
                           </motion.div>
                           <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                            <Button variant="outline" size="sm" className="border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                            <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-indigo-50">
                               Assign Officer
                             </Button>
                           </motion.div>
                           <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                            <Button variant="outline" size="sm" className="border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                            <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-indigo-50">
                               Update Status
                             </Button>
                           </motion.div>
@@ -444,11 +444,11 @@ const EFirScreen: React.FC = () => {
                 <Card>
                   <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
                     <CardTitle className="text-lg flex items-center justify-between">
-                      <span className="text-indigo-800">All E-FIRs</span>
+                      <span className="text-purple-800">All E-FIRs</span>
                       <div className="flex gap-2">
-                        <Input placeholder="Search FIRs..." className="w-64 border-indigo-300 focus:border-indigo-500" />
+                        <Input placeholder="Search FIRs..." className="w-64 border-purple-300 focus:border-purple-500" />
                         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-                          <Button variant="outline" size="icon" className="border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                          <Button variant="outline" size="icon" className="border-purple-300 text-purple-700 hover:bg-indigo-50">
                             <Search className="w-4 h-4" />
                           </Button>
                         </motion.div>
@@ -472,12 +472,12 @@ const EFirScreen: React.FC = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 }}
-                          className="flex items-center justify-between p-3 border border-indigo-100 rounded-lg hover:bg-indigo-50 transition-colors"
+                          className="flex items-center justify-between p-3 border border-purple-100 rounded-lg hover:bg-indigo-50 transition-colors"
                         >
                           <div className="flex items-center gap-4">
                             <div>
-                              <p className="font-medium text-sm text-indigo-800">{fir.id}</p>
-                              <p className="text-xs text-indigo-600">{fir.incidentType} - {fir.touristName}</p>
+                              <p className="font-medium text-sm text-purple-800">{fir.id}</p>
+                              <p className="text-xs text-purple-600">{fir.incidentType} - {fir.touristName}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -487,7 +487,7 @@ const EFirScreen: React.FC = () => {
                             <Badge variant="outline" className={getStatusColor(fir.status) + ' border-2'}>
                               {fir.status}
                             </Badge>
-                            <p className="text-xs text-indigo-500">
+                            <p className="text-xs text-purple-500">
                               {new Date(fir.reportedAt).toLocaleDateString()}
                             </p>
                           </div>

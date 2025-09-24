@@ -93,13 +93,13 @@ const AlertsScreen: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-purple-50">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white shadow-md border-b sticky top-0 z-40"
+          className="bg-primary/80 shadow-md border-b sticky top-0 z-40"
         >
           <div className="p-4 max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -109,7 +109,7 @@ const AlertsScreen: React.FC = () => {
                     variant="ghost" 
                     size="icon"
                     onClick={() => setAuthorityPage('dashboard')}
-                    className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50"
+                    className="text-white hover:text-indigo-800 hover:bg-indigo-50"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </Button>
@@ -117,13 +117,13 @@ const AlertsScreen: React.FC = () => {
                 <TooltipContent>Back to Dashboard</TooltipContent>
               </Tooltip>
               <div>
-                <h1 className="text-2xl font-bold text-indigo-800">Alerts & Notifications</h1>
-                <p className="text-sm text-indigo-600">Manage tourist safety alerts</p>
+                <h1 className="text-2xl font-semibold text-white">Alerts & Notifications</h1>
+                <p className="text-sm text-white">Manage tourist safety alerts</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Select value={activeTab} onValueChange={(value) => setActiveTab(value as 'send' | 'active' | 'history')}>
-                <SelectTrigger className="w-32 border-indigo-300 focus:border-indigo-500">
+                <SelectTrigger className="w-32 border-purple-300 focus:border-purple-500">
                   <SelectValue placeholder="Select Tab" />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,9 +149,9 @@ const AlertsScreen: React.FC = () => {
                 className="grid grid-cols-1 lg:grid-cols-2 gap-6"
               >
                 <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Send className="w-5 h-5 text-indigo-600" />
+                  <CardHeader className="pb-3 bg-primary/80">
+                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                      <Send className="w-5 h-5 text-white" />
                       Create New Alert
                     </CardTitle>
                   </CardHeader>
@@ -160,7 +160,7 @@ const AlertsScreen: React.FC = () => {
                       <div className="space-y-2">
                         <Label>Alert Type</Label>
                         <Select value={alertForm.type} onValueChange={(value) => setAlertForm(prev => ({ ...prev, type: value }))}>
-                          <SelectTrigger className="border-indigo-300 focus:border-indigo-500">
+                          <SelectTrigger className="border-purple-300 focus:border-purple-500">
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -175,7 +175,7 @@ const AlertsScreen: React.FC = () => {
                       <div className="space-y-2">
                         <Label>Severity</Label>
                         <Select value={alertForm.severity} onValueChange={(value) => setAlertForm(prev => ({ ...prev, severity: value }))}>
-                          <SelectTrigger className="border-indigo-300 focus:border-indigo-500">
+                          <SelectTrigger className="border-purple-300 focus:border-purple-500">
                             <SelectValue placeholder="Select severity" />
                           </SelectTrigger>
                           <SelectContent>
@@ -193,7 +193,7 @@ const AlertsScreen: React.FC = () => {
                         value={alertForm.title}
                         onChange={(e) => setAlertForm(prev => ({ ...prev, title: e.target.value }))}
                         placeholder="Enter alert title"
-                        className="border-indigo-300 focus:border-indigo-500"
+                        className="border-purple-300 focus:border-purple-500"
                       />
                     </div>
                     <div className="space-y-2">
@@ -203,7 +203,7 @@ const AlertsScreen: React.FC = () => {
                         onChange={(e) => setAlertForm(prev => ({ ...prev, message: e.target.value }))}
                         placeholder="Enter detailed alert message"
                         rows={4}
-                        className="border-indigo-300 focus:border-indigo-500"
+                        className="border-purple-300 focus:border-purple-500"
                       />
                     </div>
                     <div className="space-y-2">
@@ -212,13 +212,13 @@ const AlertsScreen: React.FC = () => {
                         value={alertForm.location}
                         onChange={(e) => setAlertForm(prev => ({ ...prev, location: e.target.value }))}
                         placeholder="Specify location or area"
-                        className="border-indigo-300 focus:border-indigo-500"
+                        className="border-purple-300 focus:border-purple-500"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Target Group</Label>
                       <Select value={alertForm.targetGroup} onValueChange={(value) => setAlertForm(prev => ({ ...prev, targetGroup: value }))}>
-                        <SelectTrigger className="border-indigo-300 focus:border-indigo-500">
+                        <SelectTrigger className="border-purple-300 focus:border-purple-500">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -254,15 +254,15 @@ const AlertsScreen: React.FC = () => {
                 </Card>
 
                 <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Bell className="w-5 h-5 text-indigo-600" />
+                  <CardHeader className="pb-3 bg-primary/80">
+                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                      <Bell className="w-5 h-5 text-white" />
                       Alert Preview
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-4">
                     {alertForm.title && alertForm.message ? (
-                      <div className="border border-indigo-200 rounded-lg p-4 space-y-3">
+                      <div className="border border-purple-200 rounded-lg p-4 space-y-3">
                         <div className="flex items-center gap-2">
                           {getTypeIcon(alertForm.type)}
                           <span className="font-medium text-indigo-800">{alertForm.title}</span>
@@ -281,7 +281,7 @@ const AlertsScreen: React.FC = () => {
                         )}
                       </div>
                     ) : (
-                      <div className="text-center text-indigo-400 py-8">
+                      <div className="text-center text-black-400 py-8">
                         <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
                         <p>Fill in the form to see alert preview</p>
                       </div>
@@ -323,7 +323,7 @@ const AlertsScreen: React.FC = () => {
                             <Badge variant="outline" className={getSeverityColor(alert.severity)}>
                               {alert.severity}
                             </Badge>
-                            <Badge variant="outline" className="border-indigo-300 text-indigo-700">
+                            <Badge variant="outline" className="border-purple-300 text-indigo-700">
                               {alert.type}
                             </Badge>
                           </div>
@@ -345,10 +345,10 @@ const AlertsScreen: React.FC = () => {
                         </div>
 
                         <div className="flex gap-2 mt-4">
-                          <Button variant="outline" size="sm" className="border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                          <Button variant="outline" size="sm" className="border-purple-300 text-indigo-700 hover:bg-indigo-50">
                             View Details
                           </Button>
-                          <Button variant="outline" size="sm" className="border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                          <Button variant="outline" size="sm" className="border-purple-300 text-indigo-700 hover:bg-indigo-50">
                             Update Alert
                           </Button>
                           <Button variant="destructive" size="sm">
@@ -385,7 +385,7 @@ const AlertsScreen: React.FC = () => {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="flex items-center justify-between p-3 border border-indigo-200 rounded-lg"
+                        className="flex items-center justify-between p-3 border border-purple-200 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-3 h-3 bg-indigo-100 rounded-full"></div>
@@ -395,7 +395,7 @@ const AlertsScreen: React.FC = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge variant="outline" className="border-indigo-300 text-indigo-700">Resolved</Badge>
+                          <Badge variant="outline" className="border-purple-300 text-indigo-700">Resolved</Badge>
                           <p className="text-xs text-indigo-600 mt-1">{i} day{i !== 1 ? 's' : ''} ago</p>
                         </div>
                       </motion.div>

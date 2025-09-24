@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 const MapDashboard: React.FC = () => {
   const { setAuthorityPage } = useApp();
-  const { signOut } = useAuthorityAuth();
+  // const { signOut } = useAuthorityAuth();
   const [selectedTourist, setSelectedTourist] = useState<Tourist | null>(null);
   const [tourists] = useState<Tourist[]>(touristsData);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,13 +25,13 @@ const MapDashboard: React.FC = () => {
     setSelectedTourist(tourist);
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await signOut();
+  //   } catch (error) {
+  //     console.error('Logout error:', error);
+  //   }
+  // };
 
   const safeCount = tourists.filter(t => t.status === 'safe').length;
   const alertCount = tourists.filter(t => t.status === 'alert').length;
@@ -51,26 +51,26 @@ const MapDashboard: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-primary text-primary-foreground">
+      <div className="min-h-screen bg-purple-50 text-primary-foreground">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-card shadow-lg border-b border-primary/20 sticky top-0 z-40"
+          className="bg-primary/80 shadow-lg border-b border-primary/20 sticky top-0 z-40"
         >
           <div className="p-4 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-primary-foreground">Authority Dashboard</h1>
-                <p className="text-sm text-primary-foreground/80">Real-time tourist monitoring</p>
+                <h1 className="text-2xl font-semibold text-white">Authority Dashboard</h1>
+                <p className="text-sm text-white">Real-time tourist monitoring</p>
               </div>
               <div className="flex items-center gap-4">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setAuthorityPage('alerts')}
-                  className="border-primary/50 text-primary-foreground hover:bg-primary/20"
+                  className="border-purple-200 text-black hover:bg-purple-100"
                 >
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Alerts
@@ -82,7 +82,7 @@ const MapDashboard: React.FC = () => {
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="text-red-500 hover:text-red-500/90 hover:bg-red-500/10"
+                          className="text-red-500 hover:text-red-500/90 hover:bg-red-500/25"
                         >
                           <LogOut className="w-5 h-5" />
                         </Button>
@@ -97,7 +97,7 @@ const MapDashboard: React.FC = () => {
                       <div className="flex gap-2">
                         <Button 
                           variant="destructive" 
-                          onClick={handleLogout}
+                          // onClick={handleLogout}
                           className="flex-1"
                         >
                           Logout
@@ -163,12 +163,12 @@ const MapDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-card border border-primary/20">
+                <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-white border border-primary/20">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className={`text-4xl font-extrabold ${stat.color}`}>{stat.value}</p>
-                        <p className="text-sm text-primary-foreground/80 font-medium">{stat.title}</p>
+                        <p className="text-sm text-black font-medium">{stat.title}</p>
                       </div>
                       <div className={`w-12 h-12 ${stat.bgColor} rounded-full flex items-center justify-center`}>
                         <stat.icon className={`w-6 h-6 ${stat.color}`} />
@@ -225,8 +225,8 @@ const MapDashboard: React.FC = () => {
             className="space-y-6"
           >
             <Card className="shadow-lg bg-card border border-primary/20">
-              <CardHeader className="pb-3 bg-primary/10">
-                <CardTitle className="text-lg flex items-center gap-2 text-primary-foreground">
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="text-lg flex items-center gap-2 text-white">
                   <Search className="w-5 h-5" />
                   Search Tourists
                 </CardTitle>
@@ -247,10 +247,10 @@ const MapDashboard: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-primary-foreground">{tourist.name}</span>
+                        <span className="text-sm font-medium text-black">{tourist.name}</span>
                         <Badge variant={
-                          tourist.status === 'safe' ? 'success' :
-                          tourist.status === 'alert' ? 'warning' : 'destructive'
+                          tourist.status === 'safe' ? 'default' :
+                          tourist.status === 'alert' ? 'secondary' : 'destructive'
                         }>
                           {tourist.status.toUpperCase()}
                         </Badge>
@@ -274,22 +274,22 @@ const MapDashboard: React.FC = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <Card className="shadow-lg bg-card border border-primary/20">
-                    <CardHeader className="pb-3 bg-primary/10">
-                      <CardTitle className="text-lg flex items-center gap-2 text-primary-foreground">
+                    <CardHeader className="pb-3 bg-primary/80">
+                      <CardTitle className="text-lg flex items-center gap-2 text-white">
                         <Users className="w-5 h-5" />
                         Tourist Details
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 p-4">
                       <div>
-                        <h3 className="font-semibold text-lg text-primary-foreground">{selectedTourist.name}</h3>
+                        <h3 className="font-semibold text-lg text-black">{selectedTourist.name}</h3>
                         <p className="text-sm text-muted-foreground">ID: {selectedTourist.digitalId}</p>
                       </div>
                       
                       <div className="flex items-center gap-2">
                         <Badge variant={
-                          selectedTourist.status === 'safe' ? 'success' :
-                          selectedTourist.status === 'alert' ? 'warning' : 'destructive'
+                          selectedTourist.status === 'safe' ? 'default' :
+                          selectedTourist.status === 'alert' ? 'secondary' : 'destructive'
                         } className="px-3 py-1">
                           {selectedTourist.status.toUpperCase()}
                         </Badge>
@@ -301,14 +301,14 @@ const MapDashboard: React.FC = () => {
                       <div className="space-y-3 text-sm">
                         <div className="flex items-center gap-2">
                           <Phone className="w-4 h-4 text-muted-foreground" />
-                          <p className="text-primary-foreground/80">{selectedTourist.phone}</p>
+                          <p className="text-primary-black">{selectedTourist.phone}</p>
                         </div>
                         {selectedTourist.currentLocation && (
                           <div className="flex items-start gap-2">
                             <MapPin className="w-4 h-4 text-muted-foreground mt-1" />
                             <div>
-                              <p className="font-medium text-primary-foreground">Current Location</p>
-                              <p className="text-primary-foreground/80">
+                              <p className="font-medium text-black">Current Location</p>
+                              <p className="text-primary-black">
                                 {selectedTourist.currentLocation.address}
                               </p>
                               <p className="text-xs text-muted-foreground">
@@ -320,8 +320,8 @@ const MapDashboard: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <Activity className="w-4 h-4 text-muted-foreground" />
                           <div>
-                            <p className="font-medium text-primary-foreground">Last Active</p>
-                            <p className="text-primary-foreground/80">
+                            <p className="font-medium text-black">Last Active</p>
+                            <p className="text-primary-black">
                               {new Date(selectedTourist.lastActive).toLocaleString()}
                             </p>
                           </div>
@@ -333,7 +333,7 @@ const MapDashboard: React.FC = () => {
                           <Phone className="w-4 h-4 mr-2" />
                           Contact Tourist
                         </Button>
-                        <Button variant="outline" size="sm" className="w-full border-primary/50 text-primary-foreground hover:bg-primary/20">
+                        <Button variant="outline" size="sm" className="w-full border-primary/50 text-black hover:bg-primary/20">
                           <Activity className="w-4 h-4 mr-2" />
                           View History
                         </Button>
@@ -351,7 +351,7 @@ const MapDashboard: React.FC = () => {
                 <Card className="shadow-lg bg-card border border-primary/20">
                   <CardContent className="p-6 text-center">
                     <MapPin className="w-12 h-12 text-primary/30 mx-auto mb-4" />
-                    <h3 className="font-semibold mb-2 text-primary-foreground">Select a Tourist</h3>
+                    <h3 className="font-semibold mb-2 text-black">Select a Tourist</h3>
                     <p className="text-sm text-muted-foreground">
                       Click on a tourist on the map to view their details.
                     </p>
@@ -361,8 +361,8 @@ const MapDashboard: React.FC = () => {
             )}
 
             <Card className="shadow-lg bg-card border border-primary/20">
-              <CardHeader className="pb-3 bg-primary/10">
-                <CardTitle className="text-lg flex items-center gap-2 text-primary-foreground">
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="text-lg flex items-center gap-2 text-white">
                   <Activity className="w-5 h-5" />
                   Quick Actions
                 </CardTitle>
@@ -372,7 +372,7 @@ const MapDashboard: React.FC = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start border-primary/50 text-primary-foreground hover:bg-primary/20"
+                    className="w-full justify-start border-primary/50 text-black hover:bg-primary/20"
                     onClick={() => setAuthorityPage('verification')}
                   >
                     <Shield className="w-4 h-4 mr-2" />
@@ -383,7 +383,7 @@ const MapDashboard: React.FC = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start border-primary/50 text-primary-foreground hover:bg-primary/20"
+                    className="w-full justify-start border-primary/50 text-black hover:bg-primary/20"
                     onClick={() => setAuthorityPage('efir')}
                   >
                     <AlertTriangle className="w-4 h-4 mr-2" />
@@ -394,7 +394,7 @@ const MapDashboard: React.FC = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start border-primary/50 text-primary-foreground hover:bg-primary/20"
+                    className="w-full justify-start border-primary/50 text-black hover:bg-primary/20"
                     onClick={() => setAuthorityPage('analytics')}
                   >
                     <Activity className="w-4 h-4 mr-2" />

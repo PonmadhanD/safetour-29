@@ -54,7 +54,7 @@ const VerificationScreen: React.FC = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white shadow-md border-b sticky top-0 z-40"
+          className="bg-primary/80 shadow-md border-b sticky top-0 z-40"
         >
           <div className="p-4 max-w-4xl mx-auto flex items-center gap-3">
             <Tooltip>
@@ -63,16 +63,16 @@ const VerificationScreen: React.FC = () => {
                   variant="ghost" 
                   size="icon"
                   onClick={() => setAuthorityPage('dashboard')}
-                  className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50"
+                  className="text-purple-700 hover:text-purple-800 hover:bg-purple-50"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-5 h-5 text-white" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Back to Dashboard</TooltipContent>
             </Tooltip>
             <div>
-              <h1 className="text-2xl font-bold text-indigo-800">Tourist ID Verification</h1>
-              <p className="text-sm text-indigo-600">Verify digital tourist identification</p>
+              <h1 className="text-2xl font-semibold text-white">Tourist ID Verification</h1>
+              <p className="text-sm text-white">Verify digital tourist identification</p>
             </div>
           </div>
         </motion.div>
@@ -86,9 +86,9 @@ const VerificationScreen: React.FC = () => {
             transition={{ delay: 0.2, duration: 0.5 }}
           >
             <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Search className="w-5 h-5 text-indigo-600" />
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <Search className="w-5 h-5 text-white" />
                   Search by ID
                 </CardTitle>
               </CardHeader>
@@ -98,13 +98,13 @@ const VerificationScreen: React.FC = () => {
                     placeholder="Enter Digital ID or Tourist Name"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="border-indigo-300 focus:border-indigo-500"
+                    className="border-purple-300 focus:border-purple-500"
                   />
                   <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                     <Button 
                       onClick={handleSearch} 
                       disabled={!searchQuery}
-                      className="bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300"
+                      className="bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-300"
                     >
                       <Search className="w-4 h-4" />
                     </Button>
@@ -114,9 +114,9 @@ const VerificationScreen: React.FC = () => {
             </Card>
 
             <Card className="shadow-md hover:shadow-lg transition-shadow bg-white">
-              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <QrCode className="w-5 h-5 text-indigo-600" />
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <QrCode className="w-5 h-5 text-white" />
                   QR Code Scanner
                 </CardTitle>
               </CardHeader>
@@ -124,18 +124,18 @@ const VerificationScreen: React.FC = () => {
                 <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
                   <Button 
                     variant="outline" 
-                    className="w-full h-16 border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                    className="w-full h-16 border-purple-300 text-black-700 hover:bg-purple-50"
                     onClick={handleQRScan}
                     disabled={scanning}
                   >
                     {scanning ? (
                       <>
-                        <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                        <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin mr-2"></div>
                         Scanning...
                       </>
                     ) : (
                       <>
-                        <Camera className="w-6 h-6 mr-2 text-indigo-600" />
+                        <Camera className="w-6 h-6 mr-2 text-black-600" />
                         Scan QR Code
                       </>
                     )}
@@ -171,34 +171,34 @@ const VerificationScreen: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Personal Information */}
                       <div className="space-y-4">
-                        <h3 className="font-semibold text-lg border-b pb-2 text-indigo-800">Personal Information</h3>
+                        <h3 className="font-semibold text-lg border-b pb-2 text-black">Personal Information</h3>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
-                            <User className="w-4 h-4 text-indigo-600" />
+                            <User className="w-4 h-4 text-black-600" />
                             <div>
-                              <p className="text-sm text-indigo-600">Full Name</p>
-                              <p className="font-medium text-indigo-800">{verificationResult.name}</p>
+                              <p className="text-sm text-black-600">Full Name</p>
+                              <p className="font-medium text-black-800">{verificationResult.name}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Shield className="w-4 h-4 text-indigo-600" />
+                            <Shield className="w-4 h-4 text-black-600" />
                             <div>
-                              <p className="text-sm text-indigo-600">Digital ID</p>
-                              <p className="font-medium font-mono text-indigo-800">{verificationResult.digitalId}</p>
+                              <p className="text-sm text-black-600">Digital ID</p>
+                              <p className="font-medium font-mono text-black-800">{verificationResult.digitalId}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Phone className="w-4 h-4 text-indigo-600" />
+                            <Phone className="w-4 h-4 text-black-600" />
                             <div>
-                              <p className="text-sm text-indigo-600">Phone Number</p>
-                              <p className="font-medium text-indigo-800">{verificationResult.phone}</p>
+                              <p className="text-sm text-black-600">Phone Number</p>
+                              <p className="font-medium text-black-800">{verificationResult.phone}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <MapPin className="w-4 h-4 text-indigo-600" />
+                            <MapPin className="w-4 h-4 text-black-600" />
                             <div>
-                              <p className="text-sm text-indigo-600">Current Location</p>
-                              <p className="font-medium text-indigo-800">{verificationResult.currentLocation}</p>
+                              <p className="text-sm text-black-600">Current Location</p>
+                              <p className="font-medium text-black-800">{verificationResult.currentLocation}</p>
                             </div>
                           </div>
                         </div>
@@ -206,30 +206,30 @@ const VerificationScreen: React.FC = () => {
 
                       {/* Verification Details */}
                       <div className="space-y-4">
-                        <h3 className="font-semibold text-lg border-b pb-2 text-indigo-800">Verification Details</h3>
+                        <h3 className="font-semibold text-lg border-b pb-2 text-black-800">Verification Details</h3>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
-                            <Calendar className="w-4 h-4 text-indigo-600" />
+                            <Calendar className="w-4 h-4 text-black-600" />
                             <div>
-                              <p className="text-sm text-indigo-600">Issue Date</p>
-                              <p className="font-medium text-indigo-800">{verificationResult.issueDate}</p>
+                              <p className="text-sm text-black-600">Issue Date</p>
+                              <p className="font-medium text-black-800">{verificationResult.issueDate}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Calendar className="w-4 h-4 text-indigo-600" />
+                            <Calendar className="w-4 h-4 text-black-600" />
                             <div>
-                              <p className="text-sm text-indigo-600">Expiry Date</p>
-                              <p className="font-medium text-indigo-800">{verificationResult.expiryDate}</p>
+                              <p className="text-sm text-black-600">Expiry Date</p>
+                              <p className="font-medium text-black-800">{verificationResult.expiryDate}</p>
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <p className="text-sm text-indigo-600">Status</p>
+                            <p className="text-sm text-black-600">Status</p>
                             <div className="flex gap-2">
                               <Badge className="bg-green-600 text-white">
                                 <CheckCircle className="w-3 h-3 mr-1" />
                                 Valid ID
                               </Badge>
-                              <Badge className="bg-indigo-600 text-white">
+                              <Badge className="bg-purple-600 text-white">
                                 Blockchain Verified
                               </Badge>
                             </div>
@@ -244,9 +244,9 @@ const VerificationScreen: React.FC = () => {
                     </div>
 
                     {/* Emergency Information */}
-                    <div className="mt-6 p-4 bg-indigo-50 rounded-lg">
-                      <h4 className="font-semibold text-indigo-800 mb-2">Emergency Contact</h4>
-                      <p className="text-sm text-indigo-600">
+                    <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+                      <h4 className="font-semibold text-black-800 mb-2">Emergency Contact</h4>
+                      <p className="text-sm text-black-600">
                         <span className="font-medium">Contact:</span> {verificationResult.emergencyContact}
                       </p>
                     </div>
@@ -265,7 +265,7 @@ const VerificationScreen: React.FC = () => {
                       <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                         <Button 
                           variant="outline" 
-                          className="flex-1 border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                          className="flex-1 border-purple-300 text-black-700 hover:bg-purple-50"
                         >
                           View Travel History
                         </Button>
@@ -292,8 +292,8 @@ const VerificationScreen: React.FC = () => {
             transition={{ delay: 0.4, duration: 0.5 }}
           >
             <Card className="shadow-md bg-white">
-              <CardHeader className="pb-3 bg-gradient-to-r from-indigo-50 to-blue-50">
-                <CardTitle className="text-lg">Recent Verifications</CardTitle>
+              <CardHeader className="pb-3 bg-primary/80">
+                <CardTitle className="text-lg text-white">Recent Verifications</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -303,18 +303,18 @@ const VerificationScreen: React.FC = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.1 }}
-                      className="flex items-center justify-between p-3 border border-indigo-100 rounded-lg hover:bg-indigo-50 transition-colors"
+                      className="flex items-center justify-between p-3 border border-purple-100 rounded-lg hover:bg-purple-50 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div>
-                          <p className="font-medium text-sm text-indigo-800">Tourist ID Verified</p>
-                          <p className="text-xs text-indigo-600">John Doe - DID_1642857600000</p>
+                          <p className="font-medium text-sm text-purple-800">Tourist ID Verified</p>
+                          <p className="text-xs text-purple-600">John Doe - DID_1642857600000</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <Badge className="bg-green-600 text-white">Verified</Badge>
-                        <p className="text-xs text-indigo-500 mt-1">{i} hour{i !== 1 ? 's' : ''} ago</p>
+                        <p className="text-xs text-purple-500 mt-1">{i} hour{i !== 1 ? 's' : ''} ago</p>
                       </div>
                     </motion.div>
                   ))}

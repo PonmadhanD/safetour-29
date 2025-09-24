@@ -1,91 +1,118 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext'; // Assuming useAuth provides user info
+import { useAuth } from './AuthContext';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '@/integrations/firebase/client';
 
-// Define the shape of the context
 interface LanguageContextType {
   language: string;
   setLanguage: (language: string) => void;
-  translations: any; // Consider a more specific type
+  translations: Record<string, any>;
   t: (key: string, options?: any) => string;
+  error: string | null;
 }
 
-// Create the context
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Custom hook to use the language context
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
+  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
   return context;
 };
 
-// Provider component
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth(); // Get user from auth context
-  const [language, setLanguage] = useState('en');
-  const [translations, setTranslations] = useState({});
+  const { user } = useAuth();
+  const supportedLanguages = ['en', 'hi', 'ta'];
 
+  const [language, setLanguage] = useState('en');
+  const [translations, setTranslations] = useState<Record<string, any>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  // Load translation JSON files
   useEffect(() => {
-    // Function to load translations for the current language
     const loadTranslations = async () => {
       try {
         const response = await fetch(`/locales/${language}.json`);
+        if (!response.ok) throw new Error(`Failed to load translations for ${language}`);
         const data = await response.json();
         setTranslations(data);
-      } catch (error) {
-        console.error(`Could not load translations for ${language}`, error);
-        // Fallback to English if the desired language fails to load
-        if (language !== 'en') {
-          setLanguage('en');
-        }
+        setError(null);
+      } catch (err) {
+        console.error(`Could not load translations for ${language}:`, err);
+        if (language !== 'en') setLanguage('en');
+        setError('Failed to load translations. Using default.');
       }
     };
-
     loadTranslations();
   }, [language]);
 
+  // Load user's preferred language from Firestore safely
   useEffect(() => {
     const loadUserLanguage = async () => {
-      if (user && user.language) {
-        const supportedLanguages = ['en', 'hi', 'fr', 'es', 'de']; // Example supported languages
-        if (supportedLanguages.includes(user.language)) {
-          setLanguage(user.language);
+      const browserLang = navigator.language.split('-')[0];
+      const defaultLang = supportedLanguages.includes(browserLang) ? browserLang : 'en';
+
+      if (!user) {
+        setLanguage(defaultLang);
+        return;
+      }
+
+      try {
+        const settingsRef = doc(db, 'user_settings', user.uid);
+        const settingsDoc = await getDoc(settingsRef);
+
+        if (settingsDoc.exists() && supportedLanguages.includes(settingsDoc.data()?.language)) {
+          setLanguage(settingsDoc.data().language);
         } else {
-          console.warn(`User language '${user.language}' is not supported. Defaulting to English.`);
-          setLanguage('en');
+          setLanguage(defaultLang);
+          // Try to save default language, but ignore failures
+          try {
+            await setDoc(settingsRef, { language: defaultLang }, { merge: true });
+          } catch (err: any) {
+            console.warn('Could not save default language to Firestore:', err.code, err.message);
+          }
         }
-      } else {
-        // If no user or user.language, determine language from browser settings
-        const browserLang = navigator.language.split('-')[0];
-        const supportedLanguages = ['en', 'hi', 'fr', 'es', 'de'];
-        if (supportedLanguages.includes(browserLang)) {
-          setLanguage(browserLang);
-        } else {
-          setLanguage('en');
-        }
+        setError(null);
+      } catch (err: any) {
+        console.warn('Could not access Firestore. Using browser/default language.', err.code, err.message);
+        setLanguage(defaultLang);
+        setError('Using default language due to Firestore permissions.');
       }
     };
 
     loadUserLanguage();
   }, [user]);
 
-  // Translation function
+  const handleSetLanguage = async (newLanguage: string) => {
+    if (!supportedLanguages.includes(newLanguage)) {
+      setError('Unsupported language selected');
+      return;
+    }
+    setLanguage(newLanguage);
+
+    if (user) {
+      try {
+        await setDoc(doc(db, 'user_settings', user.uid), { language: newLanguage }, { merge: true });
+        setError(null);
+      } catch (err: any) {
+        console.warn('Could not save language preference to Firestore:', err.code, err.message);
+        setError('Failed to save language preference. Changes will only apply locally.');
+      }
+    }
+  };
+
   const t = (key: string, options?: any) => {
     const keyParts = key.split('.');
-    let translation = translations;
+    let translation: any = translations;
+
     for (const part of keyParts) {
       if (translation && typeof translation === 'object' && part in translation) {
         translation = translation[part];
-      } else {
-        return key; // Return the key if translation is not found
-      }
+      } else return key;
     }
 
     if (typeof translation === 'string' && options) {
       Object.keys(options).forEach(optKey => {
-        translation = (translation as string).replace(`{{${optKey}}}`, options[optKey]);
+        translation = translation.replace(`{{${optKey}}}`, options[optKey]);
       });
     }
 
@@ -93,7 +120,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, translations, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, translations, t, error }}>
       {children}
     </LanguageContext.Provider>
   );
