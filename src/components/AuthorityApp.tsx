@@ -1,13 +1,13 @@
 import React from 'react';
 import { useAuthorityAuth } from '@/contexts/AuthorityAuthContext';
 import AdminAuthScreen from '@/components/authority/AdminAuthScreen';
-import MapDashboard from '@/components/authority/MapDashboard';
 import VerificationScreen from '@/components/authority/VerificationScreen';
 import AlertsScreen from '@/components/authority/AlertsScreen';
 import EFirScreen from '@/components/authority/EFirScreen';
 import AnalyticsScreen from '@/components/authority/AnalyticsScreen';
 import SettingsScreen from '@/components/authority/SettingsScreen';
 import { useApp } from '@/contexts/AppContext';
+import Dashboard from '@/components/authority/DashboardScreen';
 
 const AuthorityApp: React.FC = () => {
   const { authorityPage } = useApp();
@@ -36,7 +36,7 @@ const AuthorityApp: React.FC = () => {
   const renderPage = () => {
     switch (authorityPage) {
       case 'dashboard':
-        return <MapDashboard />;
+        return <Dashboard />;
       case 'verification':
         return <VerificationScreen />;
       case 'alerts':
@@ -48,7 +48,7 @@ const AuthorityApp: React.FC = () => {
       case 'settings':
         return <SettingsScreen />;
       default:
-        return <MapDashboard />; // Default to dashboard after login
+        return <Dashboard />; // Default to dashboard after login
     }
   };
 

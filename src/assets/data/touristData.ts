@@ -1,7 +1,7 @@
 import { Tourist } from "../../types/index";
 
 export const touristsData: Tourist[] = [
-  // Group 1: Shillong Central (5 tourists, mostly safe)
+  // Group 1: Shillong Central (5 tourists)
   {
     id: '1',
     name: 'John Doe',
@@ -16,8 +16,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T10:30:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T10:30:00Z'
   },
   {
     id: '2',
@@ -33,8 +33,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T10:25:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T10:25:00Z'
   },
   {
     id: '3',
@@ -50,8 +50,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T10:20:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T10:20:00Z'
   },
   {
     id: '4',
@@ -67,8 +67,9 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T10:15:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T10:15:00Z',
+    resolvedAt: '2025-09-26T09:00:00Z'
   },
   {
     id: '5',
@@ -84,10 +85,10 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T10:10:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T10:10:00Z'
   },
-  // Group 2: Cherrapunji Area (6 tourists, mixed status)
+  // Group 2: Cherrapunji Area (6 tourists)
   {
     id: '6',
     name: 'Michael Garcia',
@@ -102,8 +103,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T09:45:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T09:45:00Z'
   },
   {
     id: '7',
@@ -119,8 +120,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T09:40:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T09:40:00Z'
   },
   {
     id: '8',
@@ -136,8 +137,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T09:35:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T09:35:00Z'
   },
   {
     id: '9',
@@ -154,7 +155,7 @@ export const touristsData: Tourist[] = [
     emergencyContacts: [],
     travelHistory: [],
     status: 'emergency',
-    lastActive: '2024-01-08T09:30:00Z'
+    lastActive: '2025-09-26T09:30:00Z'
   },
   {
     id: '10',
@@ -170,8 +171,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T09:25:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T09:25:00Z'
   },
   {
     id: '11',
@@ -187,10 +188,11 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T09:20:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T09:20:00Z',
+    resolvedAt: '2025-09-26T08:00:00Z'
   },
-  // Group 3: Mawlynnong Village (7 tourists, mostly alert)
+  // Group 3: Mawlynnong Village (7 tourists)
   {
     id: '12',
     name: 'Raj Kumar',
@@ -205,8 +207,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T09:15:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T09:15:00Z'
   },
   {
     id: '13',
@@ -222,8 +224,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T09:10:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T09:10:00Z'
   },
   {
     id: '14',
@@ -239,8 +241,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T09:05:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T09:05:00Z'
   },
   {
     id: '15',
@@ -256,8 +258,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T09:00:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T09:00:00Z'
   },
   {
     id: '16',
@@ -273,8 +275,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:55:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T08:55:00Z'
   },
   {
     id: '17',
@@ -290,8 +292,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T08:50:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T08:50:00Z'
   },
   {
     id: '18',
@@ -307,10 +309,11 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:45:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T08:45:00Z',
+    resolvedAt: '2025-09-26T07:30:00Z'
   },
-  // Group 4: Dawki River Area (8 tourists, varied status)
+  // Group 4: Dawki River Area (8 tourists)
   {
     id: '19',
     name: 'Kiran Desai',
@@ -325,8 +328,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:40:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T08:40:00Z'
   },
   {
     id: '20',
@@ -342,8 +345,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T08:35:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T08:35:00Z'
   },
   {
     id: '21',
@@ -360,7 +363,7 @@ export const touristsData: Tourist[] = [
     emergencyContacts: [],
     travelHistory: [],
     status: 'emergency',
-    lastActive: '2024-01-08T08:30:00Z'
+    lastActive: '2025-09-26T08:30:00Z'
   },
   {
     id: '22',
@@ -376,8 +379,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:25:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T08:25:00Z'
   },
   {
     id: '23',
@@ -393,8 +396,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T08:20:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T08:20:00Z'
   },
   {
     id: '24',
@@ -410,8 +413,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:15:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T08:15:00Z'
   },
   {
     id: '25',
@@ -427,8 +430,9 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:10:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T08:10:00Z',
+    resolvedAt: '2025-09-26T07:00:00Z'
   },
   {
     id: '26',
@@ -444,10 +448,10 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T08:05:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T08:05:00Z'
   },
-  // Group 5: Kaziranga National Park (5 tourists, mostly safe)
+  // Group 5: Kaziranga National Park (5 tourists)
   {
     id: '27',
     name: 'Rahul Verma',
@@ -462,8 +466,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T08:00:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T08:00:00Z'
   },
   {
     id: '28',
@@ -479,8 +483,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:55:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T07:55:00Z'
   },
   {
     id: '29',
@@ -496,8 +500,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T07:50:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T07:50:00Z'
   },
   {
     id: '30',
@@ -513,8 +517,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:45:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T07:45:00Z'
   },
   {
     id: '31',
@@ -530,10 +534,11 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:40:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T07:40:00Z',
+    resolvedAt: '2025-09-26T06:30:00Z'
   },
-  // Group 6: Majuli Island (5 tourists, emergency heavy)
+  // Group 6: Majuli Island (5 tourists)
   {
     id: '32',
     name: 'Deepa Malhotra',
@@ -549,7 +554,7 @@ export const touristsData: Tourist[] = [
     emergencyContacts: [],
     travelHistory: [],
     status: 'emergency',
-    lastActive: '2024-01-08T07:35:00Z'
+    lastActive: '2025-09-26T07:35:00Z'
   },
   {
     id: '33',
@@ -565,8 +570,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T07:30:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T07:30:00Z'
   },
   {
     id: '34',
@@ -583,7 +588,7 @@ export const touristsData: Tourist[] = [
     emergencyContacts: [],
     travelHistory: [],
     status: 'emergency',
-    lastActive: '2024-01-08T07:25:00Z'
+    lastActive: '2025-09-26T07:25:00Z'
   },
   {
     id: '35',
@@ -599,8 +604,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:20:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T07:20:00Z'
   },
   {
     id: '36',
@@ -617,9 +622,9 @@ export const touristsData: Tourist[] = [
     emergencyContacts: [],
     travelHistory: [],
     status: 'emergency',
-    lastActive: '2024-01-08T07:15:00Z'
+    lastActive: '2025-09-26T07:15:00Z'
   },
-  // Group 7: Tawang Monastery (5 tourists, safe)
+  // Group 7: Tawang Monastery (5 tourists)
   {
     id: '37',
     name: 'Aarav Singh',
@@ -634,8 +639,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:10:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T07:10:00Z'
   },
   {
     id: '38',
@@ -651,8 +656,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:05:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T07:05:00Z'
   },
   {
     id: '39',
@@ -668,8 +673,9 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T07:00:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T07:00:00Z',
+    resolvedAt: '2025-09-26T06:00:00Z'
   },
   {
     id: '40',
@@ -685,8 +691,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:55:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T06:55:00Z'
   },
   {
     id: '41',
@@ -702,10 +708,10 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:50:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T06:50:00Z'
   },
-  // Group 8: Ziro Valley (5 tourists, alert heavy)
+  // Group 8: Ziro Valley (5 tourists)
   {
     id: '42',
     name: 'Naina Roy',
@@ -720,8 +726,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T06:45:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T06:45:00Z'
   },
   {
     id: '43',
@@ -737,8 +743,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T06:40:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T06:40:00Z'
   },
   {
     id: '44',
@@ -754,8 +760,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:35:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T06:35:00Z'
   },
   {
     id: '45',
@@ -771,8 +777,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T06:30:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T06:30:00Z'
   },
   {
     id: '46',
@@ -788,10 +794,10 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'alert',
-    lastActive: '2024-01-08T06:25:00Z'
+    status: 'active alerts',
+    lastActive: '2025-09-26T06:25:00Z'
   },
-  // Group 9: Namdapha National Park (5 tourists, safe)
+  // Group 9: Namdapha National Park (5 tourists)
   {
     id: '47',
     name: 'Dev Sharma',
@@ -806,8 +812,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:20:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T06:20:00Z'
   },
   {
     id: '48',
@@ -823,8 +829,8 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:15:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T06:15:00Z'
   },
   {
     id: '49',
@@ -840,8 +846,9 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:10:00Z'
+    status: 'resolved today',
+    lastActive: '2025-09-26T06:10:00Z',
+    resolvedAt: '2025-09-26T05:30:00Z'
   },
   {
     id: '50',
@@ -857,7 +864,7 @@ export const touristsData: Tourist[] = [
     },
     emergencyContacts: [],
     travelHistory: [],
-    status: 'safe',
-    lastActive: '2024-01-08T06:05:00Z'
+    status: 'active now',
+    lastActive: '2025-09-26T06:05:00Z'
   }
 ];

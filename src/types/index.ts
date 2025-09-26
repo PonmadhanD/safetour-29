@@ -14,11 +14,22 @@ declare module "leaflet" {
   ): L.Layer;
 }
 
+export interface EmergencyContact {
+  // Define fields as needed
+  name: string;
+  phone: string;
+}
+
+export interface TravelRecord {
+  // Define fields as needed
+  location: string;
+  timestamp: string;
+}
+
 export interface Tourist {
   id: string;
   name: string;
   email: string;
-  // coordinates: [number, number];
   phone: string;
   digitalId: string;
   isVerified: boolean;
@@ -29,10 +40,10 @@ export interface Tourist {
   };
   emergencyContacts: EmergencyContact[];
   travelHistory: TravelRecord[];
-  status: 'safe' | 'alert' | 'emergency';
+  status: 'active now' | 'active alerts' | 'emergency' | 'resolved today';
   lastActive: string;
+  resolvedAt?: string;
 }
-
 export interface EmergencyContact {
   id: string;
   name: string;
